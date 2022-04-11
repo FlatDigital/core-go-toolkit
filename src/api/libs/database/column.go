@@ -3,9 +3,6 @@ package database
 import (
 	"fmt"
 	"strconv"
-
-	// package imported for mysql driver for database/sql
-	_ "github.com/go-sql-driver/mysql"
 )
 
 // DBColumn it's a column

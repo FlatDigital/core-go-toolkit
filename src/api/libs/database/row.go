@@ -3,9 +3,6 @@ package database
 import (
 	"fmt"
 	"reflect"
-
-	// package imported for mysql driver for database/sql
-	_ "github.com/go-sql-driver/mysql"
 )
 
 // DBRow it's a row

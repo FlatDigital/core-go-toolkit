@@ -10,9 +10,8 @@ import (
 	"strings"
 	"time"
 
-	// package imported for mysql driver for database/sql
 	"github.com/FlatDigital/flat-go-toolkit/src/api/libs/database/converter"
-	"github.com/go-sql-driver/mysql"
+	"github.com/lib/pq"
 )
 
 var (
@@ -89,9 +88,14 @@ const (
 
 // NewService returns a database service interface
 func NewService(config ServiceConfig) (Database, error) {
-	// connection
-	connectionString := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8", config.DBUsername,
-		config.DBPassword, config.DBHost, config.DBName)
+	// connection for MySQL
+	// connectionString := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8", config.DBUsername,
+	// 	config.DBPassword, config.DBHost, config.DBName)
+
+	// connection for Postgress
+	connectionString := fmt.Sprintf("host=%s port=%d user=%s "+
+		"password=%s dbname=%s sslmode=disable",
+		config.DBHost, 5432, config.DBUsername, config.DBPassword, config.DBName)
 	// if config has ConnReadTimeout set, appends readTimeout param
 	if config.ConnReadTimeout != nil {
 		connectionString = fmt.Sprintf("%s&readTimeout=%s", connectionString, config.ConnReadTimeout.String())
@@ -104,7 +108,7 @@ func NewService(config ServiceConfig) (Database, error) {
 	if config.ConnTimeout != nil {
 		connectionString = fmt.Sprintf("%s&timeout=%s", connectionString, config.ConnTimeout.String())
 	}
-	db, err := sql.Open("mysql", connectionString)
+	db, err := sql.Open("postgres", connectionString)
 	db.SetMaxIdleConns(config.MaxIdleConns)
 	db.SetMaxOpenConns(config.MaxOpenConns)
 	connMaxLifetime := config.ConnMaxLifetime * time.Second
@@ -653,9 +657,9 @@ func (service *service) logMetric(logType logType, operation string, detail stri
 	// 	Add("detail", detail)
 
 	if err != nil {
-		mySQLError, ok := err.(*mysql.MySQLError)
-		if ok && mySQLError != nil {
-			// tags = tags.Add("error", fmt.Sprintf("%d", mySQLError.Number))
+		postgresError, ok := err.(*pq.Error)
+		if ok && postgresError != nil {
+			// tags = tags.Add("error", fmt.Sprintf("%s", postgresError.Code))
 		}
 	}
 

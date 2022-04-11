@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/go-sql-driver/mysql"
+	"github.com/lib/pq"
 	"github.com/stretchr/testify/assert"
 
 	sqlmock "github.com/FlatDigital/flat-go-toolkit/src/api/libs/database/mock"
@@ -1770,9 +1770,9 @@ func Test_MySQLError(t *testing.T) {
 	sqlConn := newDBConnMock()
 
 	// when
-	sqlMock.PatchConn(ctx, sqlConn, &mysql.MySQLError{
-		Number:  1234,
-		Message: "mysql-error",
+	sqlMock.PatchConn(ctx, sqlConn, &pq.Error{
+		Code:    pq.ErrorCode("1234"),
+		Message: "postgres-error",
 	})
 	dbCtx, err := service.Connection()
 

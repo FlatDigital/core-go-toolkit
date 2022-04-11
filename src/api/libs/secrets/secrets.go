@@ -19,13 +19,12 @@ var (
 	ErrEmptyValue = errors.New("empty value")
 )
 
+// service struct
+type service struct{}
+
 // NewService returns a kvs service interface
 func NewService() Secrets {
 	return &service{}
-}
-
-// service struct
-type service struct {
 }
 
 // Get returns a secret

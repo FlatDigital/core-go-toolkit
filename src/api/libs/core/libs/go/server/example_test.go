@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/FlatDigital/flat-go-toolkit/src/api/libs/server"
+	"github.com/FlatDigital/flat-go-toolkit/src/api/libs/core/libs/go/server"
 	"github.com/gin-gonic/gin"
 )
 

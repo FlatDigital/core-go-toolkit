@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/FlatDigital/flat-go-toolkit/src/api/libs/logger"
+	"github.com/FlatDigital/flat-go-toolkit/src/api/libs/core/libs/go/logger"
 	"github.com/gin-gonic/gin"
 
 	newrelic "github.com/newrelic/go-agent"
@@ -119,6 +119,12 @@ var (
 	ForbiddenApiError = ErrorCode{
 		Status:    http.StatusForbidden,
 		Literal:   "ForbiddenApiError",
+		Alertable: false,
+	}
+
+	UnavailableForLegalReasonsError = ErrorCode{
+		Status:    http.StatusUnavailableForLegalReasons,
+		Literal:   "UnavailableForLegalReasonsError",
 		Alertable: false,
 	}
 )

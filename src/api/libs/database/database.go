@@ -96,17 +96,21 @@ func NewService(config ServiceConfig) (Database, error) {
 	connectionString := fmt.Sprintf("host=%s port=%d user=%s "+
 		"password=%s dbname=%s sslmode=disable",
 		config.DBHost, 5432, config.DBUsername, config.DBPassword, config.DBName)
+
+	// DOC: https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-CONNSTRING
+	// pq dsn not support read_timeout & write_timeout
+
 	// if config has ConnReadTimeout set, appends readTimeout param
-	if config.ConnReadTimeout != nil {
-		connectionString = fmt.Sprintf("%s&readTimeout=%s", connectionString, config.ConnReadTimeout.String())
-	}
-	// if config has ConnWriteTimeout set, appends writeTimeout param
-	if config.ConnWriteTimeout != nil {
-		connectionString = fmt.Sprintf("%s&writeTimeout=%s", connectionString, config.ConnWriteTimeout.String())
-	}
-	// if config has ConnTimeout set, appends timeout param
+	// if config.ConnReadTimeout != nil {
+	// 	connectionString = fmt.Sprintf("%s read_timeout=%v", connectionString, config.ConnReadTimeout.Seconds())
+	// }
+	// // // if config has ConnWriteTimeout set, appends writeTimeout param
+	// if config.ConnWriteTimeout != nil {
+	// 	connectionString = fmt.Sprintf("%s write_timeout=%v", connectionString, config.ConnWriteTimeout.Seconds())
+	// }
+	// // if config has ConnTimeout set, appends timeout param
 	if config.ConnTimeout != nil {
-		connectionString = fmt.Sprintf("%s&timeout=%s", connectionString, config.ConnTimeout.String())
+		connectionString = fmt.Sprintf("%s connect_timeout=%v", connectionString, config.ConnTimeout.Seconds())
 	}
 	db, err := sql.Open("postgres", connectionString)
 	db.SetMaxIdleConns(config.MaxIdleConns)

@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/FlatDigital/flat-go-toolkit/src/api/libs/apierror"
 	"github.com/gin-gonic/gin"
 	"github.com/go-resty/resty/v2"
 )
@@ -69,7 +68,6 @@ func (service *restyService) MakeGetRequest(ctx *gin.Context, url string, header
 	var r *resty.Response
 	req := service.restyClient.R()
 	req.SetHeaderMultiValues(headers)
-	req.SetError(&apierror.APIError{})
 
 	r, err := req.Get(url)
 
@@ -80,7 +78,7 @@ func (service *restyService) MakeGetRequest(ctx *gin.Context, url string, header
 
 	if r.StatusCode() != http.StatusOK {
 		// returns API error
-		return r.StatusCode(), r.Body(), apierror.New(r.StatusCode(), "Status code was not 200")
+		return r.StatusCode(), r.Body(), err
 	}
 
 	return r.StatusCode(), r.Body(), nil
@@ -88,32 +86,26 @@ func (service *restyService) MakeGetRequest(ctx *gin.Context, url string, header
 
 func (service *restyService) MakePostRequest(ctx *gin.Context, url string, body interface{}, headers http.Header) (int, []byte, error) {
 	var r *resty.Response
-	req := service.restyClient.NewRequest()
+	req := service.restyClient.R()
 	req.SetHeaderMultiValues(headers)
-	req.SetError(&apierror.APIError{})
 
 	r, err := req.Post(url)
 
 	if err != nil {
-		// returns API error
 		return r.StatusCode(), r.Body(), err
 	}
 
 	if r.StatusCode() != http.StatusOK {
-		// returns API error
-		return r.StatusCode(), r.Body(), apierror.New(r.StatusCode(), "Status code was not 200")
+		return r.StatusCode(), r.Body(), err
 	}
-
-	// if err = json.Unmarshal(r.Body(), v); err != nil {
-	// 	// returns API error
-	// 	return r.StatusCode(), r.Body(), apierror.New(500, "Unmarshal error")
-	// }
 
 	return r.StatusCode(), r.Body(), nil
 }
+
 func (service *restyService) MakePutRequest(ctx *gin.Context, url string, body interface{}, headers http.Header) (int, []byte, error) {
 	return 0, []byte{}, nil
 }
+
 func (service *restyService) MakeDeleteRequest(ctx *gin.Context, url string, headers http.Header) (int, []byte, error) {
 	return 0, []byte{}, nil
 }

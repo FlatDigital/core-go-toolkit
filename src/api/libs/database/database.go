@@ -133,6 +133,7 @@ func NewService(config ServiceConfig) (Database, error) {
 		metricPrefix = os.Getenv("APPLICATION")
 	}
 
+	fmt.Println("connectionString", connectionString)
 	sqllib := converter.SQLToDBer(db)
 
 	// make the service

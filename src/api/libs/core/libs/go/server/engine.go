@@ -4,6 +4,8 @@ import (
 	"fmt"
 
 	"github.com/gin-gonic/gin"
+	gintrace "gopkg.in/DataDog/dd-trace-go.v1/contrib/gin-gonic/gin"
+	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/tracer"
 )
 
 // GroupPreffix is the preffix added to every exposed url
@@ -45,6 +47,9 @@ type Server struct {
 // RoutingGroup (exposed urls mapped to a valid Role) and accepts a list of options for
 // specifying configuration options outside of the defaults for a given environment.
 func NewEngine(scope string, routes RoutingGroup, opts ...Opt) (*Server, error) {
+	tracer.Start()
+	defer tracer.Stop()
+
 	// Infer application context from fury scope
 	ctx, err := ContextFromScopeString(scope)
 	if err != nil {
@@ -94,6 +99,7 @@ func NewEngine(scope string, routes RoutingGroup, opts ...Opt) (*Server, error) 
 	// Call the current Role group function with the current group as param
 	// so that it loads the active urls.
 	group := server.Group(GroupPreffix)
+	group.Use(gintrace.Middleware("property-listings-api"))
 
 	// group.Use(ginrequestid.RequestId())
 

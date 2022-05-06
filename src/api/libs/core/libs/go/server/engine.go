@@ -47,7 +47,9 @@ type Server struct {
 // RoutingGroup (exposed urls mapped to a valid Role) and accepts a list of options for
 // specifying configuration options outside of the defaults for a given environment.
 func NewEngine(scope string, routes RoutingGroup, opts ...Opt) (*Server, error) {
-	tracer.Start()
+	tracer.Start(
+		tracer.WithAgentAddr("datadog-agent:8126"),
+	)
 	defer tracer.Stop()
 
 	// Infer application context from fury scope

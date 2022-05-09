@@ -103,11 +103,40 @@ func (service *restyService) MakePostRequest(ctx *gin.Context, url string, body 
 }
 
 func (service *restyService) MakePutRequest(ctx *gin.Context, url string, body interface{}, headers http.Header) (int, []byte, error) {
-	return 0, []byte{}, nil
+	var r *resty.Response
+	req := service.restyClient.R()
+	req.SetHeaderMultiValues(headers)
+	req.SetBody(body)
+
+	r, err := req.Put(url)
+
+	if err != nil {
+		return r.StatusCode(), r.Body(), err
+	}
+
+	if r.StatusCode() != http.StatusOK {
+		return r.StatusCode(), r.Body(), err
+	}
+
+	return r.StatusCode(), r.Body(), nil
 }
 
 func (service *restyService) MakeDeleteRequest(ctx *gin.Context, url string, headers http.Header) (int, []byte, error) {
-	return 0, []byte{}, nil
+	var r *resty.Response
+	req := service.restyClient.R()
+	req.SetHeaderMultiValues(headers)
+
+	r, err := req.Delete(url)
+
+	if err != nil {
+		return r.StatusCode(), r.Body(), err
+	}
+
+	if r.StatusCode() != http.StatusOK {
+		return r.StatusCode(), r.Body(), err
+	}
+
+	return r.StatusCode(), r.Body(), nil
 }
 
 func (service *restyService) MakeGetRequestWithConfig(ctx *gin.Context, url string, headers http.Header, config RequestConfig) (int, []byte, error) {

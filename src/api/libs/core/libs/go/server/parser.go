@@ -5,9 +5,8 @@ import (
 	"strings"
 )
 
-// ContextFromScopeString parses the fury scope to get the execution context (environment)
 // Scope format must be: {environment}-{app role}[-{app name}]
-// For example: test-search, develop-indexer, production-indexer-feature-new-context
+// For example: develop-read, production-read-feature-new-context
 func ContextFromScopeString(scope string) (ApplicationContext, error) {
 	parts := strings.SplitN(strings.ToLower(scope), "-", 3)
 
@@ -18,7 +17,7 @@ func ContextFromScopeString(scope string) (ApplicationContext, error) {
 
 	env, role := Environment(parts[0]), Role(parts[1])
 
-	// If fury scope has a 3rd part, then we use that as some kind of tag for the application
+	// If scope has a 3rd part, then we use that as some kind of tag for the application
 	// Eg.:  We might use this tag for running a specific branch from the git repository.
 	var tag string
 	if len(parts) == 3 {

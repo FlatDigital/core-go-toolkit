@@ -1,17 +1,20 @@
 package server_test
 
 import (
-	"fmt"
 	"log"
+	"testing"
 
 	"github.com/FlatDigital/flat-go-toolkit/src/api/libs/core/libs/go/server"
 	"github.com/gin-gonic/gin"
+	"github.com/stretchr/testify/assert"
 )
 
-func ExampleNewEngine() {
+func Test_ExampleNewEngine(t *testing.T) {
+	ass := assert.New(t)
+
 	routes := server.RoutingGroup{
-		server.RoleIndexer: func(g *gin.RouterGroup) {
-			g.POST("/indexer", func(c *gin.Context) {})
+		server.RoleRead: func(g *gin.RouterGroup) {
+			g.GET("/read", func(c *gin.Context) {})
 		},
 		server.RoleWrite: func(g *gin.RouterGroup) {
 			g.POST("/writer", func(c *gin.Context) {})
@@ -19,7 +22,7 @@ func ExampleNewEngine() {
 	}
 
 	srv, err := server.NewEngine(
-		"test-indexer-feature-branch",
+		"test-read-feature-branch",
 		routes,
 
 		// Optional configuration override
@@ -31,10 +34,7 @@ func ExampleNewEngine() {
 		log.Fatal(err)
 	}
 
-	fmt.Printf("Env: %s, Role: %s, Tag: %s", srv.Context.Environment, srv.Context.Role, srv.Context.Tag)
-
-	//
-	// srv.Run(":8080")
-
-	//output: Env: test, Role: indexer, Tag: feature-branch
+	ass.Equal(server.EnvTest, srv.Context.Environment)
+	ass.Equal(server.RoleRead, srv.Context.Role)
+	ass.Equal("feature-branch", srv.Context.Tag)
 }

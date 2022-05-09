@@ -9,10 +9,8 @@ import (
 	"github.com/FlatDigital/flat-go-toolkit/src/api/libs/core/gk"
 	"github.com/FlatDigital/flat-go-toolkit/src/api/libs/core/libs/go/logger"
 	"github.com/gin-gonic/gin"
-	newrelic "github.com/newrelic/go-agent"
 	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 func TestHandler(t *testing.T) {
@@ -39,12 +37,6 @@ func TestHandler(t *testing.T) {
 		assert.NotNil(t, ctx.Log)
 		assert.IsType(t, &logger.Logger{}, ctx.Log)
 
-		assert.Implements(t, (*gk.Measurable)(nil), ctx)
-
-		// Dummy calls to simple methods to increase coverage
-		require.NoError(t, ctx.StartSegment("test segment").End())
-		require.NoError(t, ctx.StartExternalSegment("test external segment").End())
-		require.NoError(t, ctx.DatastoreSegment(newrelic.DatastoreCassandra, "test-collection", gk.Select).End())
 		ctx.NoticeError(fmt.Errorf("Test error"))
 	})(c)
 }

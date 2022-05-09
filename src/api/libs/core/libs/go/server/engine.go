@@ -21,11 +21,10 @@ type settings struct {
 
 // Map with default server settings for each possible scope.
 var envSettings = map[Environment]settings{
-	EnvDevelop:     {LogLevel: "DEBUG", PushMetrics: true, Debug: true, AuthScopes: nil},
-	EnvTest:        {LogLevel: "INFO", PushMetrics: true, Debug: true, AuthScopes: nil},
-	EnvIntegration: {LogLevel: "INFO", PushMetrics: false, Debug: true, AuthScopes: nil},
-	EnvProduction:  {LogLevel: "INFO", PushMetrics: true, Debug: false, AuthScopes: nil},
-	EnvSandbox:     {LogLevel: "INFO", PushMetrics: true, Debug: false, AuthScopes: nil},
+	EnvDevelop:    {LogLevel: "DEBUG", PushMetrics: true, Debug: true, AuthScopes: nil},
+	EnvTest:       {LogLevel: "INFO", PushMetrics: true, Debug: true, AuthScopes: nil},
+	EnvProduction: {LogLevel: "INFO", PushMetrics: true, Debug: false, AuthScopes: nil},
+	EnvSandbox:    {LogLevel: "INFO", PushMetrics: true, Debug: false, AuthScopes: nil},
 }
 
 // RoutingGroup is a map of urls and functions for a given role.
@@ -43,19 +42,21 @@ type Server struct {
 	settings settings
 }
 
-// NewEngine configures the underlying gin.Engine struct of Server with a given fury scope, a
+// NewEngine configures the underlying gin.Engine struct of Server with a given scope, a
 // RoutingGroup (exposed urls mapped to a valid Role) and accepts a list of options for
 // specifying configuration options outside of the defaults for a given environment.
 func NewEngine(scope string, routes RoutingGroup, opts ...Opt) (*Server, error) {
+
+	// Tracer is used to send metrics to Datadog
 	tracer.Start(
-		tracer.WithAgentAddr("datadog-agent:8126"),
+	// tracer.WithAgentAddr("datadog-agent:8126"),
 	)
 	defer tracer.Stop()
 
-	// Infer application context from fury scope
+	// Infer application context from scope
 	ctx, err := ContextFromScopeString(scope)
 	if err != nil {
-		return nil, fmt.Errorf("error infering context from fury scope: %v", err)
+		return nil, fmt.Errorf("error infering context from scope: %v", err)
 	}
 
 	// Check if the given routes are valid for the current application role
@@ -106,21 +107,7 @@ func NewEngine(scope string, routes RoutingGroup, opts ...Opt) (*Server, error) 
 	// group.Use(ginrequestid.RequestId())
 
 	if server.settings.PushMetrics {
-		// group.Use(mlhandlers.NewRelic())
-		// group.Use(mlhandlers.Datadog())
-		// group.Use(RenameNewRelicTransaction())
-	}
-
-	// Add authentication middleware, but only if not on indexer role.
-	// When on indexer role, requests are being called by BigQ, and in this
-	// scenario there's not authentication present (no caller ID nor scopes).
-	// If this middleware is run under this conditions, all requests would fail.
-	if ctx.Role != RoleIndexer && ctx.Role != RoleWorker && ctx.Role != RoleMiddleEnd {
-		if auth := server.settings.AuthScopes; auth != nil {
-			// group.Use(mlhandlers.MLAuth(auth))
-		}
-
-		// group.Use(Auth())
+		// group.Use(...)
 	}
 
 	// Add support for test header used by API rules to all endpoints

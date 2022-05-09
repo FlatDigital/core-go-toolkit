@@ -14,21 +14,20 @@ func TestContextFromScopeString(t *testing.T) {
 		ExpectedTag   string
 		ExpectedErr   bool
 	}{
-		{"production-indexer", server.RoleIndexer, server.EnvProduction, "", false},
-		{"sandbox-indexer", server.RoleIndexer, server.EnvSandbox, "", false},
-		{"develop-indexer", server.RoleIndexer, server.EnvDevelop, "", false},
-		{"integration-indexer", server.RoleIndexer, server.EnvIntegration, "", false},
-		{"test-indexer", server.RoleIndexer, server.EnvTest, "", false},
+		{"production-read", server.RoleRead, server.EnvProduction, "", false},
+		{"sandbox-read", server.RoleRead, server.EnvSandbox, "", false},
+		{"develop-read", server.RoleRead, server.EnvDevelop, "", false},
+		{"test-read", server.RoleRead, server.EnvTest, "", false},
 
-		{"production-indexer-tag", server.RoleIndexer, server.EnvProduction, "tag", false},
-		{"production-indexer-feature-new-search", server.RoleIndexer, server.EnvProduction, "feature-new-search", false},
+		{"production-read-tag", server.RoleRead, server.EnvProduction, "tag", false},
+		{"production-read-feature-new-search", server.RoleRead, server.EnvProduction, "feature-new-search", false},
 
-		{"custom-indexer", server.RoleIndexer, server.Environment("custom"), "", false},
-		{"custom-indexer-appname", server.RoleIndexer, server.Environment("custom"), "appname", false},
+		{"custom-read", server.RoleRead, server.Environment("custom"), "", false},
+		{"custom-read-appname", server.RoleRead, server.Environment("custom"), "appname", false},
 		{"test-custom", server.Role("custom"), server.EnvTest, "", false},
 		{"test-custom-appname", server.Role("custom"), server.EnvTest, "appname", false},
 
-		{"invalid", server.RoleIndexer, server.EnvTest, "", true},
+		{"invalid", server.RoleRead, server.EnvTest, "", true},
 	}
 
 	for _, tc := range tt {

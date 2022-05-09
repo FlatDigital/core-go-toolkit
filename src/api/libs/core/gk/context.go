@@ -15,20 +15,6 @@ import (
 	"github.com/FlatDigital/flat-go-toolkit/src/api/libs/core/libs/go/logger"
 )
 
-// Measurable is the interface of the exposed methods used for measuring
-// code execution time and reporting errors.
-type Measurable interface {
-	StartSegment(name string) Segment
-	StartExternalSegment(url string) Segment
-	NoticeError(err error)
-}
-
-// Segment interfaces exposes available methods for all
-// StartXXX functions resulting segments.
-type Segment interface {
-	End() error
-}
-
 // Caller is the type that contains the information inside a request that
 // represents the user that generated it.
 type Caller struct {
@@ -65,20 +51,6 @@ func Handler(f HandlerFunc) gin.HandlerFunc {
 	}
 }
 
-// StartSegment makes it easy to instrument segments.
-// After starting a segment do `defer segment.End()`
-func (c *Context) StartSegment(name string) Segment {
-	return newrelic.StartSegment(c.NrTransaction, name)
-}
-
-// StartExternalSegment makes it easy to instrument segments that call external services.
-func (c *Context) StartExternalSegment(url string) Segment {
-	return &newrelic.ExternalSegment{
-		URL:       url,
-		StartTime: newrelic.StartSegmentNow(c.NrTransaction),
-	}
-}
-
 // NoticeError records an error.  The first five errors per transaction are recorded.
 func (c *Context) NoticeError(err error) {
 	if c.NrTransaction == nil {
@@ -86,16 +58,6 @@ func (c *Context) NoticeError(err error) {
 	}
 
 	c.NrTransaction.NoticeError(err)
-}
-
-// DatastoreSegment records a segment pertaining an operation with a datastore
-func (c *Context) DatastoreSegment(db newrelic.DatastoreProduct, collection string, operation DBOperation) Segment {
-	return &newrelic.DatastoreSegment{
-		StartTime:  newrelic.StartSegmentNow(c.NrTransaction),
-		Product:    db,
-		Collection: collection,
-		Operation:  string(operation),
-	}
 }
 
 // CreateTestContext returns a MPCS Context ready to use for testing purposes. The

@@ -3,6 +3,7 @@ package server
 import (
 	"fmt"
 
+	"github.com/atarantini/ginrequestid"
 	"github.com/gin-gonic/gin"
 	gintrace "gopkg.in/DataDog/dd-trace-go.v1/contrib/gin-gonic/gin"
 	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/tracer"
@@ -106,7 +107,7 @@ func NewEngine(scope string, routes RoutingGroup, opts ...Opt) (*Server, error) 
 	group := server.Group(GroupPreffix)
 	group.Use(gintrace.Middleware("property-listings-api"))
 
-	// group.Use(ginrequestid.RequestId())
+	group.Use(ginrequestid.RequestId())
 
 	if server.settings.PushMetrics {
 		// group.Use(...)

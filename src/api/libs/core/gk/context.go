@@ -8,8 +8,6 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	newrelic "github.com/newrelic/go-agent"
-	"github.com/newrelic/go-agent/_integrations/nrgin/v1"
 	uuid "github.com/satori/go.uuid"
 
 	"github.com/FlatDigital/flat-go-toolkit/src/api/libs/core/libs/go/logger"
@@ -26,13 +24,10 @@ type Caller struct {
 
 // Context contains all the resources we use during a given request
 type Context struct {
-	ClientID            string
-	Caller              Caller
-	RequestID           string
-	Log                 *logger.Logger
-	TraceabilityHeaders http.Header
-
-	NrTransaction newrelic.Transaction
+	ClientID  string
+	Caller    Caller
+	RequestID string
+	Log       *logger.Logger
 }
 
 // HandlerFunc defines the signature of our http handlers
@@ -51,20 +46,11 @@ func Handler(f HandlerFunc) gin.HandlerFunc {
 	}
 }
 
-// NoticeError records an error.  The first five errors per transaction are recorded.
-func (c *Context) NoticeError(err error) {
-	if c.NrTransaction == nil {
-		return
-	}
-
-	c.NrTransaction.NoticeError(err)
-}
-
 // CreateTestContext returns a MPCS Context ready to use for testing purposes. The
 // context is only populated with a functioning logger and a valid request id.
 // If more information is required, then the user should add it in its end.
 func CreateTestContext() *Context {
-	reqID := uuid.NewV4()
+	reqID, _ := uuid.NewV4()
 
 	return &Context{
 		RequestID: reqID.String(),
@@ -96,17 +82,8 @@ func TransformGinContextToGK(c *gin.Context, callerName string) *Context {
 		Log: &logger.Logger{
 			Attributes: logger.Attrs{"request_id": reqID},
 		},
-		NrTransaction: nrgin.Transaction(c),
 	}
 
-	// Rename NewRelic transaction name to the name of the function that's being
-	// wrapped by our context.
-	if context.NrTransaction != nil {
-		splitURL := strings.Split(callerName, "/")
-		if len(splitURL) > 0 {
-			context.NrTransaction.SetName(splitURL[len(splitURL)-1])
-		}
-	}
 	return context
 }
 

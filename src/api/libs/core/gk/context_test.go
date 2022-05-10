@@ -1,7 +1,6 @@
 package gk_test
 
 import (
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -14,7 +13,7 @@ import (
 )
 
 func TestHandler(t *testing.T) {
-	uuid := uuid.NewV4()
+	uuid, _ := uuid.NewV4()
 	reqID := uuid.String()
 
 	rr := httptest.NewRecorder()
@@ -36,8 +35,6 @@ func TestHandler(t *testing.T) {
 
 		assert.NotNil(t, ctx.Log)
 		assert.IsType(t, &logger.Logger{}, ctx.Log)
-
-		ctx.NoticeError(fmt.Errorf("Test error"))
 	})(c)
 }
 

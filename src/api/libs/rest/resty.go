@@ -9,18 +9,6 @@ import (
 	"github.com/go-resty/resty/v2"
 )
 
-var (
-// DefaultDialTimeout is the max interval of time the dialer will wait when
-// executing the TCP handshake before returning a timeout error.
-//
-// This value is known and fixed within the internal network.
-// DefaultDialTimeout = 300 * time.Millisecond
-
-// DefaultKeepAliveProbeInterval is the interval at which the dialer sets the
-// KeepAlive probe packet to be sent to assert the state of the connection.
-// DefaultKeepAliveProbeInterval = 15 * time.Second
-)
-
 type restyService struct {
 	restyClient *resty.Client
 }
@@ -77,12 +65,10 @@ func (service *restyService) MakeGetRequest(ctx *gin.Context, url string, header
 	r, err := req.Get(url)
 
 	if err != nil {
-		// returns API error
 		return r.StatusCode(), r.Body(), err
 	}
 
 	if r.StatusCode() != http.StatusOK {
-		// returns API error
 		return r.StatusCode(), r.Body(), err
 	}
 
@@ -145,7 +131,24 @@ func (service *restyService) MakeDeleteRequest(ctx *gin.Context, url string, hea
 }
 
 func (service *restyService) MakeGetRequestWithConfig(ctx *gin.Context, url string, headers http.Header, config RequestConfig) (int, []byte, error) {
-	return 0, []byte{}, nil
+	client := service.restyClient
+	client.SetTimeout(config.Timeout)
+
+	var r *resty.Response
+	req := service.restyClient.R()
+	req.SetHeaderMultiValues(headers)
+
+	r, err := req.Get(url)
+
+	if err != nil {
+		return r.StatusCode(), r.Body(), err
+	}
+
+	if r.StatusCode() != http.StatusOK {
+		return r.StatusCode(), r.Body(), err
+	}
+
+	return r.StatusCode(), r.Body(), nil
 }
 
 func (service *restyService) MakePostRequestWithConfig(ctx *gin.Context, url string, body interface{}, headers http.Header, config RequestConfig) (int, []byte, error) {

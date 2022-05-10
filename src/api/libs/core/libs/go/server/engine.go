@@ -49,7 +49,7 @@ func NewEngine(scope string, routes RoutingGroup, opts ...Opt) (*Server, error) 
 
 	// Tracer is used to send metrics to Datadog
 	tracer.Start(
-	// tracer.WithAgentAddr("datadog-agent:8126"),
+		tracer.WithDogstatsdAddress("datadog-agent:8126"),
 	)
 	defer tracer.Stop()
 

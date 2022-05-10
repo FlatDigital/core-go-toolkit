@@ -104,10 +104,12 @@ func NewService(config ServiceConfig) (Database, error) {
 	// if config.ConnReadTimeout != nil {
 	// 	connectionString = fmt.Sprintf("%s read_timeout=%v", connectionString, config.ConnReadTimeout.Seconds())
 	// }
+
 	// // // if config has ConnWriteTimeout set, appends writeTimeout param
 	// if config.ConnWriteTimeout != nil {
 	// 	connectionString = fmt.Sprintf("%s write_timeout=%v", connectionString, config.ConnWriteTimeout.Seconds())
 	// }
+
 	// // if config has ConnTimeout set, appends timeout param
 	if config.ConnTimeout != nil {
 		connectionString = fmt.Sprintf("%s connect_timeout=%v", connectionString, config.ConnTimeout.Seconds())

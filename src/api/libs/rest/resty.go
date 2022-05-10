@@ -37,27 +37,32 @@ func NewRestyServiceWithConfig(config ServiceConfig) Rest {
 
 	dialer := &net.Dialer{
 		Timeout: rConfig.ConnectTimeout,
-		// KeepAlive: DefaultKeepAliveProbeInterval,
-		// DualStack: true,
 	}
 
 	transport := &http.Transport{
-		DialContext: dialer.DialContext,
-		// ForceAttemptHTTP2:     true,
-		// IdleConnTimeout:       90 * time.Second,
-		// MaxIdleConnsPerHost:   500,
-		// Proxy:                 http.ProxyFromEnvironment,
-		// ExpectContinueTimeout: 1 * time.Second,
-		// TLSHandshakeTimeout:   10 * time.Second,
+		DialContext:         dialer.DialContext,
+		MaxIdleConnsPerHost: config.MaxIdleConnsPerHost,
 	}
 
 	restyClient := resty.New()
 	restyClient.
-		// Set client timeout as per your need
-		SetTimeout(rConfig.Timeout).
-		// Set retry count to non zero to enable retries
-		SetRetryCount(3).
+		// Overrode default transport layer
 		SetTransport(transport)
+
+		// TODO: Add values to RequestConfig to support the following methods
+
+		// SetRetryCount(3).
+		// SetRetryWaitTime(100 * time.Millisecond).
+		// SetRetryMaxWaitTime(2 * time.Second).
+		// SetRetryAfter(nil).
+		// AddRetryCondition(nil).
+		// AddRetryAfterErrorCondition().
+		// AddRetryHook(nil).
+
+	if !rConfig.DisableTimeout {
+		// Set client timeout as per your need
+		restyClient.SetTimeout(rConfig.Timeout)
+	}
 
 	return &restyService{
 		restyClient: restyClient,

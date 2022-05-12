@@ -157,14 +157,3 @@ func WithDebug(debug bool) Opt {
 		s.settings.Debug = debug
 	}
 }
-
-// WithJSONSchemaDir func reads the given directory, and initializes
-// gordik's jsonschema package with support for all .json schema
-// definitions found in there.
-// func WithJSONSchemaDir(path string) Opt {
-// 	return func(s *Server) {
-// 		if err := jsonschema.AddSchemaDir(path); err != nil {
-// 			panic(err)
-// 		}
-// 	}
-// }

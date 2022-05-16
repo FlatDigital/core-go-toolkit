@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	sqlmock "github.com/FlatDigital/flat-go-toolkit/src/api/libs/database/mock"
+	sqlmock "github.com/FlatDigital/core-go-toolkit/src/api/libs/database/mock"
 )
 
 func Test_Rows_PatchColumns_Success(t *testing.T) {

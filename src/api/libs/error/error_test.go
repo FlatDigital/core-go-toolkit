@@ -6,7 +6,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/FlatDigital/flat-go-toolkit/src/api/libs/error"
+	"github.com/FlatDigital/core-go-toolkit/src/api/libs/error"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 )

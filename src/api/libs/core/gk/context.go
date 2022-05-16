@@ -10,7 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 	uuid "github.com/satori/go.uuid"
 
-	"github.com/FlatDigital/flat-go-toolkit/src/api/libs/core/libs/go/logger"
+	"github.com/FlatDigital/core-go-toolkit/src/api/libs/core/libs/go/logger"
 )
 
 // Caller is the type that contains the information inside a request that

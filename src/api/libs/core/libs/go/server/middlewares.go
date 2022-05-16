@@ -4,7 +4,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/FlatDigital/flat-go-toolkit/src/api/libs/core/libs/go/errors"
+	"github.com/FlatDigital/core-go-toolkit/src/api/libs/core/libs/go/errors"
 	"github.com/gin-gonic/gin"
 	"github.com/newrelic/go-agent/_integrations/nrgin/v1"
 )

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/FlatDigital/flat-go-toolkit/src/api/libs/database"
+	"github.com/FlatDigital/core-go-toolkit/src/api/libs/database"
 	"github.com/stretchr/testify/assert"
 )
 

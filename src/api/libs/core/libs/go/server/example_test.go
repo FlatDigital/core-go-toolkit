@@ -4,7 +4,7 @@ import (
 	"log"
 	"testing"
 
-	"github.com/FlatDigital/flat-go-toolkit/src/api/libs/core/libs/go/server"
+	"github.com/FlatDigital/core-go-toolkit/src/api/libs/core/libs/go/server"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 )

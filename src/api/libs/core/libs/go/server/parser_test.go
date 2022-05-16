@@ -3,7 +3,7 @@ package server_test
 import (
 	"testing"
 
-	"github.com/FlatDigital/flat-go-toolkit/src/api/libs/core/libs/go/server"
+	"github.com/FlatDigital/core-go-toolkit/src/api/libs/core/libs/go/server"
 )
 
 func TestContextFromScopeString(t *testing.T) {

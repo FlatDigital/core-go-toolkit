@@ -5,8 +5,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	// gkErrors "github.com/FlatDigital/flat-go-toolkit/src/api/libs/core/libs/go/errors"
-	gkErrors "github.com/FlatDigital/flat-go-toolkit/src/api/libs/core/libs/go/errors"
+	// gkErrors "github.com/FlatDigital/core-go-toolkit/src/api/libs/core/libs/go/errors"
+	gkErrors "github.com/FlatDigital/core-go-toolkit/src/api/libs/core/libs/go/errors"
 )
 
 // BadGateway (502)

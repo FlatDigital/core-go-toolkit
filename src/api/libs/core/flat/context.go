@@ -1,4 +1,4 @@
-package gk
+package flat
 
 import (
 	"net/http"

@@ -1,11 +1,11 @@
-package gk_test
+package flat_test
 
 import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	"github.com/FlatDigital/core-go-toolkit/src/api/libs/core/gk"
+	"github.com/FlatDigital/core-go-toolkit/src/api/libs/core/flat"
 	"github.com/FlatDigital/core-go-toolkit/src/api/libs/core/libs/go/logger"
 	"github.com/gin-gonic/gin"
 	uuid "github.com/satori/go.uuid"
@@ -27,7 +27,7 @@ func TestHandler(t *testing.T) {
 	c.Request.Header.Set("X-Caller-Scopes", "admin")
 	c.Request.Header.Set("X-Public", "true")
 
-	gk.Handler(func(c *gin.Context, ctx *gk.Context) {
+	flat.Handler(func(c *gin.Context, ctx *flat.Context) {
 		assert.EqualValues(t, reqID, ctx.RequestID)
 		assert.EqualValues(t, 120120120, ctx.Caller.ID)
 		assert.EqualValues(t, true, ctx.Caller.IsAdmin)
@@ -40,5 +40,5 @@ func TestHandler(t *testing.T) {
 
 func TestCreateTestContext(t *testing.T) {
 	// This test is really unnecessary, but we do it as to not to penalize our code coverage
-	gk.CreateTestContext()
+	flat.CreateTestContext()
 }

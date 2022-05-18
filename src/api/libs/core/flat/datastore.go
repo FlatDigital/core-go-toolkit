@@ -1,4 +1,4 @@
-package gk
+package flat
 
 // DBOperation are the available operation we can do to a Datastore
 type DBOperation string

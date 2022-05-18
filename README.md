@@ -79,7 +79,7 @@ The flat context gives you typed access to request data, and a configured logger
 
 Import and use it.
 
-```
+```go
 import (
  "github.com/gin-gonic/gin"
  "net/http"

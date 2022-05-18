@@ -101,24 +101,30 @@ func Ping(c *gin.Context) {
 
 Methods
 
-`LoggerWithName(c *gin.Context, name string) *Logger`
+```go
+LoggerWithName(c *gin.Context, name string) *Logger 
+```
 
 Returns a logger pointer with gin context information. The name is used for more information.
 
-`(l *Logger) LogWithLevel(level string, event string, attrs ...Attrs) *Logger`
+```go
+(l *Logger) LogWithLevel(level string, event string, attrs ...Attrs) *Logger 
+```
 
 Basic log method. Level `INFO`, `DEBUG`, `WARN` or `ERROR`, and an event are required.
 Optional attrs of type `Attrs - map[string]interface{}` can be passed.
 
 Direct methods for each level are provided.
 
-`(l *Logger) Debug(event string, attrs ...Attrs) *Logger`
+```go
+(l *Logger) Debug(event string, attrs ...Attrs) *Logger
 
-`(l *Logger) Error(event string, attrs ...Attrs) *Logger`
+(l *Logger) Error(event string, attrs ...Attrs) *Logger
 
-`(l *Logger) Warning(event string, attrs ...Attrs) *Logger`
+(l *Logger) Warning(event string, attrs ...Attrs) *Logger
 
-`(l *Logger) Info(event string, attrs ...Attrs) *Logger`
+(l *Logger) Info(event string, attrs ...Attrs) *Logger
+```
 
 ### Functionality needed for initializing a web server
 
@@ -428,7 +434,7 @@ if scope == "" || err != nil {
 ## Execute test with coverage
 
 ``` sh
-    go test -cover ./... 
+  go test -cover ./... 
 ```
 
 <p align="right">(<a href="#top">back to top</a>)</p>

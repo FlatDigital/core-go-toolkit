@@ -50,7 +50,7 @@ func NewEngine(scope string, routes RoutingGroup, opts ...Opt) (*Server, error) 
 
 	// Tracer is used to send metrics to Datadog
 	tracer.Start(
-		tracer.WithDogstatsdAddress("datadog:8126"),
+		tracer.WithDogstatsdAddress("datadog:8125"),
 		tracer.WithRuntimeMetrics(),
 		tracer.WithAgentAddr("datadog:8126"),
 	)

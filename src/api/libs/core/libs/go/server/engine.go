@@ -54,7 +54,6 @@ func NewEngine(scope string, routes RoutingGroup, opts ...Opt) (*Server, error) 
 		tracer.WithRuntimeMetrics(),
 		tracer.WithAgentAddr("datadog:8126"),
 	)
-	defer tracer.Stop()
 
 	// Infer application context from scope
 	ctx, err := ContextFromScopeString(scope)

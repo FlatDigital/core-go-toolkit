@@ -102,10 +102,12 @@ func NewEngine(scope string, routes RoutingGroup, opts ...Opt) (*Server, error) 
 	// Setup health check handler
 	server.GET("/ping", HealthCheckHandler)
 
+	// Using gintrace middleware for datadog tracing
+	server.Use(gintrace.Middleware("property-listings-api"))
+
 	// Call the current Role group function with the current group as param
 	// so that it loads the active urls.
 	group := server.Group(GroupPreffix)
-	group.Use(gintrace.Middleware("property-listings-api"))
 
 	group.Use(ginrequestid.RequestId())
 

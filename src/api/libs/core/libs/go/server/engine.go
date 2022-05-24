@@ -18,6 +18,7 @@ type settings struct {
 	PushMetrics bool
 	Debug       bool
 	AuthScopes  []string
+	AppName     string
 }
 
 // Map with default server settings for each possible scope.
@@ -102,17 +103,15 @@ func NewEngine(scope string, routes RoutingGroup, opts ...Opt) (*Server, error) 
 	server.GET("/ping", HealthCheckHandler)
 
 	// Using gintrace middleware for datadog tracing
-	server.Use(gintrace.Middleware("property-listings-api"))
+	if len(server.settings.AppName) != 0 {
+		server.Use(gintrace.Middleware(server.settings.AppName))
+	}
 
 	// Call the current Role group function with the current group as param
 	// so that it loads the active urls.
 	group := server.Group(GroupPreffix)
 
 	group.Use(ginrequestid.RequestId())
-
-	if server.settings.PushMetrics {
-		// group.Use(...)
-	}
 
 	// Add support for test header used by API rules to all endpoints
 	// group.Use(FlatAPIRules())
@@ -156,5 +155,11 @@ func WithPushMetrics(pushMetrics bool) Opt {
 func WithDebug(debug bool) Opt {
 	return func(s *Server) {
 		s.settings.Debug = debug
+	}
+}
+
+func WithAppName(name string) Opt {
+	return func(s *Server) {
+		s.settings.AppName = name
 	}
 }

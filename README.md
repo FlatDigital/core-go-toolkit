@@ -83,7 +83,7 @@ Import and use it.
 import (
  "github.com/gin-gonic/gin"
  "net/http"
- "github.com/FlatDigital/core-go-toolkit/src/api/libs/core/libs/go/logger"
+ "github.com/FlatDigital/core-go-toolkit/core/libs/go/logger"
 )
 
 func Ping(c *gin.Context) {
@@ -140,7 +140,7 @@ The scope format used is: `environment`-`role`-`tag` (the `tag` segment is optio
 package main
 
 import (
- "github.com/FlatDigital/core-go-toolkit/src/api/libs/core/libs/go/server"
+ "github.com/FlatDigital/core-go-toolkit/core/libs/go/server"
 )
 
 routes := server.RoutingGroup{
@@ -180,7 +180,7 @@ Import lib and use it.
 
 ```go
 import (
-    "github.com/FlatDigital/core-go-toolkit/src/api/libs/database"
+    "github.com/FlatDigital/core-go-toolkit/database"
 )
 
 dbConfig := database.ServiceConfig{
@@ -278,7 +278,7 @@ Import lib and use it.
 
 ```go
 import (
-  errorWrapper "github.com/FlatDigital/core-go-toolkit/src/api/libs/error"
+  errorWrapper "github.com/FlatDigital/core-go-toolkit/error"
 )
 ```
 

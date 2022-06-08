@@ -30,6 +30,7 @@ type (
 		Execute(dbc *DBContext, query string, params ...interface{}) (*DBResult, error)
 		ExecuteEnsuringOneAffectedRowWithQuery(dbc *DBContext, query *Query) error
 		ExecuteEnsuringOneAffectedRow(dbc *DBContext, query string, params ...interface{}) error
+		ExecuteEnsuringOneAffectedRowReturnRows(dbc *DBContext, query string, params ...interface{}) ([]DBRow, error)
 		SelectWithQuery(dbc *DBContext, query *Query) (*DBResult, error)
 		Select(dbc *DBContext, query string, forUpdate bool, params ...interface{}) (*DBResult, error)
 		SelectUniqueValueWithQuery(dbc *DBContext, query *Query) (*DBRow, error)

@@ -575,6 +575,18 @@ func (service *service) ExecuteEnsuringOneAffectedRow(dbc *DBContext, query stri
 	return nil
 }
 
+// ExecuteEnsuringOneAffectedRowReturnRows executes a query inside a given transaction (if you have one) and return the modify element
+func (service *service) ExecuteEnsuringOneAffectedRowReturnRows(dbc *DBContext, query string, params ...interface{}) ([]DBRow, error) {
+	dbr, err := service.Execute(dbc, query, params...)
+	if err != nil {
+		return dbr.GetRows(), err
+	}
+	if dbr.AffectedRows() != 1 {
+		return dbr.GetRows(), fmt.Errorf("unable to insert or update: %d", dbr.AffectedRows())
+	}
+	return dbr.GetRows(), nil
+}
+
 // ExecuteWithQuery executes a query inside a given transaction (if you have one)
 func (service *service) ExecuteWithQuery(dbc *DBContext, query *Query) (*DBResult, error) {
 	stmt, params, err := query.GetStatementAndParams()

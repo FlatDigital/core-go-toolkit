@@ -30,7 +30,7 @@ type (
 		Execute(dbc *DBContext, query string, params ...interface{}) (*DBResult, error)
 		ExecuteEnsuringOneAffectedRowWithQuery(dbc *DBContext, query *Query) error
 		ExecuteEnsuringOneAffectedRow(dbc *DBContext, query string, params ...interface{}) error
-		ExecuteEnsuringOneAffectedRowReturnRows(dbc *DBContext, query string, params ...interface{}) ([]DBRow, error)
+		ExecuteEnsuringOneAffectedRowReturnId(dbc *DBContext, query string, params ...interface{}) ([]int64, error)
 		SelectWithQuery(dbc *DBContext, query *Query) (*DBResult, error)
 		Select(dbc *DBContext, query string, forUpdate bool, params ...interface{}) (*DBResult, error)
 		SelectUniqueValueWithQuery(dbc *DBContext, query *Query) (*DBRow, error)
@@ -576,16 +576,16 @@ func (service *service) ExecuteEnsuringOneAffectedRow(dbc *DBContext, query stri
 	return nil
 }
 
-// ExecuteEnsuringOneAffectedRowReturnRows executes a query inside a given transaction (if you have one) and return the modify element
-func (service *service) ExecuteEnsuringOneAffectedRowReturnRows(dbc *DBContext, query string, params ...interface{}) ([]DBRow, error) {
+// ExecuteEnsuringOneAffectedRowReturnId ExecuteEnsuringOneAffectedRowReturnRows executes a query inside a given transaction (if you have one) and return the modify element
+func (service *service) ExecuteEnsuringOneAffectedRowReturnId(dbc *DBContext, query string, params ...interface{}) ([]int64, error) {
 	dbr, err := service.Execute(dbc, query, params...)
 	if err != nil {
-		return dbr.GetRows(), err
+		return dbr.affectedRowsId, err
 	}
 	if dbr.AffectedRows() != 1 {
-		return dbr.GetRows(), fmt.Errorf("unable to insert or update: %d", dbr.AffectedRows())
+		return dbr.affectedRowsId, fmt.Errorf("unable to insert or update: %d", dbr.AffectedRows())
 	}
-	return dbr.GetRows(), nil
+	return dbr.affectedRowsId, nil
 }
 
 // ExecuteWithQuery executes a query inside a given transaction (if you have one)
@@ -664,8 +664,12 @@ func (service *service) Execute(dbc *DBContext, query string, params ...interfac
 	}
 
 	// done
+	var affectedRowsId []int64
+	createdId, _ := res.LastInsertId()
+	affectedRowsId = append(affectedRowsId, createdId)
 	return &DBResult{
-		affectedRows: affectedRows,
+		affectedRows:   affectedRows,
+		affectedRowsId: affectedRowsId,
 	}, nil
 }
 

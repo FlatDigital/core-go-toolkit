@@ -2,8 +2,9 @@ package database
 
 // DBResult it's a database result struct
 type DBResult struct {
-	affectedRows int64
-	rows         DBRows
+	affectedRows   int64
+	rows           DBRows
+	affectedRowsId []int64
 }
 
 //

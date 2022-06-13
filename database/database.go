@@ -30,7 +30,7 @@ type (
 		Execute(dbc *DBContext, query string, params ...interface{}) (*DBResult, error)
 		ExecuteEnsuringOneAffectedRowWithQuery(dbc *DBContext, query *Query) error
 		ExecuteEnsuringOneAffectedRow(dbc *DBContext, query string, params ...interface{}) error
-		ExecuteEnsuringOneAffectedRowReturnId(dbc *DBContext, query string, params ...interface{}) (int64, error)
+		QueryRow(query string, params ...interface{}) (int64, error)
 		SelectWithQuery(dbc *DBContext, query *Query) (*DBResult, error)
 		Select(dbc *DBContext, query string, forUpdate bool, params ...interface{}) (*DBResult, error)
 		SelectUniqueValueWithQuery(dbc *DBContext, query *Query) (*DBRow, error)
@@ -576,26 +576,14 @@ func (service *service) ExecuteEnsuringOneAffectedRow(dbc *DBContext, query stri
 	return nil
 }
 
-// ExecuteEnsuringOneAffectedRowReturnId ExecuteEnsuringOneAffectedRowReturnRows executes a query inside a given transaction (if you have one) and return the modify element
-func (service *service) ExecuteEnsuringOneAffectedRowReturnId(dbc *DBContext, query string, params ...interface{}) (int64, error) {
-	affectedRowsId, err := service.QueryRowContext(dbc, query, params...)
+// QueryRow executes a query inside a given transaction (if you have one) and return to modify element
+func (service *service) QueryRow(query string, params ...interface{}) (int64, error) {
+	affectedRowId, err := service.db.QueryRow(query, params...)
 	if err != nil {
-		return affectedRowsId, err
+		service.logMetric(logError, "query rows", "service.db.Prepare(query)", err)
+		return affectedRowId, err
 	}
-	return affectedRowsId, nil
-}
-
-// QueryRowContext QueryRow executes a query return the id created
-func (service *service) QueryRowContext(dbc *DBContext, query string, params ...interface{}) (int64, error) {
-	var affectedId int64
-	if dbc != nil && (dbc.tx != nil || dbc.dbConn != nil) {
-		err := dbc.tx.QueryRowContext(dbc.ctx, query, params).Scan(&affectedId)
-		if err != nil {
-			service.logMetric(logError, "execute", "txstmt.ExecContext(dbc.ctx, params...)", err)
-			return affectedId, nil
-		}
-	}
-	return affectedId, fmt.Errorf("you have sent a dbc without tx or dbConn")
+	return affectedRowId, nil
 }
 
 // ExecuteWithQuery executes a query inside a given transaction (if you have one)
@@ -674,9 +662,6 @@ func (service *service) Execute(dbc *DBContext, query string, params ...interfac
 	}
 
 	// done
-	var affectedRowsId []int64
-	createdId, _ := res.LastInsertId()
-	affectedRowsId = append(affectedRowsId, createdId)
 	return &DBResult{
 		affectedRows: affectedRows,
 	}, nil

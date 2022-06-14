@@ -237,11 +237,11 @@ func (mock *SQLStmtMock) QueryContext(ctx context.Context, args ...interface{}) 
 }
 
 // QueryRow mocks the real implementation of QueryRow for the database/sql/stmt
-func (mock *SQLStmtMock) QueryRow(args ...interface{}) *sql.Row {
+func (mock *SQLStmtMock) QueryRow(args ...interface{}) (*sql.Row, error) {
 	panic("TODO: Implement mock for sql.stmt.QueryRow")
 }
 
 // QueryRowContext mocks the real implementation of QueryRowContext for the database/sql/stmt
-func (mock *SQLStmtMock) QueryRowContext(ctx context.Context, args ...interface{}) *sql.Row {
+func (mock *SQLStmtMock) QueryRowContext(ctx context.Context, query string, args ...interface{}) (*sql.Row, error) {
 	panic("TODO: Implement mock for sql.stmt.QueryRowContext")
 }

@@ -25,8 +25,8 @@ type DBer interface {
 	PrepareContext(ctx context.Context, query string) (DBStmter, error)
 	Query(query string, args ...interface{}) (*sql.Rows, error)
 	QueryContext(ctx context.Context, query string, args ...interface{}) (*sql.Rows, error)
-	QueryRow(query string, args ...interface{}) *sql.Row
-	QueryRowContext(ctx context.Context, query string, args ...interface{}) *sql.Row
+	QueryRow(query string, args ...interface{}) (*sql.Row, error)
+	QueryRowContext(ctx context.Context, query string, args ...interface{}) (*sql.Row, error)
 	SetConnMaxLifetime(d time.Duration)
 	SetMaxIdleConns(n int)
 	SetMaxOpenConns(n int)
@@ -41,7 +41,7 @@ type DBConner interface {
 	PingContext(ctx context.Context) error
 	PrepareContext(ctx context.Context, query string) (*sql.Stmt, error)
 	QueryContext(ctx context.Context, query string, args ...interface{}) (*sql.Rows, error)
-	QueryRowContext(ctx context.Context, query string, args ...interface{}) *sql.Row
+	QueryRowContext(ctx context.Context, query string, args ...interface{}) (*sql.Row, error)
 	Raw(f func(driverConn interface{}) error) (err error)
 }
 
@@ -54,8 +54,8 @@ type DBTxer interface {
 	PrepareContext(ctx context.Context, query string) (DBStmter, error)
 	Query(query string, args ...interface{}) (*sql.Rows, error)
 	QueryContext(ctx context.Context, query string, args ...interface{}) (*sql.Rows, error)
-	QueryRow(query string, args ...interface{}) *sql.Row
-	QueryRowContext(ctx context.Context, query string, args ...interface{}) *sql.Row
+	QueryRow(query string, args ...interface{}) (*sql.Row, error)
+	QueryRowContext(ctx context.Context, query string, args ...interface{}) (*sql.Row, error)
 	Rollback() error
 	Stmt(stmt *sql.Stmt) *sql.Stmt
 	StmtContext(ctx context.Context, stmt *sql.Stmt) *sql.Stmt
@@ -68,8 +68,8 @@ type DBStmter interface {
 	ExecContext(ctx context.Context, args ...interface{}) (sql.Result, error)
 	Query(args ...interface{}) (DBRowser, error)
 	QueryContext(ctx context.Context, args ...interface{}) (DBRowser, error)
-	QueryRow(args ...interface{}) *sql.Row
-	QueryRowContext(ctx context.Context, args ...interface{}) *sql.Row
+	QueryRow(args ...interface{}) (*sql.Row, error)
+	QueryRowContext(ctx context.Context, query string, args ...interface{}) (*sql.Row, error)
 }
 
 // DBRowser rows database interface
@@ -200,6 +200,15 @@ func (c *sqlStmtConverter) QueryContext(ctx context.Context, args ...interface{}
 		return nil, err
 	}
 	return rows, err
+}
+
+// QueryRow convert the real implementation from QueryRows in database/sql/stmt in DBer.QueryRow
+func (c *sqlConverter) QueryRow(query string, args ...interface{}) (*sql.Row, error) {
+	row := c.db.QueryRow(query, args...)
+	if row.Err() != nil {
+		return nil, row.Err()
+	}
+	return row, nil
 }
 
 // Exec convert the real implementation from Exec in database/sql/stmt in DBStmter.Exec

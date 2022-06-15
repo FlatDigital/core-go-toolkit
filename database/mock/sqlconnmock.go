@@ -73,7 +73,7 @@ func (mock *SQLConnMock) QueryContext(ctx context.Context, query string, args ..
 }
 
 // QueryRowContext mocks the real implementation of QueryRowContext for the database/sql/conn
-func (mock *SQLConnMock) QueryRowContext(ctx context.Context, query string, args ...interface{}) *sql.Row {
+func (mock *SQLConnMock) QueryRowContext(ctx context.Context, query string, args ...interface{}) (*sql.Row, error) {
 	panic("TODO: Implement mock for sql.conn.QueryRowContext")
 }
 

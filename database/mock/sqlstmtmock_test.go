@@ -190,6 +190,6 @@ func Test_Stmt_PatchQueryRowContext_Panic(t *testing.T) {
 
 	// then
 	ass.Panics(func() {
-		mock.QueryRowContext(ctx, nil)
+		mock.QueryRowContext(ctx, "")
 	})
 }

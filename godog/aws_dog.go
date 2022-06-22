@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	ENDPOINT            string = "localhost:8125"
+	ENDPOINT            string = "datadog:8125"
 	DEFAULT_BUFFER_SIZE int    = 500
 )
 

@@ -190,7 +190,7 @@ func TestValidEnvironment(t *testing.T) {
 	ass := assert.New(t)
 
 	env, err := getEnvironmentSettings(ApplicationContext{
-		Environment: EnvSandbox,
+		Environment: EnvStaging,
 		Role:        RoleRead,
 	})
 

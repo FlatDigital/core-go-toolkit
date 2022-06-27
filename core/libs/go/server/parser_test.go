@@ -15,7 +15,7 @@ func TestContextFromScopeString(t *testing.T) {
 		ExpectedErr   bool
 	}{
 		{"production-read", server.RoleRead, server.EnvProduction, "", false},
-		{"sandbox-read", server.RoleRead, server.EnvSandbox, "", false},
+		{"staging-read", server.RoleRead, server.EnvStaging, "", false},
 		{"develop-read", server.RoleRead, server.EnvDevelop, "", false},
 		{"test-read", server.RoleRead, server.EnvTest, "", false},
 

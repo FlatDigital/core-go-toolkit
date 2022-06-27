@@ -26,7 +26,7 @@ var envSettings = map[Environment]settings{
 	EnvDevelop:    {LogLevel: "DEBUG", PushMetrics: true, Debug: true, AuthScopes: nil},
 	EnvTest:       {LogLevel: "INFO", PushMetrics: true, Debug: true, AuthScopes: nil},
 	EnvProduction: {LogLevel: "INFO", PushMetrics: true, Debug: false, AuthScopes: nil},
-	EnvSandbox:    {LogLevel: "INFO", PushMetrics: true, Debug: false, AuthScopes: nil},
+	EnvStaging:    {LogLevel: "INFO", PushMetrics: true, Debug: false, AuthScopes: nil},
 }
 
 // RoutingGroup is a map of urls and functions for a given role.

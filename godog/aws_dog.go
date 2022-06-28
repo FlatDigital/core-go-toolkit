@@ -1,13 +1,9 @@
-/**
- * @author mlabarinas
- */
-
 package godog
 
 import (
 	"os"
 
-	"github.com/DataDog/datadog-go/statsd"
+	"github.com/DataDog/datadog-go/v5/statsd"
 )
 
 const (
@@ -24,38 +20,27 @@ func (a *AwsDogClient) RecordSimpleMetric(metricName string, value float64, tags
 	buffer.Count(metricName, value, getTags(tags...), 1)
 }
 
-func (a *AwsDogClient) RecordSimpleTimeMetric(metricName string, fn action, tags ...string) (interface{}, error) {
-	time, result, error := takeTime(fn)
-
-	buffer.Count(metricName, float64(time), getTags(tags...), 1)
-
-	return result, error
+func (a *AwsDogClient) RecordCompoundMetric(metricName string, value float64, tags ...string) {
+	buffer.Gauge(metricName, value, getTags(tags...), 1)
 }
 
 func getTags(tags ...string) []string {
-	result := make([]string, 0, len(tags)+3)
+	result := make([]string, 0, len(tags)+1)
 
-	if platform := os.Getenv("PLATFORM"); platform != "" {
-		result = append(result, GetRawTag("platform", platform))
-	}
 	if application := os.Getenv("APPLICATION"); application != "" {
 		result = append(result, GetRawTag("application", application))
-	}
-	if dataCenter := os.Getenv("DATACENTER"); dataCenter != "" {
-		result = append(result, GetRawTag("datacenter", dataCenter))
 	}
 
 	return append(result, tags...)
 }
 
 func init() {
-	c, error := statsd.NewBuffered(ENDPOINT, DEFAULT_BUFFER_SIZE)
-
+	// c, error := statsd.New(ENDPOINT, statsd.WithMaxBytesPerPayload(10))
+	c, error := statsd.New(ENDPOINT)
 	if error != nil {
 		panic(error)
 	}
 
 	client = c
 	buffer = CreateBuffer()
-	return
 }

@@ -79,6 +79,7 @@ func (service *restyService) MakePostRequest(ctx *gin.Context, url string, body 
 	var r *resty.Response
 	req := service.restyClient.R()
 	req.SetHeaderMultiValues(headers)
+	req.SetBody(body)
 
 	r, err := req.Post(url)
 

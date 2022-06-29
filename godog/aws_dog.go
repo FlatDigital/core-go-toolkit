@@ -35,7 +35,6 @@ func getTags(tags ...string) []string {
 }
 
 func init() {
-	// c, error := statsd.New(ENDPOINT, statsd.WithMaxBytesPerPayload(10))
 	c, error := statsd.New(ENDPOINT)
 	if error != nil {
 		panic(error)

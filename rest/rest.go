@@ -48,6 +48,7 @@ type ServiceConfig struct {
 	BaseURL             string
 	MaxIdleConnsPerHost int
 	RequestConfig       *RequestConfig
+	DatadogMetricPrefix string
 }
 
 type RequestConfig struct {

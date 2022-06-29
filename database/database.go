@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/FlatDigital/core-go-toolkit/database/converter"
+	"github.com/FlatDigital/core-go-toolkit/godog"
 	"github.com/lib/pq"
 )
 
@@ -234,11 +235,10 @@ func (service *service) Begin(inDbc *DBContext) (outDbc *DBContext, err error) {
 		if r := recover(); r != nil {
 			service.logMetric(logError, "begin", "recover", errPanicOnBeginTransaction)
 
-			// TODO: Implement datadog
-			// tags := new(godog.Tags).
-			// 	ToArray()
-			// godog.RecordSimpleMetric(fmt.Sprintf("application.%s.db.service.connection.begin.panic_recover",
-			// 	service.datadogMetricPrefix), 1, tags...)
+			tags := new(godog.Tags).
+				ToArray()
+			godog.RecordSimpleMetric(fmt.Sprintf("application.%s.db.service.connection.begin.panic_recover",
+				service.datadogMetricPrefix), 1, tags...)
 		}
 	}()
 
@@ -669,17 +669,17 @@ func (service *service) Execute(dbc *DBContext, query string, params ...interfac
 
 // logMetric logs an error metric if the error is not null
 func (service *service) logMetric(logType logType, operation string, detail string, err error) {
-	// tags := new(godog.Tags).
-	// 	Add("operation", operation).
-	// 	Add("detail", detail)
+	tags := new(godog.Tags).
+		Add("operation", operation).
+		Add("detail", detail)
 
 	if err != nil {
 		postgresError, ok := err.(*pq.Error)
 		if ok && postgresError != nil {
-			// tags = tags.Add("error", fmt.Sprintf("%s", postgresError.Code))
+			tags = tags.Add("error", string(postgresError.Code))
 		}
 	}
 
-	// godog.RecordSimpleMetric(fmt.Sprintf("application.%s.db.service.%s", service.datadogMetricPrefix,
-	// 	string(logType)), 1, tags.ToArray()...)
+	godog.RecordSimpleMetric(fmt.Sprintf("application.%s.db.service.%s", service.datadogMetricPrefix,
+		string(logType)), 1, tags.ToArray()...)
 }

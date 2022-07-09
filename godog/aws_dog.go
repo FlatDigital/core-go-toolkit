@@ -1,6 +1,7 @@
 package godog
 
 import (
+	"log"
 	"os"
 
 	"github.com/DataDog/datadog-go/v5/statsd"
@@ -37,7 +38,7 @@ func getTags(tags ...string) []string {
 func init() {
 	c, error := statsd.New(ENDPOINT)
 	if error != nil {
-		panic(error)
+		log.Print(error)
 	}
 
 	client = c

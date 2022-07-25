@@ -378,6 +378,29 @@ func (service *service) Rollback(dbc *DBContext) error {
 	return nil
 }
 
+func (service *service) ManagedTransaction(txFunction func(dbc *DBContext) error) error {
+	txContext, err := service.Begin(nil)
+	if err != nil {
+		return err
+	}
+
+	defer func() {
+		if p := recover(); p != nil {
+			fmt.Printf("Rollbacking due panic ")
+			err = service.Rollback(txContext)
+			panic(p)
+		} else if err != nil {
+			fmt.Printf("Rollbacking due txFunc error ")
+			_ = service.Rollback(txContext) // err is non-nil; don't change it
+		} else {
+			fmt.Printf("Commiting txFunc ")
+			err = service.Commit(txContext) // err is nil; if Commit returns Error update err
+		}
+	}()
+
+	return txFunction(txContext)
+}
+
 // SelectWithQuery does a select in the database with a Query and process results returning a Map
 func (service *service) SelectWithQuery(dbc *DBContext, query *Query) (*DBResult, error) {
 	stmt, params, err := query.GetStatementAndParams()

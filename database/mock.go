@@ -13,6 +13,7 @@ type Mock struct {
 	patchBeginMap                         map[hash][]outputForBegin
 	patchCommitMap                        map[hash][]outputForCommit
 	patchRollbackMap                      map[hash][]outputForRollback
+	patchWithTransactionMap               map[hash][]outputForWithTransaction
 	patchSelectMap                        map[hash][]outputForSelect
 	patchSelectUniqueValueMap             map[hash][]outputForSelectUniqueValue
 	patchExecuteMap                       map[hash][]outputForExecute
@@ -87,6 +88,7 @@ func NewMock() *Mock {
 	patchBeginMap := make(map[hash][]outputForBegin)
 	patchCommitMap := make(map[hash][]outputForCommit)
 	patchRollbackMap := make(map[hash][]outputForRollback)
+	patchWithTransactionMap := make(map[hash][]outputForWithTransaction)
 	patchSelectMap := make(map[hash][]outputForSelect)
 	patchSelectUniqueValueMap := make(map[hash][]outputForSelectUniqueValue)
 	patchExecuteMap := make(map[hash][]outputForExecute)
@@ -95,6 +97,7 @@ func NewMock() *Mock {
 		patchBeginMap:                         patchBeginMap,
 		patchCommitMap:                        patchCommitMap,
 		patchRollbackMap:                      patchRollbackMap,
+		patchWithTransactionMap:               patchWithTransactionMap,
 		patchSelectMap:                        patchSelectMap,
 		patchSelectUniqueValueMap:             patchSelectUniqueValueMap,
 		patchExecuteMap:                       patchExecuteMap,
@@ -129,6 +132,14 @@ type inputForRollback struct {
 }
 
 type outputForRollback struct {
+	err error
+}
+
+type inputForWithTransaction struct {
+	txFn func(dbc *DBContext) error
+}
+
+type outputForWithTransaction struct {
 	err error
 }
 
@@ -183,8 +194,6 @@ func toHash(input interface{}) hash {
 	jsonBytes, _ := json.Marshal(input)
 	return md5.Sum(jsonBytes)
 }
-
-//
 
 // PatchBegin patch for Begin function
 func (mock *Mock) PatchBegin(inputDBC *DBContext, outputDBC *DBContext, outputError error) {
@@ -262,6 +271,32 @@ func getOutputForRollback(err error) outputForRollback {
 	}
 }
 
+// PatchWithTransaction patch for WithTransaction function
+func (mock *Mock) PatchWithTransaction(txFn func(dbc *DBContext) error, outputError error) {
+	input := getInputForWithTransaction(txFn)
+	inputHash := toHash(input)
+	output := getOutputForWithTransaction(outputError)
+
+	if _, exists := mock.patchWithTransactionMap[inputHash]; !exists {
+		arrOutputForWithTransaction := make([]outputForWithTransaction, 0)
+		mock.patchWithTransactionMap[inputHash] = arrOutputForWithTransaction
+	}
+
+	mock.patchWithTransactionMap[inputHash] = append(mock.patchWithTransactionMap[inputHash], output)
+}
+
+func getInputForWithTransaction(txFn func(dbc *DBContext) error) inputForWithTransaction {
+	return inputForWithTransaction{
+		txFn: txFn,
+	}
+}
+
+func getOutputForWithTransaction(err error) outputForWithTransaction {
+	return outputForWithTransaction{
+		err: err,
+	}
+}
+
 // PatchSelect patch for Select function
 func (mock *Mock) PatchSelect(inputDBC *DBContext, inputQuery string, inputForUpdate bool,
 	inputArrParams []interface{}, outputDBResult *DBResult, outputError error) {
@@ -321,9 +356,7 @@ func getOutputForExecute(dbr *DBResult, err error) outputForExecute {
 	}
 }
 
-//
-
-// Begin Mock for begin
+// Begin mock for Begin function
 func (mock *Mock) Begin(inDbc *DBContext) (outDbc *DBContext, err error) {
 	input := getInputForBegin(inDbc)
 	inputHash := toHash(input)
@@ -344,7 +377,7 @@ func (mock *Mock) Begin(inDbc *DBContext) (outDbc *DBContext, err error) {
 	return output.dbc, nil
 }
 
-// Commit Mock for commit
+// Commit mock for Commit function
 func (mock *Mock) Commit(dbc *DBContext) error {
 	input := getInputForCommit(dbc)
 	inputHash := toHash(input)
@@ -377,6 +410,27 @@ func (mock *Mock) Rollback(dbc *DBContext) error {
 	output := arrOutputForRollback[0]
 	arrOutputForRollback = arrOutputForRollback[1:]
 	mock.patchRollbackMap[inputHash] = arrOutputForRollback
+
+	if output.err != nil {
+		return output.err
+	}
+
+	// done
+	return nil
+}
+
+// WithTransaction mock for WithTransaction function
+func (mock *Mock) WithTransaction(txFn func(dbc *DBContext) error) error {
+	input := getInputForWithTransaction(txFn)
+	inputHash := toHash(input)
+	arrOutputForWithTransaction, exists := mock.patchWithTransactionMap[inputHash]
+	if !exists || len(arrOutputForWithTransaction) == 0 {
+		panic(fmt.Sprintf("Mock not available for Database.WithTransaction(txFn: ...)"))
+	}
+
+	output := arrOutputForWithTransaction[0]
+	arrOutputForWithTransaction = arrOutputForWithTransaction[1:]
+	mock.patchWithTransactionMap[inputHash] = arrOutputForWithTransaction
 
 	if output.err != nil {
 		return output.err

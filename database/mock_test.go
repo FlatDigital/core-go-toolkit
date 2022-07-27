@@ -193,6 +193,66 @@ func Test_Mock_Database_RollbackWithoutMock_ShouldPanic(t *testing.T) {
 
 //
 
+func Test_Mock_Database_WithTransactionWithNoErrorMocked_ShouldProcess_WithoutError(t *testing.T) {
+	// Given
+	assertions, mockService := buildMockDependencies(t)
+
+	// When
+
+	txFn := func(dbc *database.DBContext) error { return nil }
+	mockService.PatchWithTransaction(txFn, nil)
+
+	err := mockService.WithTransaction(txFn)
+
+	// Then
+	assertions.Nil(err)
+}
+
+func Test_Mock_Database_WithTransactionWithNoErrorMockedCalledTwice_ShouldPanic(t *testing.T) {
+	// Given
+	assertions, mockService := buildMockDependencies(t)
+
+	// When
+	txFn := func(dbc *database.DBContext) error { return nil }
+	mockService.PatchWithTransaction(txFn, nil)
+
+	mockService.WithTransaction(txFn)
+
+	// Then
+	assertions.PanicsWithValue(fmt.Sprintf("Mock not available for Database.WithTransaction(txFn: ...)"),
+		func() { mockService.WithTransaction(txFn) })
+}
+
+func Test_Mock_Database_WithTransactionWithErrorMocked_ShouldProcess_WithError(t *testing.T) {
+	// Given
+	assertions, mockService := buildMockDependencies(t)
+
+	// When
+	txFn := func(txFn *database.DBContext) error { return nil }
+	mockedError := errors.New("test error")
+	mockService.PatchWithTransaction(txFn, mockedError)
+
+	err := mockService.WithTransaction(txFn)
+
+	// Then
+	assertions.NotNil(err)
+	assertions.EqualError(mockedError, err.Error())
+}
+
+func Test_Mock_Database_WithTransactionWithoutMock_ShouldPanic(t *testing.T) {
+	// Given
+	assertions, mockService := buildMockDependencies(t)
+
+	// When
+	txFn := func(txFn *database.DBContext) error { return nil }
+
+	// Then
+	assertions.PanicsWithValue(fmt.Sprintf("Mock not available for Database.WithTransaction(txFn: ...)"),
+		func() { mockService.WithTransaction(txFn) })
+}
+
+//
+
 func Test_Mock_Database_SelectWithNoErrorMockedWithoutParams_ShouldProcess_WithoutError(t *testing.T) {
 	// Given
 	assertions, mockService := buildMockDependencies(t)

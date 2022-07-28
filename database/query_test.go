@@ -7,8 +7,8 @@ import (
 )
 
 const (
-	insertStmt              string = `INSERT INTO incoming_transaction VALUES `
-	selectStmtversion       string = `SELECT * FROM version WHERE version = ?`
+	insertStmtIncomingTrans string = `INSERT INTO incoming_transaction VALUES `
+	selectStmtVersion       string = `SELECT * FROM version WHERE version = ?`
 	selectStmtIncomingTrans string = "SELECT t.id as transaction_id, it.operation_id " +
 		"FROM incoming_transaction it " +
 		"INNER JOIN transaction t ON t.operation_id = it.operation_id " +
@@ -20,7 +20,7 @@ const (
 
 func Test_QueryBeginEndSingleValueCompleteSuccess(t *testing.T) {
 	ass := assert.New(t)
-	begin := insertStmt
+	begin := insertStmtIncomingTrans
 	end := endChar
 	value := valuePlaceholder
 	params := []interface{}{10, 15}
@@ -41,7 +41,7 @@ func Test_QueryBeginEndSingleValueCompleteSuccess(t *testing.T) {
 
 func Test_NewQueryBeginEndMustWorkSuccess(t *testing.T) {
 	ass := assert.New(t)
-	begin := insertStmt
+	begin := insertStmtIncomingTrans
 	end := endChar
 	value := valuePlaceholder
 	q := NewQueryBeginEndMustWork(begin, end, value)
@@ -56,7 +56,7 @@ func Test_NewQueryBeginEndMustWorkPanic(t *testing.T) {
 	}()
 
 	// We force a panic
-	begin := insertStmt
+	begin := insertStmtIncomingTrans
 	end := endChar
 	value := `(now())` // We sent any ? in order to get test panicking
 	NewQueryBeginEndMustWork(begin, end, value)
@@ -140,7 +140,7 @@ func Test_QueryPlaceholderAppearsMultipleTimes(t *testing.T) {
 
 func Test_QueryBeginEndValuesDifferentLength(t *testing.T) {
 	ass := assert.New(t)
-	begin := insertStmt
+	begin := insertStmtIncomingTrans
 	end := endChar
 	value := valuePlaceholder
 	params := []interface{}{10, 15, 17}
@@ -154,7 +154,7 @@ func Test_QueryBeginEndValuesDifferentLength(t *testing.T) {
 
 func Test_QueryBeginEndMultipleParams(t *testing.T) {
 	ass := assert.New(t)
-	q, err := NewQueryBeginEnd(insertStmt, ";", valuePlaceholder)
+	q, err := NewQueryBeginEnd(insertStmtIncomingTrans, ";", valuePlaceholder)
 	ass.NotNil(q)
 	ass.Nil(err)
 	err = q.AddParams([]interface{}{10, "world"})
@@ -165,7 +165,7 @@ func Test_QueryBeginEndMultipleParams(t *testing.T) {
 
 func Test_QueryBeginEndWithoutParams(t *testing.T) {
 	ass := assert.New(t)
-	q, err := NewQueryBeginEnd(insertStmt, ";", valuePlaceholder)
+	q, err := NewQueryBeginEnd(insertStmtIncomingTrans, ";", valuePlaceholder)
 	ass.NotNil(q)
 	ass.Nil(err)
 	statement, err := q.Statement()
@@ -183,7 +183,7 @@ func Test_QueryBeginEndWithoutParams(t *testing.T) {
 
 func Test_QueryBeginEndWithoutValues(t *testing.T) {
 	ass := assert.New(t)
-	q, err := NewQueryBeginEnd(insertStmt, endChar, ``)
+	q, err := NewQueryBeginEnd(insertStmtIncomingTrans, endChar, ``)
 	ass.Nil(q)
 	ass.Error(err)
 	ass.EqualError(err, "unable to find any ? in the value placeholder")
@@ -191,7 +191,7 @@ func Test_QueryBeginEndWithoutValues(t *testing.T) {
 
 func Test_QueryBeginEndEmptyEnd(t *testing.T) {
 	ass := assert.New(t)
-	q, err := NewQueryBeginEnd(insertStmt, ``, valuePlaceholder)
+	q, err := NewQueryBeginEnd(insertStmtIncomingTrans, ``, valuePlaceholder)
 	ass.NotNil(q)
 	ass.Nil(err)
 	ass.Equal(";", q.stmtEnd)
@@ -199,7 +199,7 @@ func Test_QueryBeginEndEmptyEnd(t *testing.T) {
 
 func Test_QueryBeginEndForUpdate(t *testing.T) {
 	ass := assert.New(t)
-	q, err := NewQueryBeginEnd(insertStmt, endChar, valuePlaceholder)
+	q, err := NewQueryBeginEnd(insertStmtIncomingTrans, endChar, valuePlaceholder)
 	ass.NotNil(q)
 	ass.Nil(err)
 	ass.Equal(false, q.IsForUpdate())
@@ -211,7 +211,7 @@ func Test_QueryBeginEndForUpdate(t *testing.T) {
 
 func Test_QueryBeginEndInvalidQueryType(t *testing.T) {
 	ass := assert.New(t)
-	q, err := NewQueryBeginEnd(insertStmt, ";", valuePlaceholder)
+	q, err := NewQueryBeginEnd(insertStmtIncomingTrans, ";", valuePlaceholder)
 	ass.NotNil(q)
 	ass.Nil(err)
 	err = q.AddParams([]interface{}{10, "world"})
@@ -225,7 +225,7 @@ func Test_QueryBeginEndInvalidQueryType(t *testing.T) {
 
 func Test_NewQueryPlainSuccess(t *testing.T) {
 	ass := assert.New(t)
-	stmt := selectStmtversion
+	stmt := selectStmtVersion
 	q, err := NewQueryPlain(stmt)
 	ass.NotNil(q)
 	ass.Nil(err)
@@ -242,7 +242,7 @@ func Test_NewQueryPlainFail(t *testing.T) {
 
 func Test_QueryPlainFailWithMultipleParams(t *testing.T) {
 	ass := assert.New(t)
-	stmt := selectStmtversion
+	stmt := selectStmtVersion
 	q, err := NewQueryPlain(stmt)
 	ass.NotNil(q)
 	ass.Nil(err)
@@ -255,7 +255,7 @@ func Test_QueryPlainFailWithMultipleParams(t *testing.T) {
 
 func Test_QueryPlainStatementSuccess(t *testing.T) {
 	ass := assert.New(t)
-	stmt := selectStmtversion
+	stmt := selectStmtVersion
 	q, err := NewQueryPlain(stmt)
 	ass.NotNil(q)
 	ass.Nil(err)
@@ -268,7 +268,7 @@ func Test_QueryPlainStatementSuccess(t *testing.T) {
 
 func Test_NewQueryPlainMustWorkSuccess(t *testing.T) {
 	ass := assert.New(t)
-	stmt := selectStmtversion
+	stmt := selectStmtVersion
 	q := NewQueryPlainMustWork(stmt)
 	ass.NotNil(q)
 }

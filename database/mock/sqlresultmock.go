@@ -3,6 +3,7 @@ package sqlmock
 // SQLResultMock mock struct
 type SQLResultMock struct {
 	patchResultRowsAffected []outputForResultRowsAffected
+	patchResultLastInsertId []outputForResultLastInsertId
 }
 
 // NewResultMockService return mock for database/sql
@@ -19,9 +20,14 @@ type (
 		rowsNum     int64
 		outputError error
 	}
+
+	outputForResultLastInsertId struct {
+		lastInsertId int64
+		outputError  error
+	}
 )
 
-// PatchRowsAffected patches the funcion RowsAffected
+// PatchRowsAffected patches the function RowsAffected
 func (mock *SQLResultMock) PatchRowsAffected(rowsNum int64, outputErr error) {
 	output := outputForResultRowsAffected{
 		rowsNum:     rowsNum,
@@ -29,6 +35,16 @@ func (mock *SQLResultMock) PatchRowsAffected(rowsNum int64, outputErr error) {
 	}
 
 	mock.patchResultRowsAffected = append(mock.patchResultRowsAffected, output)
+}
+
+// PatchLastInsertId patches the function PatchLastInsertId
+func (mock *SQLResultMock) PatchLastInsertId(lastInsertId int64, outputErr error) {
+	output := outputForResultLastInsertId{
+		lastInsertId: lastInsertId,
+		outputError:  outputErr,
+	}
+
+	mock.patchResultLastInsertId = append(mock.patchResultLastInsertId, output)
 }
 
 // RowsAffected mocks the real implementation of RowsAffected for the database/sql/rows
@@ -44,7 +60,15 @@ func (mock *SQLResultMock) RowsAffected() (int64, error) {
 	return output.rowsNum, output.outputError
 }
 
-// LastInsertId mocks the real implementation of LastInsertId for the database/sql/result
+// LastInsertId mocks the real implementation of LastInsertId for the database/sql/rows
 func (mock *SQLResultMock) LastInsertId() (int64, error) {
-	panic("TODO: Implement mock for sql.stmt.LastInsertId")
+	if len(mock.patchResultLastInsertId) == 0 {
+		panic("Mock not available for SQLResultMock.LastInsertId")
+	}
+
+	output := mock.patchResultLastInsertId[0]
+	// dequeue
+	mock.patchResultLastInsertId = mock.patchResultLastInsertId[1:]
+
+	return output.lastInsertId, output.outputError
 }

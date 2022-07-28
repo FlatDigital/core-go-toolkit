@@ -469,6 +469,7 @@ func (service *service) Select(dbc *DBContext, query string, forUpdate bool, par
 	// done
 	return &DBResult{
 		affectedRows: 0,
+		lastInsertId: 0,
 		rows:         DBRows{dbRowArray},
 	}, nil
 }
@@ -693,9 +694,16 @@ func (service *service) Execute(dbc *DBContext, query string, params ...interfac
 		return nil, err
 	}
 
+	// Get last insert id
+	lastInsertId, err := res.LastInsertId()
+	if err != nil {
+		return nil, err
+	}
+
 	// done
 	return &DBResult{
 		affectedRows: affectedRows,
+		lastInsertId: lastInsertId,
 	}, nil
 }
 

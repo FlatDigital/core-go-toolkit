@@ -15,6 +15,7 @@ import (
 const (
 	selectStmt  string = "SELECT * FROM test FOR UPDATE"
 	selectStmt2 string = "SELECT * FROM test"
+	insertStmt  string = "INSERT INTO test(test) values(?)"
 )
 
 func Test_DBRow_Equals_True(t *testing.T) {
@@ -1510,7 +1511,8 @@ func Test_Execute_Success(t *testing.T) {
 	resultMock := newDBResultMock()
 
 	// when
-	resultMock.PatchRowsAffected(3, nil)
+	resultMock.PatchRowsAffected(1, nil)
+	resultMock.PatchLastInsertId(0, nil)
 	stmtMock.PatchExec(params, resultMock, nil)
 	stmtMock.PatchClose(nil)
 	sqlMock.PatchPrepare(query, stmtMock, nil)
@@ -1539,6 +1541,7 @@ func Test_Execute_Prepare_Err(t *testing.T) {
 
 	// when
 	resultMock.PatchRowsAffected(3, nil)
+	resultMock.PatchLastInsertId(0, nil)
 	stmtMock.PatchExec(params, resultMock, nil)
 	stmtMock.PatchClose(nil)
 	sqlMock.PatchPrepare(query, stmtMock, errors.New("test_execute_err"))
@@ -1567,6 +1570,7 @@ func Test_Execute_Stmt_Execute_Err(t *testing.T) {
 
 	// when
 	resultMock.PatchRowsAffected(3, nil)
+	resultMock.PatchLastInsertId(0, nil)
 	stmtMock.PatchExec(params, resultMock, errors.New("test_execute_err"))
 	stmtMock.PatchClose(nil)
 	sqlMock.PatchPrepare(query, stmtMock, nil)
@@ -1603,6 +1607,7 @@ func Test_ExecuteEnsuringOneAffectedRowWithQuery_Success(t *testing.T) {
 
 	// when
 	resultMock.PatchRowsAffected(1, nil)
+	resultMock.PatchLastInsertId(0, nil)
 	stmtMock.PatchExec(params, resultMock, nil)
 	stmtMock.PatchClose(nil)
 	sqlMock.PatchPrepare(queryString, stmtMock, nil)
@@ -1635,6 +1640,7 @@ func Test_Execute_With_Tx(t *testing.T) {
 
 	// when
 	resultMock.PatchRowsAffected(3, nil)
+	resultMock.PatchLastInsertId(0, nil)
 	stmtMock.PatchExecContext(ctx, params, resultMock, nil)
 	stmtMock.PatchClose(nil)
 	txMock.PatchPrepareContext(ctx, query, stmtMock, nil)
@@ -1668,6 +1674,7 @@ func Test_Execute_With_Tx_Prepare_Error(t *testing.T) {
 
 	// when
 	resultMock.PatchRowsAffected(3, nil)
+	resultMock.PatchLastInsertId(0, nil)
 	stmtMock.PatchExecContext(ctx, params, resultMock, nil)
 	stmtMock.PatchClose(nil)
 	txMock.PatchPrepareContext(ctx, query, stmtMock, errors.New("test_execute_err"))
@@ -1701,6 +1708,7 @@ func Test_Execute_With_Tx_ExecContext_Error(t *testing.T) {
 
 	// when
 	resultMock.PatchRowsAffected(3, nil)
+	resultMock.PatchLastInsertId(0, nil)
 	stmtMock.PatchExecContext(ctx, params, resultMock, errors.New("test_execute_err"))
 	stmtMock.PatchClose(nil)
 	txMock.PatchPrepareContext(ctx, query, stmtMock, nil)
@@ -1735,6 +1743,7 @@ func Test_Execute_With_Conn(t *testing.T) {
 
 	// when
 	resultMock.PatchRowsAffected(3, nil)
+	resultMock.PatchLastInsertId(0, nil)
 	stmtMock.PatchExecContext(ctx, params, resultMock, nil)
 	stmtMock.PatchClose(nil)
 	sqlMock.PatchPrepareContext(ctx, query, stmtMock, nil)
@@ -1769,6 +1778,7 @@ func Test_Execute_With_Conn_PrepareContext_Error(t *testing.T) {
 
 	// when
 	resultMock.PatchRowsAffected(3, nil)
+	resultMock.PatchLastInsertId(0, nil)
 	stmtMock.PatchExecContext(ctx, params, resultMock, nil)
 	stmtMock.PatchClose(nil)
 	sqlMock.PatchPrepareContext(ctx, query, stmtMock, errors.New("test_execute_err"))
@@ -1803,6 +1813,7 @@ func Test_Execute_With_Conn_Stmt_ExecuteContext_Err(t *testing.T) {
 
 	// when
 	resultMock.PatchRowsAffected(3, nil)
+	resultMock.PatchLastInsertId(0, nil)
 	stmtMock.PatchExecContext(ctx, params, resultMock, errors.New("test_execute_err"))
 	stmtMock.PatchClose(nil)
 	sqlMock.PatchPrepareContext(ctx, query, stmtMock, nil)
@@ -1831,6 +1842,36 @@ func Test_Execute_RowsAffected_Error(t *testing.T) {
 
 	// when
 	resultMock.PatchRowsAffected(3, errors.New("test_execute_err"))
+	resultMock.PatchLastInsertId(0, errors.New("test_execute_err"))
+	stmtMock.PatchExec(params, resultMock, nil)
+	stmtMock.PatchClose(nil)
+	sqlMock.PatchPrepare(query, stmtMock, nil)
+	dbResult, err := service.Execute(dbc, query, params...)
+
+	// then
+	ass.Nil(dbResult)
+	ass.NotNil(err)
+}
+
+func Test_Execute_LastInsertId_Error(t *testing.T) {
+	// given
+	ass := assert.New(t)
+
+	config := ServiceConfig{
+		MaxConnectionRetries: 1,
+	}
+	service, sqlMock := newMockService(config)
+	dbc := &DBContext{}
+	query := selectStmt2
+	stmtMock := newDBStmtMock()
+	params := make([]interface{}, 0)
+	params = append(params, "test_value")
+
+	resultMock := newDBResultMock()
+
+	// when
+	resultMock.PatchRowsAffected(1, nil)
+	resultMock.PatchLastInsertId(1, errors.New("test_execute_err"))
 	stmtMock.PatchExec(params, resultMock, nil)
 	stmtMock.PatchClose(nil)
 	sqlMock.PatchPrepare(query, stmtMock, nil)
@@ -1867,6 +1908,7 @@ func Test_ExecuteWithQuery_Success(t *testing.T) {
 
 	// when
 	resultMock.PatchRowsAffected(3, nil)
+	resultMock.PatchLastInsertId(0, nil)
 	stmtMock.PatchExec(params, resultMock, nil)
 	stmtMock.PatchClose(nil)
 	sqlMock.PatchPrepare(queryForUpdate, stmtMock, nil)

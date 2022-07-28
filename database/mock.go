@@ -22,10 +22,11 @@ type Mock struct {
 
 //
 
-// ParseMockDBResultAffectedRows parse a mocked dbresult with affected rows
-func ParseMockDBResultAffectedRows(affectedRows int64) *DBResult {
+// ParseMockDBResult parse a mocked dbresult with affected rows and last inserted id
+func ParseMockDBResult(affectedRows int64, lastInsertId int64) *DBResult {
 	dbr := DBResult{
 		affectedRows: affectedRows,
+		lastInsertId: lastInsertId,
 	}
 
 	// done

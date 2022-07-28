@@ -375,7 +375,7 @@ func Test_Mock_Database_ExecuteWithNoErrorMockedWithoutParams_ShouldProcess_With
 	dbc := &database.DBContext{}
 	query := updateStmt
 	params := []interface{}{"2", 3}
-	mockedDBR := database.ParseMockDBResultAffectedRows(int64(1))
+	mockedDBR := database.ParseMockDBResult(int64(1), int64(0))
 
 	mockService.PatchExecute(dbc, query, params, mockedDBR, nil)
 
@@ -395,7 +395,7 @@ func Test_Mock_Database_ExecuteWithNoErrorMockedCalledTwice_ShouldPanic(t *testi
 	dbc := &database.DBContext{}
 	query := updateStmt
 	params := []interface{}{"2", 3}
-	mockedDBR := database.ParseMockDBResultAffectedRows(int64(1))
+	mockedDBR := database.ParseMockDBResult(int64(1), int64(0))
 
 	mockService.PatchExecute(dbc, query, params, mockedDBR, nil)
 

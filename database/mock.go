@@ -13,7 +13,6 @@ type Mock struct {
 	patchBeginMap                         map[hash][]outputForBegin
 	patchCommitMap                        map[hash][]outputForCommit
 	patchRollbackMap                      map[hash][]outputForRollback
-	patchWithTransactionMap               map[hash][]outputForWithTransaction
 	patchSelectMap                        map[hash][]outputForSelect
 	patchSelectUniqueValueMap             map[hash][]outputForSelectUniqueValue
 	patchExecuteMap                       map[hash][]outputForExecute
@@ -88,7 +87,6 @@ func NewMock() *Mock {
 	patchBeginMap := make(map[hash][]outputForBegin)
 	patchCommitMap := make(map[hash][]outputForCommit)
 	patchRollbackMap := make(map[hash][]outputForRollback)
-	patchWithTransactionMap := make(map[hash][]outputForWithTransaction)
 	patchSelectMap := make(map[hash][]outputForSelect)
 	patchSelectUniqueValueMap := make(map[hash][]outputForSelectUniqueValue)
 	patchExecuteMap := make(map[hash][]outputForExecute)
@@ -97,7 +95,6 @@ func NewMock() *Mock {
 		patchBeginMap:                         patchBeginMap,
 		patchCommitMap:                        patchCommitMap,
 		patchRollbackMap:                      patchRollbackMap,
-		patchWithTransactionMap:               patchWithTransactionMap,
 		patchSelectMap:                        patchSelectMap,
 		patchSelectUniqueValueMap:             patchSelectUniqueValueMap,
 		patchExecuteMap:                       patchExecuteMap,
@@ -132,14 +129,6 @@ type inputForRollback struct {
 }
 
 type outputForRollback struct {
-	err error
-}
-
-type inputForWithTransaction struct {
-	txFn func(dbc *DBContext) error
-}
-
-type outputForWithTransaction struct {
 	err error
 }
 
@@ -273,28 +262,7 @@ func getOutputForRollback(err error) outputForRollback {
 
 // PatchWithTransaction patch for WithTransaction function
 func (mock *Mock) PatchWithTransaction(txFn func(dbc *DBContext) error, outputError error) {
-	input := getInputForWithTransaction(txFn)
-	inputHash := toHash(input)
-	output := getOutputForWithTransaction(outputError)
-
-	if _, exists := mock.patchWithTransactionMap[inputHash]; !exists {
-		arrOutputForWithTransaction := make([]outputForWithTransaction, 0)
-		mock.patchWithTransactionMap[inputHash] = arrOutputForWithTransaction
-	}
-
-	mock.patchWithTransactionMap[inputHash] = append(mock.patchWithTransactionMap[inputHash], output)
-}
-
-func getInputForWithTransaction(txFn func(dbc *DBContext) error) inputForWithTransaction {
-	return inputForWithTransaction{
-		txFn: txFn,
-	}
-}
-
-func getOutputForWithTransaction(err error) outputForWithTransaction {
-	return outputForWithTransaction{
-		err: err,
-	}
+	panic(fmt.Sprintf("To patch Database.WithTransaction patch Database.Begin, Database.Rollback and Database.Commit"))
 }
 
 // PatchSelect patch for Select function
@@ -421,23 +389,31 @@ func (mock *Mock) Rollback(dbc *DBContext) error {
 
 // WithTransaction mock for WithTransaction function
 func (mock *Mock) WithTransaction(txFn func(dbc *DBContext) error) error {
-	input := getInputForWithTransaction(txFn)
-	inputHash := toHash(input)
-	arrOutputForWithTransaction, exists := mock.patchWithTransactionMap[inputHash]
-	if !exists || len(arrOutputForWithTransaction) == 0 {
-		panic(fmt.Sprintf("Mock not available for Database.WithTransaction(txFn: ...)"))
+	txContext, err := mock.Begin(nil)
+	if err != nil {
+		return err
 	}
 
-	output := arrOutputForWithTransaction[0]
-	arrOutputForWithTransaction = arrOutputForWithTransaction[1:]
-	mock.patchWithTransactionMap[inputHash] = arrOutputForWithTransaction
+	defer func() {
+		if p := recover(); p != nil {
+			// Rollbacks the transaction if there's a panic
+			_ = mock.Rollback(txContext)
+			panic(p)
+		} else if err != nil {
+			// Rollbacks the transaction if the txFn returns an error
+			rollbackErr := mock.Rollback(txContext)
+			if rollbackErr != nil {
+				err = fmt.Errorf("error rollbacking transaction: %s, %s", rollbackErr, err)
+			}
+		} else {
+			// Commits the transaction
+			err = mock.Commit(txContext)
+		}
+	}()
 
-	if output.err != nil {
-		return output.err
-	}
-
-	// done
-	return nil
+	// Executes txFn passed as parameter
+	err = txFn(txContext)
+	return err
 }
 
 // Select mock for select

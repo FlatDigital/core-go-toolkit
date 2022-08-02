@@ -722,6 +722,126 @@ func Test_Rollback_Close_Error(t *testing.T) {
 	ass.NotNil(err)
 }
 
+func Test_WithTransaction_Success(t *testing.T) {
+	// given
+	ass := assert.New(t)
+
+	config := ServiceConfig{
+		MaxConnectionRetries: 1,
+	}
+	service, sqlMock := newMockService(config)
+
+	ctx := context.Background()
+	sqlConn := newDBConnMock()
+	txMock := sqlmock.NewTxMockService()
+
+	txFn := func(dbc *DBContext) error { return nil }
+
+	// when
+	sqlMock.PatchConn(ctx, sqlConn, nil)
+	sqlMock.PatchPing(nil)
+	sqlMock.PatchPingContext(ctx, nil)
+	sqlMock.PatchBeginTx(ctx, nil, txMock, nil)
+	txMock.PatchCommit(nil)
+	sqlConn.PatchClose(nil)
+	err := service.WithTransaction(txFn)
+
+	// then
+	ass.Nil(err)
+}
+
+func Test_WithTransaction_Error(t *testing.T) {
+	// given
+	ass := assert.New(t)
+
+	config := ServiceConfig{
+		MaxConnectionRetries: 1,
+	}
+	service, sqlMock := newMockService(config)
+
+	ctx := context.Background()
+	sqlConn := newDBConnMock()
+	txMock := sqlmock.NewTxMockService()
+
+	testErr := errors.New("test error")
+	txFn := func(dbc *DBContext) error { return testErr }
+
+	// when
+	sqlMock.PatchConn(ctx, sqlConn, nil)
+	sqlMock.PatchPing(nil)
+	sqlMock.PatchPingContext(ctx, nil)
+	sqlMock.PatchBeginTx(ctx, nil, txMock, nil)
+	txMock.PatchRollback(nil)
+	sqlConn.PatchClose(nil)
+	err := service.WithTransaction(txFn)
+
+	// then
+	ass.NotNil(err)
+	ass.EqualValues(testErr, err)
+}
+
+func Test_WithTransaction_Commit_Error(t *testing.T) {
+	// given
+	ass := assert.New(t)
+
+	config := ServiceConfig{
+		MaxConnectionRetries: 1,
+	}
+	service, sqlMock := newMockService(config)
+
+	ctx := context.Background()
+	sqlConn := newDBConnMock()
+	txMock := sqlmock.NewTxMockService()
+
+	txFn := func(dbc *DBContext) error { return nil }
+
+	// when
+	sqlMock.PatchConn(ctx, sqlConn, nil)
+	sqlMock.PatchPing(nil)
+	sqlMock.PatchPingContext(ctx, nil)
+	sqlMock.PatchBeginTx(ctx, nil, txMock, nil)
+	testErr := errors.New("test error")
+	txMock.PatchCommit(testErr)
+	sqlConn.PatchClose(nil)
+	err := service.WithTransaction(txFn)
+
+	// then
+	ass.NotNil(err)
+	ass.EqualValues(testErr, err)
+}
+
+func Test_WithTransaction_Rollback_Error(t *testing.T) {
+	// given
+	ass := assert.New(t)
+
+	config := ServiceConfig{
+		MaxConnectionRetries: 1,
+	}
+	service, sqlMock := newMockService(config)
+
+	ctx := context.Background()
+	sqlConn := newDBConnMock()
+	txMock := sqlmock.NewTxMockService()
+
+	firstErr := errors.New("txFn error")
+	txFn := func(dbc *DBContext) error { return firstErr }
+
+	// when
+	sqlMock.PatchConn(ctx, sqlConn, nil)
+	sqlMock.PatchPing(nil)
+	sqlMock.PatchPingContext(ctx, nil)
+	sqlMock.PatchBeginTx(ctx, nil, txMock, nil)
+	secondErr := errors.New("rollback error")
+	txMock.PatchRollback(secondErr)
+	sqlConn.PatchClose(nil)
+	err := service.WithTransaction(txFn)
+
+	// then
+	expectedErr := errors.New("error rollbacking transaction: rollback error, txFn error")
+	ass.NotNil(err)
+	ass.EqualValues(expectedErr, err)
+}
+
 func Test_Select_Success(t *testing.T) {
 	// given
 	ass := assert.New(t)

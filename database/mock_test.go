@@ -193,6 +193,20 @@ func Test_Mock_Database_RollbackWithoutMock_ShouldPanic(t *testing.T) {
 
 //
 
+func Test_Mock_Database_PatchWithTransaction_ShouldPanic(t *testing.T) {
+	// Given
+	assertions, mockService := buildMockDependencies(t)
+
+	// When
+	txFn := func(txFn *database.DBContext) error { return nil }
+
+	// Then
+	assertions.PanicsWithValue(fmt.Sprintf("To patch Database.WithTransaction patch Database.Begin, Database.Rollback and Database.Commit"),
+		func() { mockService.PatchWithTransaction(txFn, nil) })
+}
+
+//
+
 func Test_Mock_Database_SelectWithNoErrorMockedWithoutParams_ShouldProcess_WithoutError(t *testing.T) {
 	// Given
 	assertions, mockService := buildMockDependencies(t)

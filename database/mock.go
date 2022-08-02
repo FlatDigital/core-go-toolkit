@@ -184,8 +184,6 @@ func toHash(input interface{}) hash {
 	return md5.Sum(jsonBytes)
 }
 
-//
-
 // PatchBegin patch for Begin function
 func (mock *Mock) PatchBegin(inputDBC *DBContext, outputDBC *DBContext, outputError error) {
 	input := getInputForBegin(inputDBC)
@@ -262,6 +260,11 @@ func getOutputForRollback(err error) outputForRollback {
 	}
 }
 
+// PatchWithTransaction patch for WithTransaction function
+func (mock *Mock) PatchWithTransaction(txFn func(dbc *DBContext) error, outputError error) {
+	panic(fmt.Sprintf("To patch Database.WithTransaction patch Database.Begin, Database.Rollback and Database.Commit"))
+}
+
 // PatchSelect patch for Select function
 func (mock *Mock) PatchSelect(inputDBC *DBContext, inputQuery string, inputForUpdate bool,
 	inputArrParams []interface{}, outputDBResult *DBResult, outputError error) {
@@ -321,9 +324,7 @@ func getOutputForExecute(dbr *DBResult, err error) outputForExecute {
 	}
 }
 
-//
-
-// Begin Mock for begin
+// Begin mock for Begin function
 func (mock *Mock) Begin(inDbc *DBContext) (outDbc *DBContext, err error) {
 	input := getInputForBegin(inDbc)
 	inputHash := toHash(input)
@@ -344,7 +345,7 @@ func (mock *Mock) Begin(inDbc *DBContext) (outDbc *DBContext, err error) {
 	return output.dbc, nil
 }
 
-// Commit Mock for commit
+// Commit mock for Commit function
 func (mock *Mock) Commit(dbc *DBContext) error {
 	input := getInputForCommit(dbc)
 	inputHash := toHash(input)
@@ -384,6 +385,35 @@ func (mock *Mock) Rollback(dbc *DBContext) error {
 
 	// done
 	return nil
+}
+
+// WithTransaction mock for WithTransaction function
+func (mock *Mock) WithTransaction(txFn func(dbc *DBContext) error) error {
+	txContext, err := mock.Begin(nil)
+	if err != nil {
+		return err
+	}
+
+	defer func() {
+		if p := recover(); p != nil {
+			// Rollbacks the transaction if there's a panic
+			_ = mock.Rollback(txContext)
+			panic(p)
+		} else if err != nil {
+			// Rollbacks the transaction if the txFn returns an error
+			rollbackErr := mock.Rollback(txContext)
+			if rollbackErr != nil {
+				err = fmt.Errorf("error rollbacking transaction: %s, %s", rollbackErr, err)
+			}
+		} else {
+			// Commits the transaction
+			err = mock.Commit(txContext)
+		}
+	}()
+
+	// Executes txFn passed as parameter
+	err = txFn(txContext)
+	return err
 }
 
 // Select mock for select

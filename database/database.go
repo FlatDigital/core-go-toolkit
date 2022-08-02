@@ -27,22 +27,23 @@ type (
 	Database interface {
 		PoolStats() sql.DBStats
 		TestConnection(dbc *DBContext) error
-		ExecuteWithQuery(dbc *DBContext, query *Query) (*DBResult, error)
 		Execute(dbc *DBContext, query string, params ...interface{}) (*DBResult, error)
-		ExecuteEnsuringOneAffectedRowWithQuery(dbc *DBContext, query *Query) error
+		ExecuteWithQuery(dbc *DBContext, query *Query) (*DBResult, error)
 		ExecuteEnsuringOneAffectedRow(dbc *DBContext, query string, params ...interface{}) error
+		ExecuteEnsuringOneAffectedRowWithQuery(dbc *DBContext, query *Query) error
 		QueryRow(query string, params ...interface{}) (*sql.Row, error)
-		SelectWithQuery(dbc *DBContext, query *Query) (*DBResult, error)
 		Select(dbc *DBContext, query string, forUpdate bool, params ...interface{}) (*DBResult, error)
-		SelectUniqueValueWithQuery(dbc *DBContext, query *Query) (*DBRow, error)
+		SelectWithQuery(dbc *DBContext, query *Query) (*DBResult, error)
 		SelectUniqueValue(dbc *DBContext, query string, forUpdate bool, params ...interface{}) (*DBRow, error)
-		SelectUniqueValueNonEmptyWithQuery(dbc *DBContext, query *Query) (*DBRow, error)
+		SelectUniqueValueWithQuery(dbc *DBContext, query *Query) (*DBRow, error)
 		SelectUniqueValueNonEmpty(dbc *DBContext, query string, forUpdate bool, params ...interface{}) (*DBRow, error)
+		SelectUniqueValueNonEmptyWithQuery(dbc *DBContext, query *Query) (*DBRow, error)
+		Connection() (*DBContext, error)
 		Begin(dbc *DBContext) (*DBContext, error)
 		Commit(dbc *DBContext) error
 		Rollback(dbc *DBContext) error
-		Connection() (*DBContext, error)
 		Close(dbc *DBContext) error
+		WithTransaction(txFn func(dbc *DBContext) error) error
 	}
 
 	// ServiceConfig database service config
@@ -376,6 +377,37 @@ func (service *service) Rollback(dbc *DBContext) error {
 
 	// done
 	return nil
+}
+
+// WithTransaction is a high order function that manages the beginning, rollback and commit of a transaction so the
+// developer doesn't have to worry about rollback in every error or catching panics.
+func (service *service) WithTransaction(txFn func(dbc *DBContext) error) (err error) {
+	// Starts a new transaction
+	txContext, err := service.Begin(nil)
+	if err != nil {
+		return err
+	}
+
+	defer func() {
+		if p := recover(); p != nil {
+			// Rollbacks the transaction if there's a panic
+			_ = service.Rollback(txContext)
+			panic(p)
+		} else if err != nil {
+			// Rollbacks the transaction if the txFn returns an error
+			rollbackErr := service.Rollback(txContext)
+			if rollbackErr != nil {
+				err = fmt.Errorf("error rollbacking transaction: %s, %s", rollbackErr, err)
+			}
+		} else {
+			// Commits the transaction
+			err = service.Commit(txContext)
+		}
+	}()
+
+	// Executes txFn passed as parameter
+	err = txFn(txContext)
+	return err
 }
 
 // SelectWithQuery does a select in the database with a Query and process results returning a Map

@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -40,6 +41,35 @@ func Auth() gin.HandlerFunc {
 
 		c.Set("callerID", callerID)
 		c.Set("isAdmin", isAdmin)
+		c.Next()
+	}
+}
+
+// HeaderVerification Middleware. It checks that a specific header is sent
+// and matches the given value
+func HeaderVerification(header string, value string) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		headerValue := c.GetHeader(header)
+		if headerValue == "" {
+			errors.ReturnError(c, &errors.Error{
+				Code:    errors.ForbiddenApiError,
+				Cause:   "parsing header value",
+				Message: fmt.Sprintf("request doesn't contains %s header", header),
+			})
+			c.Abort()
+			return
+		}
+
+		if headerValue != value {
+			errors.ReturnError(c, &errors.Error{
+				Code:    errors.ForbiddenApiError,
+				Cause:   "comparing header value",
+				Message: fmt.Sprintf("invalid %s token", header),
+			})
+			c.Abort()
+			return
+		}
+
 		c.Next()
 	}
 }

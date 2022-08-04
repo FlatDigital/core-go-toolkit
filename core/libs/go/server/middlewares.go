@@ -64,7 +64,7 @@ func HeaderVerification(header string, value string) gin.HandlerFunc {
 			errors.ReturnError(c, &errors.Error{
 				Code:    errors.ForbiddenApiError,
 				Cause:   "comparing header value",
-				Message: fmt.Sprintf("invalid %s token, required: %s", header, value),
+				Message: fmt.Sprintf("invalid %s token", header),
 			})
 			c.Abort()
 			return

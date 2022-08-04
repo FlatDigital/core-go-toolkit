@@ -54,7 +54,7 @@ func HeaderVerification(header string, value string) gin.HandlerFunc {
 			errors.ReturnError(c, &errors.Error{
 				Code:    errors.ForbiddenApiError,
 				Cause:   "parsing header value",
-				Message: fmt.Sprintf("request doesn't contains %s header", header),
+				Message: fmt.Sprintf("request doesn't contain %s header", header),
 			})
 			c.Abort()
 			return

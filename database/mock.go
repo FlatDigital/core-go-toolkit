@@ -15,6 +15,7 @@ type Mock struct {
 	patchRollbackMap                      map[hash][]outputForRollback
 	patchSelectMap                        map[hash][]outputForSelect
 	patchSelectUniqueValueMap             map[hash][]outputForSelectUniqueValue
+	patchSelectUniqueValueNonEmptyMap     map[hash][]outputForSelectUniqueValueNonEmpty
 	patchExecuteMap                       map[hash][]outputForExecute
 	patchExecuteEnsuringOneAffectedRowMap map[hash][]outputForExecuteEnsuringOneAffectedRow
 }
@@ -89,6 +90,7 @@ func NewMock() *Mock {
 	patchRollbackMap := make(map[hash][]outputForRollback)
 	patchSelectMap := make(map[hash][]outputForSelect)
 	patchSelectUniqueValueMap := make(map[hash][]outputForSelectUniqueValue)
+	patchSelectUniqueValueNonEmptyMap := make(map[hash][]outputForSelectUniqueValueNonEmpty)
 	patchExecuteMap := make(map[hash][]outputForExecute)
 	patchExecuteEnsuringOneAffectedRowMap := make(map[hash][]outputForExecuteEnsuringOneAffectedRow)
 	databaseMock := &Mock{
@@ -97,6 +99,7 @@ func NewMock() *Mock {
 		patchRollbackMap:                      patchRollbackMap,
 		patchSelectMap:                        patchSelectMap,
 		patchSelectUniqueValueMap:             patchSelectUniqueValueMap,
+		patchSelectUniqueValueNonEmptyMap:     patchSelectUniqueValueNonEmptyMap,
 		patchExecuteMap:                       patchExecuteMap,
 		patchExecuteEnsuringOneAffectedRowMap: patchExecuteEnsuringOneAffectedRowMap,
 	}
@@ -152,6 +155,18 @@ type inputForSelectUniqueValue struct {
 }
 
 type outputForSelectUniqueValue struct {
+	dbr *DBRow
+	err error
+}
+
+type inputForSelectUniqueValueNonEmpty struct {
+	DBC       *DBContext
+	Query     string
+	ForUpdate bool
+	ArrParams []interface{}
+}
+
+type outputForSelectUniqueValueNonEmpty struct {
 	dbr *DBRow
 	err error
 }
@@ -506,6 +521,62 @@ func (mock *Mock) SelectUniqueValue(dbc *DBContext, query string, forUpdate bool
 	output := arrOutputForSelectUniqueValue[0]
 	arrOutputForSelectUniqueValue = arrOutputForSelectUniqueValue[1:]
 	mock.patchSelectUniqueValueMap[inputHash] = arrOutputForSelectUniqueValue
+
+	if output.err != nil {
+		return nil, output.err
+	}
+
+	// done
+	return output.dbr, nil
+}
+
+// SelectUniqueValueNonEmpty
+
+// PatchSelectUniqueValueNonEmpty patch for SelectUniqueValueNonEmpty function
+func (mock *Mock) PatchSelectUniqueValueNonEmpty(inputDBC *DBContext, inputQuery string, inputForUpdate bool,
+	inputArrParams []interface{}, outputDBRow *DBRow, outputError error) {
+	input := getInputForSelectUniqueValueNonEmpty(inputDBC, inputQuery, inputForUpdate, inputArrParams)
+	inputHash := toHash(input)
+	output := getOutputForSelectUniqueValueNonEmpty(outputDBRow, outputError)
+
+	if _, exists := mock.patchSelectUniqueValueNonEmptyMap[inputHash]; !exists {
+		arrOutputForSelectUniqueValueNonEmpty := make([]outputForSelectUniqueValueNonEmpty, 0)
+		mock.patchSelectUniqueValueNonEmptyMap[inputHash] = arrOutputForSelectUniqueValueNonEmpty
+	}
+	mock.patchSelectUniqueValueNonEmptyMap[inputHash] = append(mock.patchSelectUniqueValueNonEmptyMap[inputHash], output)
+}
+
+func getInputForSelectUniqueValueNonEmpty(dbc *DBContext, query string, forUpdate bool,
+	arrParams []interface{}) inputForSelectUniqueValueNonEmpty {
+	return inputForSelectUniqueValueNonEmpty{
+		DBC:       dbc,
+		Query:     query,
+		ForUpdate: forUpdate,
+		ArrParams: arrParams,
+	}
+}
+
+func getOutputForSelectUniqueValueNonEmpty(dbr *DBRow, err error) outputForSelectUniqueValueNonEmpty {
+	return outputForSelectUniqueValueNonEmpty{
+		dbr: dbr,
+		err: err,
+	}
+}
+
+// SelectUniqueValueNonEmpty mock for SelectUniqueValueNonEmpty
+func (mock *Mock) SelectUniqueValueNonEmpty(dbc *DBContext, query string, forUpdate bool,
+	params ...interface{}) (*DBRow, error) {
+	input := getInputForSelectUniqueValueNonEmpty(dbc, query, forUpdate, params)
+	inputHash := toHash(input)
+	arrOutputForSelectUniqueValueNonEmpty, exists := mock.patchSelectUniqueValueNonEmptyMap[inputHash]
+	if !exists || len(arrOutputForSelectUniqueValueNonEmpty) == 0 {
+		panic(fmt.Sprintf("Mock not available for Database.SelectUniqueValueNonEmpty(dbc: %v, query: %s, forUpdate: %t, params: %v)",
+			dbc, query, forUpdate, params))
+	}
+
+	output := arrOutputForSelectUniqueValueNonEmpty[0]
+	arrOutputForSelectUniqueValueNonEmpty = arrOutputForSelectUniqueValueNonEmpty[1:]
+	mock.patchSelectUniqueValueNonEmptyMap[inputHash] = arrOutputForSelectUniqueValueNonEmpty
 
 	if output.err != nil {
 		return nil, output.err

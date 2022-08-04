@@ -396,6 +396,8 @@ func Test_Mock_Database_ExecuteWithoutMock_ShouldPanic(t *testing.T) {
 		func() { mockService.Execute(dbc, query, params) })
 }
 
+//
+
 func Test_Mock_SelectUniqueValue_WithoutError(t *testing.T) {
 	// Given
 	assertions, mockService := buildMockDependencies(t)
@@ -498,6 +500,113 @@ func Test_Mock_SelectUniqueValue_ReturnsTwoRows_ForcedForTest_WithError(t *testi
 	assertions.EqualError(err, "unexpected records size, expected 1 but was: 2")
 	assertions.Nil(dbRow)
 }
+
+//
+
+func Test_Mock_SelectUniqueValueNonEmpty_WithoutError(t *testing.T) {
+	// Given
+	assertions, mockService := buildMockDependencies(t)
+
+	// When
+	dbc := &database.DBContext{}
+	query := selectStmt
+	forUpdate := false
+	params := []interface{}{}
+	mockedDBR := database.ParseMockDBResultFromJSON(`[{"one":"1"}]`).GetRows()[0]
+
+	mockService.PatchSelectUniqueValueNonEmpty(dbc, query, forUpdate, params, &mockedDBR, nil)
+	dbRow, err := mockService.SelectUniqueValueNonEmpty(dbc, query, forUpdate, params...)
+	one, nre := dbRow.GetInt64ByNameRequired("one")
+	assertions.Nil(nre)
+
+	// Then
+	assertions.NotNil(dbRow)
+	assertions.Equal(int64(1), one)
+	assertions.Nil(err)
+}
+
+func Test_Mock_SelectUniqueValueNonEmpty_WithError(t *testing.T) {
+	// Given
+	assertions, mockService := buildMockDependencies(t)
+
+	// When
+	dbc := &database.DBContext{}
+	query := selectStmt
+	forUpdate := false
+	params := []interface{}{}
+
+	mockService.PatchSelectUniqueValueNonEmpty(dbc, query, forUpdate, params, nil, errors.New("forced for test"))
+	dbRow, err := mockService.SelectUniqueValueNonEmpty(dbc, query, forUpdate, params...)
+
+	// Then
+	assertions.Nil(dbRow)
+	assertions.NotNil(err)
+	assertions.EqualError(err, "forced for test")
+}
+
+func Test_Mock_SelectUniqueValueNonEmpty_WithErrorFirstThenSuccess(t *testing.T) {
+	// Given
+	assertions, mockService := buildMockDependencies(t)
+
+	// When
+	dbc := &database.DBContext{}
+	query := selectStmt
+	forUpdate := false
+	params := []interface{}{}
+	// Error
+	mockService.PatchSelectUniqueValueNonEmpty(dbc, query, forUpdate, params, nil, errors.New("forced for test"))
+	// Success
+	mockedDBR := database.ParseMockDBResultFromJSON(`[{"one":"1"}]`).GetRows()[0]
+	mockService.PatchSelectUniqueValueNonEmpty(dbc, query, forUpdate, params, &mockedDBR, nil)
+	dbRow1, err1 := mockService.SelectUniqueValueNonEmpty(dbc, query, forUpdate, params...)
+	dbRow2, err2 := mockService.SelectUniqueValueNonEmpty(dbc, query, forUpdate, params...)
+	one, _ := dbRow2.GetInt64ByNameRequired("one")
+
+	// Then
+	assertions.Nil(dbRow1)
+	assertions.NotNil(err1)
+	assertions.EqualError(err1, "forced for test")
+	assertions.NotNil(dbRow2)
+	assertions.Nil(err2)
+	assertions.Equal(int64(1), one)
+}
+
+func Test_Mock_SelectUniqueValueNonEmpty_WithPanic(t *testing.T) {
+	// Given
+	assertions, mockService := buildMockDependencies(t)
+
+	// Then
+	assertions.PanicsWithValue("Mock not available for Database.SelectUniqueValueNonEmpty(dbc: &{<nil> 0 <nil> <nil>}, query: "+
+		"SELECT 1 AS one;, forUpdate: false, params: [[]])",
+		func() {
+			dbc := &database.DBContext{}
+			query := selectStmt
+			forUpdate := false
+			params := []interface{}{}
+			mockService.SelectUniqueValueNonEmpty(dbc, query, forUpdate, params)
+		})
+}
+
+func Test_Mock_SelectUniqueValueNonEmpty_ReturnsTwoRows_ForcedForTest_WithError(t *testing.T) {
+	// Given
+	assertions, mockService := buildMockDependencies(t)
+
+	// When
+	dbc := &database.DBContext{}
+	query := selectStmt
+	forUpdate := false
+	params := []interface{}{}
+	mockService.PatchSelectUniqueValueNonEmpty(dbc, query, forUpdate, params, nil,
+		errors.New("unexpected records size, expected 1 but was: 2"))
+	dbRow, err := mockService.SelectUniqueValueNonEmpty(dbc, query, forUpdate, params...)
+
+	// Then
+	assertions.NotNil(err)
+	assertions.EqualError(err, "unexpected records size, expected 1 but was: 2")
+	assertions.Nil(dbRow)
+}
+
+//
 
 func Test_Mock_ExecuteEnsuringOneAffectedRow_WithError(t *testing.T) {
 	// Given

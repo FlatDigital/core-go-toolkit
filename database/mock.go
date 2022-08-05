@@ -403,7 +403,7 @@ func (mock *Mock) Rollback(dbc *DBContext) error {
 }
 
 // WithTransaction mock for WithTransaction function
-func (mock *Mock) WithTransaction(txFn func(dbc *DBContext) error) error {
+func (mock *Mock) WithTransaction(txFn func(dbc *DBContext) error) (err error) {
 	txContext, err := mock.Begin(nil)
 	if err != nil {
 		return err

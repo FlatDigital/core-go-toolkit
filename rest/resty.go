@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"errors"
 	"fmt"
 	"net"
 	"net/http"
@@ -76,7 +77,7 @@ func (service *restyService) MakeGetRequest(ctx *gin.Context, url string, header
 	}
 
 	if r.StatusCode() != http.StatusOK {
-		service.recordErrorMetric(ctx, url, r.StatusCode(), "MakeGetRequest", err)
+		service.recordErrorMetric(ctx, url, r.StatusCode(), "MakeGetRequest", errors.New(http.StatusText(r.StatusCode())))
 		return r.StatusCode(), r.Body(), err
 	}
 
@@ -99,7 +100,7 @@ func (service *restyService) MakePostRequest(ctx *gin.Context, url string, body 
 	}
 
 	if r.StatusCode() != http.StatusOK {
-		service.recordErrorMetric(ctx, url, r.StatusCode(), "MakePostRequest", err)
+		service.recordErrorMetric(ctx, url, r.StatusCode(), "MakePostRequest", errors.New(http.StatusText(r.StatusCode())))
 		return r.StatusCode(), r.Body(), err
 	}
 
@@ -122,7 +123,7 @@ func (service *restyService) MakePutRequest(ctx *gin.Context, url string, body i
 	}
 
 	if r.StatusCode() != http.StatusOK {
-		service.recordErrorMetric(ctx, url, r.StatusCode(), "MakePutRequest", err)
+		service.recordErrorMetric(ctx, url, r.StatusCode(), "MakePutRequest", errors.New(http.StatusText(r.StatusCode())))
 		return r.StatusCode(), r.Body(), err
 	}
 
@@ -144,7 +145,7 @@ func (service *restyService) MakeDeleteRequest(ctx *gin.Context, url string, hea
 	}
 
 	if r.StatusCode() != http.StatusOK {
-		service.recordErrorMetric(ctx, url, r.StatusCode(), "MakeDeleteRequest", err)
+		service.recordErrorMetric(ctx, url, r.StatusCode(), "MakeDeleteRequest", errors.New(http.StatusText(r.StatusCode())))
 		return r.StatusCode(), r.Body(), err
 	}
 
@@ -171,7 +172,7 @@ func (service *restyService) MakeGetRequestWithConfig(ctx *gin.Context, url stri
 
 	if r.StatusCode() != http.StatusOK {
 		// Send metric to DD
-		service.recordErrorMetric(ctx, url, r.StatusCode(), "MakeGetRequestWithConfig", err)
+		service.recordErrorMetric(ctx, url, r.StatusCode(), "MakeGetRequestWithConfig", errors.New(http.StatusText(r.StatusCode())))
 		return r.StatusCode(), r.Body(), err
 	}
 

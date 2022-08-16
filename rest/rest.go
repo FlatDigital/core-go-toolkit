@@ -5,32 +5,32 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/gin-gonic/gin"
+	"github.com/FlatDigital/core-go-toolkit/core/flat"
 )
 
 // Rest interface for rest service
 type Rest interface {
-	MakeGetRequest(ctx *gin.Context, url string, headers http.Header) (int, []byte, error)
-	MakePostRequest(ctx *gin.Context, url string, body interface{}, headers http.Header) (int, []byte, error)
-	MakePutRequest(ctx *gin.Context, url string, body interface{}, headers http.Header) (int, []byte, error)
-	MakeDeleteRequest(ctx *gin.Context, url string, headers http.Header) (int, []byte, error)
+	MakeGetRequest(ctx *flat.Context, url string, headers http.Header) (int, []byte, error)
+	MakePostRequest(ctx *flat.Context, url string, body interface{}, headers http.Header) (int, []byte, error)
+	MakePutRequest(ctx *flat.Context, url string, body interface{}, headers http.Header) (int, []byte, error)
+	MakeDeleteRequest(ctx *flat.Context, url string, headers http.Header) (int, []byte, error)
 
-	MakeGetRequestWithConfig(ctx *gin.Context, url string, headers http.Header,
+	MakeGetRequestWithConfig(ctx *flat.Context, url string, headers http.Header,
 		config RequestConfig) (int, []byte, error)
-	MakePostRequestWithConfig(ctx *gin.Context, url string, body interface{}, headers http.Header,
+	MakePostRequestWithConfig(ctx *flat.Context, url string, body interface{}, headers http.Header,
 		config RequestConfig) (int, []byte, error)
-	MakePutRequestWithConfig(ctx *gin.Context, url string, body interface{}, headers http.Header,
+	MakePutRequestWithConfig(ctx *flat.Context, url string, body interface{}, headers http.Header,
 		config RequestConfig) (int, []byte, error)
-	MakeDeleteRequestWithConfig(ctx *gin.Context, url string, headers http.Header,
+	MakeDeleteRequestWithConfig(ctx *flat.Context, url string, headers http.Header,
 		config RequestConfig) (int, []byte, error)
 
-	MakeGetRequestWithTimeout(ctx *gin.Context, url string, headers http.Header,
+	MakeGetRequestWithTimeout(ctx *flat.Context, url string, headers http.Header,
 		timeout time.Duration) (int, []byte, error)
-	MakePostRequestWithTimeout(ctx *gin.Context, url string, body interface{}, headers http.Header,
+	MakePostRequestWithTimeout(ctx *flat.Context, url string, body interface{}, headers http.Header,
 		timeout time.Duration) (int, []byte, error)
-	MakePutRequestWithTimeout(ctx *gin.Context, url string, body interface{}, headers http.Header,
+	MakePutRequestWithTimeout(ctx *flat.Context, url string, body interface{}, headers http.Header,
 		timeout time.Duration) (int, []byte, error)
-	MakeDeleteRequestWithTimeout(ctx *gin.Context, url string, headers http.Header,
+	MakeDeleteRequestWithTimeout(ctx *flat.Context, url string, headers http.Header,
 		timeout time.Duration) (int, []byte, error)
 }
 
@@ -79,47 +79,47 @@ func NewRestService(config ServiceConfig) Rest {
 	}
 }
 
-func (service *service) MakeGetRequest(ctx *gin.Context, url string, headers http.Header) (int, []byte, error) {
+func (service *service) MakeGetRequest(ctx *flat.Context, url string, headers http.Header) (int, []byte, error) {
 	return 0, []byte{}, nil
 }
-func (service *service) MakePostRequest(ctx *gin.Context, url string, body interface{}, headers http.Header) (int, []byte, error) {
+func (service *service) MakePostRequest(ctx *flat.Context, url string, body interface{}, headers http.Header) (int, []byte, error) {
 	return 0, []byte{}, nil
 }
-func (service *service) MakePutRequest(ctx *gin.Context, url string, body interface{}, headers http.Header) (int, []byte, error) {
+func (service *service) MakePutRequest(ctx *flat.Context, url string, body interface{}, headers http.Header) (int, []byte, error) {
 	return 0, []byte{}, nil
 }
-func (service *service) MakeDeleteRequest(ctx *gin.Context, url string, headers http.Header) (int, []byte, error) {
-	return 0, []byte{}, nil
-}
-
-func (service *service) MakeGetRequestWithConfig(ctx *gin.Context, url string, headers http.Header, config RequestConfig) (int, []byte, error) {
+func (service *service) MakeDeleteRequest(ctx *flat.Context, url string, headers http.Header) (int, []byte, error) {
 	return 0, []byte{}, nil
 }
 
-func (service *service) MakePostRequestWithConfig(ctx *gin.Context, url string, body interface{}, headers http.Header, config RequestConfig) (int, []byte, error) {
+func (service *service) MakeGetRequestWithConfig(ctx *flat.Context, url string, headers http.Header, config RequestConfig) (int, []byte, error) {
 	return 0, []byte{}, nil
 }
 
-func (service *service) MakePutRequestWithConfig(ctx *gin.Context, url string, body interface{}, headers http.Header, config RequestConfig) (int, []byte, error) {
+func (service *service) MakePostRequestWithConfig(ctx *flat.Context, url string, body interface{}, headers http.Header, config RequestConfig) (int, []byte, error) {
 	return 0, []byte{}, nil
 }
 
-func (service *service) MakeDeleteRequestWithConfig(ctx *gin.Context, url string, headers http.Header, config RequestConfig) (int, []byte, error) {
+func (service *service) MakePutRequestWithConfig(ctx *flat.Context, url string, body interface{}, headers http.Header, config RequestConfig) (int, []byte, error) {
 	return 0, []byte{}, nil
 }
 
-func (service *service) MakeGetRequestWithTimeout(ctx *gin.Context, url string, headers http.Header, timeout time.Duration) (int, []byte, error) {
+func (service *service) MakeDeleteRequestWithConfig(ctx *flat.Context, url string, headers http.Header, config RequestConfig) (int, []byte, error) {
 	return 0, []byte{}, nil
 }
 
-func (service *service) MakePostRequestWithTimeout(ctx *gin.Context, url string, body interface{}, headers http.Header, timeout time.Duration) (int, []byte, error) {
+func (service *service) MakeGetRequestWithTimeout(ctx *flat.Context, url string, headers http.Header, timeout time.Duration) (int, []byte, error) {
 	return 0, []byte{}, nil
 }
 
-func (service *service) MakePutRequestWithTimeout(ctx *gin.Context, url string, body interface{}, headers http.Header, timeout time.Duration) (int, []byte, error) {
+func (service *service) MakePostRequestWithTimeout(ctx *flat.Context, url string, body interface{}, headers http.Header, timeout time.Duration) (int, []byte, error) {
 	return 0, []byte{}, nil
 }
 
-func (service *service) MakeDeleteRequestWithTimeout(ctx *gin.Context, url string, headers http.Header, timeout time.Duration) (int, []byte, error) {
+func (service *service) MakePutRequestWithTimeout(ctx *flat.Context, url string, body interface{}, headers http.Header, timeout time.Duration) (int, []byte, error) {
+	return 0, []byte{}, nil
+}
+
+func (service *service) MakeDeleteRequestWithTimeout(ctx *flat.Context, url string, headers http.Header, timeout time.Duration) (int, []byte, error) {
 	return 0, []byte{}, nil
 }

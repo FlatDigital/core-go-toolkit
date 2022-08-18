@@ -16,6 +16,7 @@ const (
 	MakeGetRequest           string = "MakeGetRequest"
 	MakePostRequest          string = "MakePostRequest"
 	MakePutRequest           string = "MakePutRequest"
+	MakePatchRequest         string = "MakePatchRequest"
 	MakeDeleteRequest        string = "MakeDeleteRequest"
 	MakeGetRequestWithConfig string = "MakeGetRequestWithConfig"
 )
@@ -96,6 +97,16 @@ func (service *restyService) MakePutRequest(ctx *flat.Context, url string, body 
 	req.SetBody(body)
 
 	response, err := req.Put(url)
+	return service.evaluateResponse(ctx, url, response, MakePutRequest, start, err)
+}
+
+func (service *restyService) MakePatchRequest(ctx *flat.Context, url string, body interface{}, headers http.Header) (int, []byte, error) {
+	start := time.Now()
+	req := service.restyClient.R()
+	req.SetHeaderMultiValues(headers)
+	req.SetBody(body)
+
+	response, err := req.Patch(url)
 	return service.evaluateResponse(ctx, url, response, MakePutRequest, start, err)
 }
 

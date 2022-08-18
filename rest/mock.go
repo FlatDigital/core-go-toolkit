@@ -17,6 +17,7 @@ type Mock struct {
 	makeGetRequestMockStack    map[hash][]outputForMakeGetRequest
 	makePostRequestMockStack   map[hash][]outputForMakePostRequest
 	makePutRequestMockStack    map[hash][]outputForMakePutRequest
+	makePatchRequestMockStack  map[hash][]outputForMakePatchRequest
 	makeDeleteRequestMockStack map[hash][]outputForMakeDeleteRequest
 
 	makeGetRequestWithConfigMockStack    map[hash][]outputForMakeGetRequestWithConfig
@@ -36,6 +37,7 @@ func NewMock() *Mock {
 		makeGetRequestMockStack:    map[hash][]outputForMakeGetRequest{},
 		makePostRequestMockStack:   map[hash][]outputForMakePostRequest{},
 		makePutRequestMockStack:    map[hash][]outputForMakePutRequest{},
+		makePatchRequestMockStack:  map[hash][]outputForMakePatchRequest{},
 		makeDeleteRequestMockStack: map[hash][]outputForMakeDeleteRequest{},
 
 		makeGetRequestWithConfigMockStack:    map[hash][]outputForMakeGetRequestWithConfig{},
@@ -237,6 +239,71 @@ func (mock *Mock) MakePutRequest(ctx *flat.Context, url string, body interface{}
 	arrOutput = arrOutput[1:]
 
 	mock.makePutRequestMockStack[inputHash] = arrOutput
+	return output.OutputStatusCode, output.OutputResponse, output.OutputError
+}
+
+//
+type inputForMakePatchRequest struct {
+	InputCTX     *flat.Context
+	InputURL     string
+	InputBody    interface{}
+	InputHeaders http.Header
+}
+
+type outputForMakePatchRequest struct {
+	OutputStatusCode int
+	OutputResponse   []byte
+	OutputError      error
+}
+
+// PatchMakePutRequest patch for MakePutRequest function
+func (mock *Mock) PatchMakePatchRequest(inputCTX *flat.Context, inputURL string, inputBody interface{},
+	inputHeaders http.Header, outputStatusCode int, outputResponse []byte, outputError error) {
+	mock.mux.Lock()
+	defer mock.mux.Unlock()
+
+	input := inputForMakePatchRequest{
+		InputCTX:     inputCTX,
+		InputURL:     inputURL,
+		InputBody:    inputBody,
+		InputHeaders: inputHeaders,
+	}
+
+	inputHash := toHash(input)
+
+	output := outputForMakePatchRequest{
+		OutputStatusCode: outputStatusCode,
+		OutputResponse:   outputResponse,
+		OutputError:      outputError,
+	}
+
+	mock.makePatchRequestMockStack[inputHash] = append(mock.makePatchRequestMockStack[inputHash], output)
+}
+
+// MakePutRequest mock for MakePutRequest function
+func (mock *Mock) MakePatchRequest(ctx *flat.Context, url string, body interface{},
+	headers http.Header) (int, []byte, error) {
+	mock.mux.Lock()
+	defer mock.mux.Unlock()
+
+	input := inputForMakePatchRequest{
+		InputCTX:     ctx,
+		InputURL:     url,
+		InputBody:    body,
+		InputHeaders: headers,
+	}
+
+	inputHash := toHash(input)
+	arrOutput, exists := mock.makePatchRequestMockStack[inputHash]
+
+	if !exists || len(arrOutput) == 0 {
+		panic("Mock not available for MakePatchRequest")
+	}
+
+	output := arrOutput[0]
+	arrOutput = arrOutput[1:]
+
+	mock.makePatchRequestMockStack[inputHash] = arrOutput
 	return output.OutputStatusCode, output.OutputResponse, output.OutputError
 }
 

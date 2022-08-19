@@ -53,7 +53,7 @@ type ServiceConfig struct {
 }
 
 type RequestConfig struct {
-	DisableTimeout bool // See @RequestBuilder.DisableTimeout: Disable timeout and default timeout = no timeout
+	DisableTimeout bool
 	Timeout        time.Duration
 	ConnectTimeout time.Duration
 }

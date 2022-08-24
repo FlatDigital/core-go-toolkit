@@ -7,7 +7,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/gin-gonic/gin"
+	"github.com/FlatDigital/core-go-toolkit/core/flat"
 )
 
 // Mock struct for Rest mock
@@ -17,6 +17,7 @@ type Mock struct {
 	makeGetRequestMockStack    map[hash][]outputForMakeGetRequest
 	makePostRequestMockStack   map[hash][]outputForMakePostRequest
 	makePutRequestMockStack    map[hash][]outputForMakePutRequest
+	makePatchRequestMockStack  map[hash][]outputForMakePatchRequest
 	makeDeleteRequestMockStack map[hash][]outputForMakeDeleteRequest
 
 	makeGetRequestWithConfigMockStack    map[hash][]outputForMakeGetRequestWithConfig
@@ -36,6 +37,7 @@ func NewMock() *Mock {
 		makeGetRequestMockStack:    map[hash][]outputForMakeGetRequest{},
 		makePostRequestMockStack:   map[hash][]outputForMakePostRequest{},
 		makePutRequestMockStack:    map[hash][]outputForMakePutRequest{},
+		makePatchRequestMockStack:  map[hash][]outputForMakePatchRequest{},
 		makeDeleteRequestMockStack: map[hash][]outputForMakeDeleteRequest{},
 
 		makeGetRequestWithConfigMockStack:    map[hash][]outputForMakeGetRequestWithConfig{},
@@ -51,7 +53,7 @@ func NewMock() *Mock {
 }
 
 type inputForMakeGetRequest struct {
-	InputCTX     *gin.Context
+	InputCTX     *flat.Context
 	InputURL     string
 	InputHeaders http.Header
 }
@@ -63,7 +65,7 @@ type outputForMakeGetRequest struct {
 }
 
 // PatchMakeGetRequest patch for MakeGetRequest function
-func (mock *Mock) PatchMakeGetRequest(inputCTX *gin.Context, inputURL string, inputHeaders http.Header,
+func (mock *Mock) PatchMakeGetRequest(inputCTX *flat.Context, inputURL string, inputHeaders http.Header,
 	outputStatusCode int, outputResponse []byte, outputError error) {
 	mock.mux.Lock()
 	defer mock.mux.Unlock()
@@ -86,7 +88,7 @@ func (mock *Mock) PatchMakeGetRequest(inputCTX *gin.Context, inputURL string, in
 }
 
 // MakeGetRequest mock for MakeGetRequest function
-func (mock *Mock) MakeGetRequest(ctx *gin.Context, url string, headers http.Header) (int, []byte, error) {
+func (mock *Mock) MakeGetRequest(ctx *flat.Context, url string, headers http.Header) (int, []byte, error) {
 	mock.mux.Lock()
 	defer mock.mux.Unlock()
 
@@ -111,7 +113,7 @@ func (mock *Mock) MakeGetRequest(ctx *gin.Context, url string, headers http.Head
 }
 
 type inputForMakePostRequest struct {
-	InputCTX     *gin.Context
+	InputCTX     *flat.Context
 	InputURL     string
 	InputBody    interface{}
 	InputHeaders http.Header
@@ -124,7 +126,7 @@ type outputForMakePostRequest struct {
 }
 
 // PatchMakePostRequest patch for MakePostRequest function
-func (mock *Mock) PatchMakePostRequest(inputCTX *gin.Context, inputURL string, inputBody interface{},
+func (mock *Mock) PatchMakePostRequest(inputCTX *flat.Context, inputURL string, inputBody interface{},
 	inputHeaders http.Header, outputStatusCode int, outputResponse []byte, outputError error) {
 	mock.mux.Lock()
 	defer mock.mux.Unlock()
@@ -148,7 +150,7 @@ func (mock *Mock) PatchMakePostRequest(inputCTX *gin.Context, inputURL string, i
 }
 
 // MakePostRequest mock for MakePostRequest function
-func (mock *Mock) MakePostRequest(ctx *gin.Context, url string, body interface{},
+func (mock *Mock) MakePostRequest(ctx *flat.Context, url string, body interface{},
 	headers http.Header) (int, []byte, error) {
 	mock.mux.Lock()
 	defer mock.mux.Unlock()
@@ -177,7 +179,7 @@ func (mock *Mock) MakePostRequest(ctx *gin.Context, url string, body interface{}
 }
 
 type inputForMakePutRequest struct {
-	InputCTX     *gin.Context
+	InputCTX     *flat.Context
 	InputURL     string
 	InputBody    interface{}
 	InputHeaders http.Header
@@ -190,7 +192,7 @@ type outputForMakePutRequest struct {
 }
 
 // PatchMakePutRequest patch for MakePutRequest function
-func (mock *Mock) PatchMakePutRequest(inputCTX *gin.Context, inputURL string, inputBody interface{},
+func (mock *Mock) PatchMakePutRequest(inputCTX *flat.Context, inputURL string, inputBody interface{},
 	inputHeaders http.Header, outputStatusCode int, outputResponse []byte, outputError error) {
 	mock.mux.Lock()
 	defer mock.mux.Unlock()
@@ -214,7 +216,7 @@ func (mock *Mock) PatchMakePutRequest(inputCTX *gin.Context, inputURL string, in
 }
 
 // MakePutRequest mock for MakePutRequest function
-func (mock *Mock) MakePutRequest(ctx *gin.Context, url string, body interface{},
+func (mock *Mock) MakePutRequest(ctx *flat.Context, url string, body interface{},
 	headers http.Header) (int, []byte, error) {
 	mock.mux.Lock()
 	defer mock.mux.Unlock()
@@ -240,8 +242,73 @@ func (mock *Mock) MakePutRequest(ctx *gin.Context, url string, body interface{},
 	return output.OutputStatusCode, output.OutputResponse, output.OutputError
 }
 
+//
+type inputForMakePatchRequest struct {
+	InputCTX     *flat.Context
+	InputURL     string
+	InputBody    interface{}
+	InputHeaders http.Header
+}
+
+type outputForMakePatchRequest struct {
+	OutputStatusCode int
+	OutputResponse   []byte
+	OutputError      error
+}
+
+// PatchMakePutRequest patch for MakePutRequest function
+func (mock *Mock) PatchMakePatchRequest(inputCTX *flat.Context, inputURL string, inputBody interface{},
+	inputHeaders http.Header, outputStatusCode int, outputResponse []byte, outputError error) {
+	mock.mux.Lock()
+	defer mock.mux.Unlock()
+
+	input := inputForMakePatchRequest{
+		InputCTX:     inputCTX,
+		InputURL:     inputURL,
+		InputBody:    inputBody,
+		InputHeaders: inputHeaders,
+	}
+
+	inputHash := toHash(input)
+
+	output := outputForMakePatchRequest{
+		OutputStatusCode: outputStatusCode,
+		OutputResponse:   outputResponse,
+		OutputError:      outputError,
+	}
+
+	mock.makePatchRequestMockStack[inputHash] = append(mock.makePatchRequestMockStack[inputHash], output)
+}
+
+// MakePutRequest mock for MakePutRequest function
+func (mock *Mock) MakePatchRequest(ctx *flat.Context, url string, body interface{},
+	headers http.Header) (int, []byte, error) {
+	mock.mux.Lock()
+	defer mock.mux.Unlock()
+
+	input := inputForMakePatchRequest{
+		InputCTX:     ctx,
+		InputURL:     url,
+		InputBody:    body,
+		InputHeaders: headers,
+	}
+
+	inputHash := toHash(input)
+	arrOutput, exists := mock.makePatchRequestMockStack[inputHash]
+
+	if !exists || len(arrOutput) == 0 {
+		panic("Mock not available for MakePatchRequest")
+	}
+
+	output := arrOutput[0]
+	arrOutput = arrOutput[1:]
+
+	mock.makePatchRequestMockStack[inputHash] = arrOutput
+	return output.OutputStatusCode, output.OutputResponse, output.OutputError
+}
+
 type inputForMakeDeleteRequest struct {
-	InputCTX     *gin.Context
+	InputCTX     *flat.Context
 	InputURL     string
 	InputHeaders http.Header
 }
@@ -253,7 +320,7 @@ type outputForMakeDeleteRequest struct {
 }
 
 // PatchMakeDeleteRequest patch for MakeDeleteRequest function
-func (mock *Mock) PatchMakeDeleteRequest(inputCTX *gin.Context, inputURL string, inputHeaders http.Header,
+func (mock *Mock) PatchMakeDeleteRequest(inputCTX *flat.Context, inputURL string, inputHeaders http.Header,
 	outputStatusCode int, outputResponse []byte, outputError error) {
 	mock.mux.Lock()
 	defer mock.mux.Unlock()
@@ -276,7 +343,7 @@ func (mock *Mock) PatchMakeDeleteRequest(inputCTX *gin.Context, inputURL string,
 }
 
 // MakeDeleteRequest mock for MakeDeleteRequest function
-func (mock *Mock) MakeDeleteRequest(ctx *gin.Context, url string, headers http.Header) (int, []byte, error) {
+func (mock *Mock) MakeDeleteRequest(ctx *flat.Context, url string, headers http.Header) (int, []byte, error) {
 	mock.mux.Lock()
 	defer mock.mux.Unlock()
 
@@ -303,7 +370,7 @@ func (mock *Mock) MakeDeleteRequest(ctx *gin.Context, url string, headers http.H
 // Config
 
 type inputForMakeGetRequestWithConfig struct {
-	InputCTX     *gin.Context
+	InputCTX     *flat.Context
 	InputURL     string
 	InputHeaders http.Header
 	InputConfig  RequestConfig
@@ -316,7 +383,7 @@ type outputForMakeGetRequestWithConfig struct {
 }
 
 // PatchMakeGetRequestWithConfig patch for MakeGetRequestWithConfig function
-func (mock *Mock) PatchMakeGetRequestWithConfig(inputCTX *gin.Context, inputURL string, inputHeaders http.Header,
+func (mock *Mock) PatchMakeGetRequestWithConfig(inputCTX *flat.Context, inputURL string, inputHeaders http.Header,
 	inputConfig RequestConfig, outputStatusCode int, outputResponse []byte, outputError error) {
 	mock.mux.Lock()
 	defer mock.mux.Unlock()
@@ -341,7 +408,7 @@ func (mock *Mock) PatchMakeGetRequestWithConfig(inputCTX *gin.Context, inputURL 
 }
 
 // MakeGetRequestWithConfig mock for MakeGetRequestWithConfig function
-func (mock *Mock) MakeGetRequestWithConfig(ctx *gin.Context, url string, headers http.Header,
+func (mock *Mock) MakeGetRequestWithConfig(ctx *flat.Context, url string, headers http.Header,
 	config RequestConfig) (int, []byte, error) {
 	mock.mux.Lock()
 	defer mock.mux.Unlock()
@@ -368,7 +435,7 @@ func (mock *Mock) MakeGetRequestWithConfig(ctx *gin.Context, url string, headers
 }
 
 type inputForMakePostRequestWithConfig struct {
-	InputCTX     *gin.Context
+	InputCTX     *flat.Context
 	InputURL     string
 	InputBody    interface{}
 	InputHeaders http.Header
@@ -382,7 +449,7 @@ type outputForMakePostRequestWithConfig struct {
 }
 
 // PatchMakePostRequestWithConfig patch for MakePostRequestWithConfig function
-func (mock *Mock) PatchMakePostRequestWithConfig(inputCTX *gin.Context, inputURL string, inputBody interface{},
+func (mock *Mock) PatchMakePostRequestWithConfig(inputCTX *flat.Context, inputURL string, inputBody interface{},
 	inputHeaders http.Header, inputConfig RequestConfig, outputStatusCode int, outputResponse []byte,
 	outputError error) {
 	mock.mux.Lock()
@@ -409,7 +476,7 @@ func (mock *Mock) PatchMakePostRequestWithConfig(inputCTX *gin.Context, inputURL
 }
 
 // MakePostRequestWithConfig mock for MakePostRequestWithConfig function
-func (mock *Mock) MakePostRequestWithConfig(ctx *gin.Context, url string, body interface{}, headers http.Header,
+func (mock *Mock) MakePostRequestWithConfig(ctx *flat.Context, url string, body interface{}, headers http.Header,
 	config RequestConfig) (int, []byte, error) {
 	mock.mux.Lock()
 	defer mock.mux.Unlock()
@@ -439,7 +506,7 @@ func (mock *Mock) MakePostRequestWithConfig(ctx *gin.Context, url string, body i
 }
 
 type inputForMakePutRequestWithConfig struct {
-	InputCTX     *gin.Context
+	InputCTX     *flat.Context
 	InputURL     string
 	InputBody    interface{}
 	InputHeaders http.Header
@@ -453,7 +520,7 @@ type outputForMakePutRequestWithConfig struct {
 }
 
 // PatchMakePutRequestWithConfig patch for MakePutRequestWithConfig function
-func (mock *Mock) PatchMakePutRequestWithConfig(inputCTX *gin.Context, inputURL string, inputBody interface{},
+func (mock *Mock) PatchMakePutRequestWithConfig(inputCTX *flat.Context, inputURL string, inputBody interface{},
 	inputHeaders http.Header, inputConfig RequestConfig, outputStatusCode int,
 	outputResponse []byte, outputError error) {
 	mock.mux.Lock()
@@ -480,7 +547,7 @@ func (mock *Mock) PatchMakePutRequestWithConfig(inputCTX *gin.Context, inputURL 
 }
 
 // MakePutRequestWithConfig mock for MakePutRequestWithConfig function
-func (mock *Mock) MakePutRequestWithConfig(ctx *gin.Context, url string, body interface{}, headers http.Header,
+func (mock *Mock) MakePutRequestWithConfig(ctx *flat.Context, url string, body interface{}, headers http.Header,
 	config RequestConfig) (int, []byte, error) {
 	mock.mux.Lock()
 	defer mock.mux.Unlock()
@@ -508,7 +575,7 @@ func (mock *Mock) MakePutRequestWithConfig(ctx *gin.Context, url string, body in
 }
 
 type inputForMakeDeleteRequestWithConfig struct {
-	InputCTX     *gin.Context
+	InputCTX     *flat.Context
 	InputURL     string
 	InputHeaders http.Header
 	InputConfig  RequestConfig
@@ -521,7 +588,7 @@ type outputForMakeDeleteRequestWithConfig struct {
 }
 
 // PatchMakeDeleteRequestWithConfig patch for MakeDeleteRequestWithConfig function
-func (mock *Mock) PatchMakeDeleteRequestWithConfig(inputCTX *gin.Context, inputURL string, inputHeaders http.Header,
+func (mock *Mock) PatchMakeDeleteRequestWithConfig(inputCTX *flat.Context, inputURL string, inputHeaders http.Header,
 	inputConfig RequestConfig, outputStatusCode int, outputResponse []byte, outputError error) {
 	mock.mux.Lock()
 	defer mock.mux.Unlock()
@@ -546,7 +613,7 @@ func (mock *Mock) PatchMakeDeleteRequestWithConfig(inputCTX *gin.Context, inputU
 }
 
 // MakeDeleteRequestWithConfig mock for MakeDeleteRequestWithConfig function
-func (mock *Mock) MakeDeleteRequestWithConfig(ctx *gin.Context, url string, headers http.Header,
+func (mock *Mock) MakeDeleteRequestWithConfig(ctx *flat.Context, url string, headers http.Header,
 	config RequestConfig) (int, []byte, error) {
 	mock.mux.Lock()
 	defer mock.mux.Unlock()
@@ -575,7 +642,7 @@ func (mock *Mock) MakeDeleteRequestWithConfig(ctx *gin.Context, url string, head
 // Timeout
 
 type inputForMakeGetRequestWithTimeout struct {
-	InputCTX     *gin.Context
+	InputCTX     *flat.Context
 	InputURL     string
 	InputHeaders http.Header
 	InputTimeout time.Duration
@@ -588,7 +655,7 @@ type outputForMakeGetRequestWithTimeout struct {
 }
 
 // PatchMakeGetRequestWithTimeout patch for MakeGetRequestWithTimeout function
-func (mock *Mock) PatchMakeGetRequestWithTimeout(inputCTX *gin.Context, inputURL string, inputHeaders http.Header,
+func (mock *Mock) PatchMakeGetRequestWithTimeout(inputCTX *flat.Context, inputURL string, inputHeaders http.Header,
 	inputTimeout time.Duration, outputStatusCode int, outputResponse []byte, outputError error) {
 	mock.mux.Lock()
 	defer mock.mux.Unlock()
@@ -613,7 +680,7 @@ func (mock *Mock) PatchMakeGetRequestWithTimeout(inputCTX *gin.Context, inputURL
 }
 
 // MakeGetRequestWithTimeout mock for MakeGetRequestWithTimeout function
-func (mock *Mock) MakeGetRequestWithTimeout(ctx *gin.Context, url string, headers http.Header,
+func (mock *Mock) MakeGetRequestWithTimeout(ctx *flat.Context, url string, headers http.Header,
 	timeout time.Duration) (int, []byte, error) {
 	mock.mux.Lock()
 	defer mock.mux.Unlock()
@@ -640,7 +707,7 @@ func (mock *Mock) MakeGetRequestWithTimeout(ctx *gin.Context, url string, header
 }
 
 type inputForMakePostRequestWithTimeout struct {
-	InputCTX     *gin.Context
+	InputCTX     *flat.Context
 	InputURL     string
 	InputBody    interface{}
 	InputHeaders http.Header
@@ -654,7 +721,7 @@ type outputForMakePostRequestWithTimeout struct {
 }
 
 // PatchMakePostRequestWithTimeout patch for MakePostRequestWithTimeout function
-func (mock *Mock) PatchMakePostRequestWithTimeout(inputCTX *gin.Context, inputURL string, inputBody interface{},
+func (mock *Mock) PatchMakePostRequestWithTimeout(inputCTX *flat.Context, inputURL string, inputBody interface{},
 	inputHeaders http.Header, inputTimeout time.Duration, outputStatusCode int, outputResponse []byte,
 	outputError error) {
 	mock.mux.Lock()
@@ -681,7 +748,7 @@ func (mock *Mock) PatchMakePostRequestWithTimeout(inputCTX *gin.Context, inputUR
 }
 
 // MakePostRequestWithTimeout mock for MakePostRequestWithTimeout function
-func (mock *Mock) MakePostRequestWithTimeout(ctx *gin.Context, url string, body interface{}, headers http.Header,
+func (mock *Mock) MakePostRequestWithTimeout(ctx *flat.Context, url string, body interface{}, headers http.Header,
 	timeout time.Duration) (int, []byte, error) {
 	mock.mux.Lock()
 	defer mock.mux.Unlock()
@@ -719,7 +786,7 @@ func cleanMultipartHeaders(headers http.Header) {
 }
 
 type inputForMakePutRequestWithTimeout struct {
-	InputCTX     *gin.Context
+	InputCTX     *flat.Context
 	InputURL     string
 	InputBody    interface{}
 	InputHeaders http.Header
@@ -733,7 +800,7 @@ type outputForMakePutRequestWithTimeout struct {
 }
 
 // PatchMakePutRequestWithTimeout patch for MakePutRequestWithTimeout function
-func (mock *Mock) PatchMakePutRequestWithTimeout(inputCTX *gin.Context, inputURL string, inputBody interface{},
+func (mock *Mock) PatchMakePutRequestWithTimeout(inputCTX *flat.Context, inputURL string, inputBody interface{},
 	inputHeaders http.Header, inputTimeout time.Duration, outputStatusCode int, outputResponse []byte,
 	outputError error) {
 	mock.mux.Lock()
@@ -760,7 +827,7 @@ func (mock *Mock) PatchMakePutRequestWithTimeout(inputCTX *gin.Context, inputURL
 }
 
 // MakePutRequestWithTimeout mock for MakePutRequestWithTimeout function
-func (mock *Mock) MakePutRequestWithTimeout(ctx *gin.Context, url string, body interface{}, headers http.Header,
+func (mock *Mock) MakePutRequestWithTimeout(ctx *flat.Context, url string, body interface{}, headers http.Header,
 	timeout time.Duration) (int, []byte, error) {
 	mock.mux.Lock()
 	defer mock.mux.Unlock()
@@ -788,7 +855,7 @@ func (mock *Mock) MakePutRequestWithTimeout(ctx *gin.Context, url string, body i
 }
 
 type inputForMakeDeleteRequestWithTimeout struct {
-	InputCTX     *gin.Context
+	InputCTX     *flat.Context
 	InputURL     string
 	InputHeaders http.Header
 	InputTimeout time.Duration
@@ -801,7 +868,7 @@ type outputForMakeDeleteRequestWithTimeout struct {
 }
 
 // PatchMakeDeleteRequestWithTimeout patch for MakeDeleteRequestWithTimeout function
-func (mock *Mock) PatchMakeDeleteRequestWithTimeout(inputCTX *gin.Context, inputURL string, inputHeaders http.Header,
+func (mock *Mock) PatchMakeDeleteRequestWithTimeout(inputCTX *flat.Context, inputURL string, inputHeaders http.Header,
 	inputTimeout time.Duration, outputStatusCode int, outputResponse []byte, outputError error) {
 	mock.mux.Lock()
 	defer mock.mux.Unlock()
@@ -826,7 +893,7 @@ func (mock *Mock) PatchMakeDeleteRequestWithTimeout(inputCTX *gin.Context, input
 }
 
 // MakeDeleteRequestWithTimeout mock for MakeDeleteRequestWithTimeout function
-func (mock *Mock) MakeDeleteRequestWithTimeout(ctx *gin.Context, url string, headers http.Header,
+func (mock *Mock) MakeDeleteRequestWithTimeout(ctx *flat.Context, url string, headers http.Header,
 	timeout time.Duration) (int, []byte, error) {
 	mock.mux.Lock()
 	defer mock.mux.Unlock()

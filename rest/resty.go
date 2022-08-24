@@ -7,9 +7,18 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/FlatDigital/core-go-toolkit/core/flat"
 	"github.com/FlatDigital/core-go-toolkit/godog"
-	"github.com/gin-gonic/gin"
 	"github.com/go-resty/resty/v2"
+)
+
+const (
+	MakeGetRequest           string = "MakeGetRequest"
+	MakePostRequest          string = "MakePostRequest"
+	MakePutRequest           string = "MakePutRequest"
+	MakePatchRequest         string = "MakePatchRequest"
+	MakeDeleteRequest        string = "MakeDeleteRequest"
+	MakeGetRequestWithConfig string = "MakeGetRequestWithConfig"
 )
 
 type restyService struct {
@@ -18,7 +27,6 @@ type restyService struct {
 }
 
 func NewRestyService(metricPrefix string) Rest {
-
 	return &restyService{
 		restyClient:         resty.New(),
 		datadogMetricPrefix: metricPrefix,
@@ -63,154 +71,115 @@ func NewRestyServiceWithConfig(config ServiceConfig) Rest {
 	}
 }
 
-func (service *restyService) MakeGetRequest(ctx *gin.Context, url string, headers http.Header) (int, []byte, error) {
+func (service *restyService) MakeGetRequest(ctx *flat.Context, url string, headers http.Header) (int, []byte, error) {
 	start := time.Now()
-	var r *resty.Response
 	req := service.restyClient.R()
 	req.SetHeaderMultiValues(headers)
 
-	r, err := req.Get(url)
-
-	if err != nil {
-		service.recordErrorMetric(ctx, url, r.StatusCode(), "MakeGetRequest", err)
-		return r.StatusCode(), r.Body(), err
-	}
-
-	if r.StatusCode() != http.StatusOK {
-		service.recordErrorMetric(ctx, url, r.StatusCode(), "MakeGetRequest", errors.New(http.StatusText(r.StatusCode())))
-		return r.StatusCode(), r.Body(), err
-	}
-
-	service.recordSuccessMetric(ctx, url, r.StatusCode(), "MakeGetRequest", start)
-	return r.StatusCode(), r.Body(), nil
+	response, err := req.Get(url)
+	return service.evaluateResponse(ctx, url, response, MakeGetRequest, start, err)
 }
 
-func (service *restyService) MakePostRequest(ctx *gin.Context, url string, body interface{}, headers http.Header) (int, []byte, error) {
+func (service *restyService) MakePostRequest(ctx *flat.Context, url string, body interface{}, headers http.Header) (int, []byte, error) {
 	start := time.Now()
-	var r *resty.Response
 	req := service.restyClient.R()
 	req.SetHeaderMultiValues(headers)
 	req.SetBody(body)
 
-	r, err := req.Post(url)
-
-	if err != nil {
-		service.recordErrorMetric(ctx, url, r.StatusCode(), "MakePostRequest", err)
-		return r.StatusCode(), r.Body(), err
-	}
-
-	if r.StatusCode() != http.StatusOK {
-		service.recordErrorMetric(ctx, url, r.StatusCode(), "MakePostRequest", errors.New(http.StatusText(r.StatusCode())))
-		return r.StatusCode(), r.Body(), err
-	}
-
-	service.recordSuccessMetric(ctx, url, r.StatusCode(), "MakePostRequest", start)
-	return r.StatusCode(), r.Body(), nil
+	response, err := req.Post(url)
+	return service.evaluateResponse(ctx, url, response, MakePostRequest, start, err)
 }
 
-func (service *restyService) MakePutRequest(ctx *gin.Context, url string, body interface{}, headers http.Header) (int, []byte, error) {
+func (service *restyService) MakePutRequest(ctx *flat.Context, url string, body interface{}, headers http.Header) (int, []byte, error) {
 	start := time.Now()
-	var r *resty.Response
 	req := service.restyClient.R()
 	req.SetHeaderMultiValues(headers)
 	req.SetBody(body)
 
-	r, err := req.Put(url)
-
-	if err != nil {
-		service.recordErrorMetric(ctx, url, r.StatusCode(), "MakePutRequest", err)
-		return r.StatusCode(), r.Body(), err
-	}
-
-	if r.StatusCode() != http.StatusOK {
-		service.recordErrorMetric(ctx, url, r.StatusCode(), "MakePutRequest", errors.New(http.StatusText(r.StatusCode())))
-		return r.StatusCode(), r.Body(), err
-	}
-
-	service.recordSuccessMetric(ctx, url, r.StatusCode(), "MakePutRequest", start)
-	return r.StatusCode(), r.Body(), nil
+	response, err := req.Put(url)
+	return service.evaluateResponse(ctx, url, response, MakePutRequest, start, err)
 }
 
-func (service *restyService) MakeDeleteRequest(ctx *gin.Context, url string, headers http.Header) (int, []byte, error) {
+func (service *restyService) MakePatchRequest(ctx *flat.Context, url string, body interface{}, headers http.Header) (int, []byte, error) {
 	start := time.Now()
-	var r *resty.Response
+	req := service.restyClient.R()
+	req.SetHeaderMultiValues(headers)
+	req.SetBody(body)
+
+	response, err := req.Patch(url)
+	return service.evaluateResponse(ctx, url, response, MakePutRequest, start, err)
+}
+
+func (service *restyService) MakeDeleteRequest(ctx *flat.Context, url string, headers http.Header) (int, []byte, error) {
+	start := time.Now()
 	req := service.restyClient.R()
 	req.SetHeaderMultiValues(headers)
 
-	r, err := req.Delete(url)
-
-	if err != nil {
-		service.recordErrorMetric(ctx, url, r.StatusCode(), "MakeDeleteRequest", err)
-		return r.StatusCode(), r.Body(), err
-	}
-
-	if r.StatusCode() != http.StatusOK {
-		service.recordErrorMetric(ctx, url, r.StatusCode(), "MakeDeleteRequest", errors.New(http.StatusText(r.StatusCode())))
-		return r.StatusCode(), r.Body(), err
-	}
-
-	service.recordSuccessMetric(ctx, url, r.StatusCode(), "MakeDeleteRequest", start)
-	return r.StatusCode(), r.Body(), nil
+	response, err := req.Delete(url)
+	return service.evaluateResponse(ctx, url, response, MakeDeleteRequest, start, err)
 }
 
-func (service *restyService) MakeGetRequestWithConfig(ctx *gin.Context, url string, headers http.Header, config RequestConfig) (int, []byte, error) {
+func (service *restyService) MakeGetRequestWithConfig(ctx *flat.Context, url string, headers http.Header, config RequestConfig) (int, []byte, error) {
 	start := time.Now()
 	client := service.restyClient
 	client.SetTimeout(config.Timeout)
 
-	var r *resty.Response
 	req := service.restyClient.R()
 	req.SetHeaderMultiValues(headers)
 
-	r, err := req.Get(url)
+	response, err := req.Get(url)
+	return service.evaluateResponse(ctx, url, response, MakeGetRequestWithConfig, start, err)
+}
 
+func (service *restyService) MakePostRequestWithConfig(ctx *flat.Context, url string, body interface{}, headers http.Header, config RequestConfig) (int, []byte, error) {
+	return 0, []byte{}, nil
+}
+
+func (service *restyService) MakePutRequestWithConfig(ctx *flat.Context, url string, body interface{}, headers http.Header, config RequestConfig) (int, []byte, error) {
+	return 0, []byte{}, nil
+}
+
+func (service *restyService) MakeDeleteRequestWithConfig(ctx *flat.Context, url string, headers http.Header, config RequestConfig) (int, []byte, error) {
+	return 0, []byte{}, nil
+}
+
+func (service *restyService) MakeGetRequestWithTimeout(ctx *flat.Context, url string, headers http.Header, timeout time.Duration) (int, []byte, error) {
+	return 0, []byte{}, nil
+}
+
+func (service *restyService) MakePostRequestWithTimeout(ctx *flat.Context, url string, body interface{}, headers http.Header, timeout time.Duration) (int, []byte, error) {
+	return 0, []byte{}, nil
+}
+
+func (service *restyService) MakePutRequestWithTimeout(ctx *flat.Context, url string, body interface{}, headers http.Header, timeout time.Duration) (int, []byte, error) {
+	return 0, []byte{}, nil
+}
+
+func (service *restyService) MakeDeleteRequestWithTimeout(ctx *flat.Context, url string, headers http.Header, timeout time.Duration) (int, []byte, error) {
+	return 0, []byte{}, nil
+}
+
+func (service *restyService) evaluateResponse(ctx *flat.Context, url string, response *resty.Response, resource string,
+	start time.Time, err error) (int, []byte, error) {
+
+	if response == nil {
+		service.recordErrorMetric(ctx, url, 0, resource, errResponseNotReceived)
+		return 0, nil, errResponseNotReceived
+	}
 	if err != nil {
-		// Send metric to DD
-		service.recordErrorMetric(ctx, url, r.StatusCode(), "MakeGetRequestWithConfig", err)
-		return r.StatusCode(), r.Body(), err
+		service.recordErrorMetric(ctx, url, response.StatusCode(), resource, err)
+		return response.StatusCode(), response.Body(), err
+	}
+	if !(response.StatusCode() >= http.StatusOK && response.StatusCode() <= http.StatusIMUsed) {
+		service.recordErrorMetric(ctx, url, response.StatusCode(), resource, errors.New(response.Status()))
+		return response.StatusCode(), response.Body(), errors.New(response.Status())
 	}
 
-	if r.StatusCode() != http.StatusOK {
-		// Send metric to DD
-		service.recordErrorMetric(ctx, url, r.StatusCode(), "MakeGetRequestWithConfig", errors.New(http.StatusText(r.StatusCode())))
-		return r.StatusCode(), r.Body(), err
-	}
-
-	// Send metric to DD
-	service.recordSuccessMetric(ctx, url, r.StatusCode(), "MakeGetRequestWithConfig", start)
-
-	return r.StatusCode(), r.Body(), nil
+	service.recordSuccessMetric(ctx, url, response.StatusCode(), resource, start)
+	return response.StatusCode(), response.Body(), nil
 }
 
-func (service *restyService) MakePostRequestWithConfig(ctx *gin.Context, url string, body interface{}, headers http.Header, config RequestConfig) (int, []byte, error) {
-	return 0, []byte{}, nil
-}
-
-func (service *restyService) MakePutRequestWithConfig(ctx *gin.Context, url string, body interface{}, headers http.Header, config RequestConfig) (int, []byte, error) {
-	return 0, []byte{}, nil
-}
-
-func (service *restyService) MakeDeleteRequestWithConfig(ctx *gin.Context, url string, headers http.Header, config RequestConfig) (int, []byte, error) {
-	return 0, []byte{}, nil
-}
-
-func (service *restyService) MakeGetRequestWithTimeout(ctx *gin.Context, url string, headers http.Header, timeout time.Duration) (int, []byte, error) {
-	return 0, []byte{}, nil
-}
-
-func (service *restyService) MakePostRequestWithTimeout(ctx *gin.Context, url string, body interface{}, headers http.Header, timeout time.Duration) (int, []byte, error) {
-	return 0, []byte{}, nil
-}
-
-func (service *restyService) MakePutRequestWithTimeout(ctx *gin.Context, url string, body interface{}, headers http.Header, timeout time.Duration) (int, []byte, error) {
-	return 0, []byte{}, nil
-}
-
-func (service *restyService) MakeDeleteRequestWithTimeout(ctx *gin.Context, url string, headers http.Header, timeout time.Duration) (int, []byte, error) {
-	return 0, []byte{}, nil
-}
-
-func (service *restyService) recordSuccessMetric(c *gin.Context, url string, statusCode int, resource string, start time.Time) {
+func (service *restyService) recordSuccessMetric(ctx *flat.Context, url string, statusCode int, resource string, start time.Time) {
 	// Metric
 	tags := new(godog.Tags).
 		Add("url", url).
@@ -227,7 +196,7 @@ func (service *restyService) recordSuccessMetric(c *gin.Context, url string, sta
 		tags.ToArray()...)
 }
 
-func (service *restyService) recordErrorMetric(c *gin.Context, url string, statusCode int, resource string, err error) {
+func (service *restyService) recordErrorMetric(ctx *flat.Context, url string, statusCode int, resource string, err error) {
 	// Metric
 	tags := new(godog.Tags).
 		Add("url", url).

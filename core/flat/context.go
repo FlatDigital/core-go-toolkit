@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"reflect"
 	"runtime"
-	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -16,7 +15,7 @@ import (
 // Caller is the type that contains the information inside a request that
 // represents the user that generated it.
 type Caller struct {
-	ID       uint64
+	ID       string
 	IsAdmin  bool
 	IsPublic bool
 	Scopes   []string
@@ -66,7 +65,8 @@ func TransformGinContextToGK(c *gin.Context, callerName string) *Context {
 	clientID := GetClientId(c.Request)
 
 	// If we can't parse callerID then it remains 0
-	callerID, _ := strconv.ParseUint(rawCallerID, 10, 64)
+	// callerID, _ := strconv.ParseUint(rawCallerID, 10, 64)
+	callerID := rawCallerID
 
 	reqID := c.GetString("RequestId")
 

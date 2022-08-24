@@ -29,7 +29,7 @@ func TestHandler(t *testing.T) {
 
 	flat.Handler(func(c *gin.Context, ctx *flat.Context) {
 		assert.EqualValues(t, reqID, ctx.RequestID)
-		assert.EqualValues(t, 120120120, ctx.Caller.ID)
+		assert.EqualValues(t, "120120120", ctx.Caller.ID)
 		assert.EqualValues(t, true, ctx.Caller.IsAdmin)
 		assert.EqualValues(t, true, ctx.Caller.IsPublic)
 

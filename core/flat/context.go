@@ -2,6 +2,7 @@ package flat
 
 import (
 	"net/http"
+	"net/mail"
 	"reflect"
 	"runtime"
 	"strings"
@@ -23,10 +24,11 @@ type Caller struct {
 
 // Context contains all the resources we use during a given request
 type Context struct {
-	ClientID  string
-	Caller    Caller
-	RequestID string
-	Log       *logger.Logger
+	ClientID    string
+	ClientEmail string
+	Caller      Caller
+	RequestID   string
+	Log         *logger.Logger
 }
 
 // HandlerFunc defines the signature of our http handlers
@@ -52,7 +54,8 @@ func CreateTestContext() *Context {
 	reqID, _ := uuid.NewV4()
 
 	return &Context{
-		RequestID: reqID.String(),
+		ClientEmail: "test@test.com",
+		RequestID:   reqID.String(),
 		Log: &logger.Logger{
 			Attributes: logger.Attrs{"request_id": reqID},
 		},
@@ -63,6 +66,7 @@ func CreateTestContext() *Context {
 func TransformGinContextToGK(c *gin.Context, callerName string) *Context {
 	rawCallerID := GetCaller(c.Request)
 	clientID := GetClientId(c.Request)
+	clientEmail := GetClientEmail(c.Request)
 
 	// If we can't parse callerID then it remains 0
 	// callerID, _ := strconv.ParseUint(rawCallerID, 10, 64)
@@ -77,8 +81,9 @@ func TransformGinContextToGK(c *gin.Context, callerName string) *Context {
 			IsPublic: IsPublic(c.Request),
 			Scopes:   GetCallerScopes(c.Request),
 		},
-		ClientID:  clientID,
-		RequestID: reqID,
+		ClientID:    clientID,
+		ClientEmail: clientEmail,
+		RequestID:   reqID,
 		Log: &logger.Logger{
 			Attributes: logger.Attrs{"request_id": reqID},
 		},
@@ -92,19 +97,32 @@ func TransformGinContextToGK(c *gin.Context, callerName string) *Context {
 func GetCaller(request *http.Request) string {
 	if callerId := request.Header.Get("X-Caller-Id"); callerId != "" {
 		return callerId
-
-	} else {
-		return request.URL.Query().Get("caller.id")
 	}
+	return request.URL.Query().Get("caller.id")
 }
 
 func GetClientId(request *http.Request) string {
 	if clientId := request.Header.Get("X-Client-Id"); clientId != "" {
 		return clientId
-
-	} else {
-		return request.URL.Query().Get("client.id")
 	}
+	return request.URL.Query().Get("client.id")
+}
+
+func GetClientEmail(request *http.Request) string {
+	email := request.Header.Get("X-Client-Email")
+	if email == "" {
+		email = request.URL.Query().Get("client.email")
+		if email == "" {
+			return ""
+		}
+	}
+
+	_, err := mail.ParseAddress(email)
+	if err != nil {
+		return ""
+	}
+
+	return email
 }
 
 func IsPublic(request *http.Request) bool {

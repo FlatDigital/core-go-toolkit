@@ -2,13 +2,11 @@ package rest
 
 import (
 	"errors"
-	"fmt"
 	"net"
 	"net/http"
 	"time"
 
 	"github.com/FlatDigital/core-go-toolkit/core/flat"
-	"github.com/FlatDigital/core-go-toolkit/godog"
 	"github.com/go-resty/resty/v2"
 )
 
@@ -163,50 +161,14 @@ func (service *restyService) evaluateResponse(ctx *flat.Context, url string, res
 	start time.Time, err error) (int, []byte, error) {
 
 	if response == nil {
-		service.recordErrorMetric(ctx, url, 0, resource, errResponseNotReceived)
 		return 0, nil, errResponseNotReceived
 	}
 	if err != nil {
-		service.recordErrorMetric(ctx, url, response.StatusCode(), resource, err)
 		return response.StatusCode(), response.Body(), err
 	}
 	if !(response.StatusCode() >= http.StatusOK && response.StatusCode() <= http.StatusIMUsed) {
-		service.recordErrorMetric(ctx, url, response.StatusCode(), resource, errors.New(response.Status()))
 		return response.StatusCode(), response.Body(), errors.New(response.Status())
 	}
 
-	service.recordSuccessMetric(ctx, url, response.StatusCode(), resource, start)
 	return response.StatusCode(), response.Body(), nil
-}
-
-func (service *restyService) recordSuccessMetric(ctx *flat.Context, url string, statusCode int, resource string, start time.Time) {
-	// Metric
-	tags := new(godog.Tags).
-		Add("url", url).
-		Add("status_code", fmt.Sprintf("%d", statusCode))
-
-	godog.RecordSimpleMetric(
-		fmt.Sprintf("resty.%s.%s.success", service.datadogMetricPrefix, resource),
-		1,
-		tags.ToArray()...)
-
-	godog.RecordCompoundMetric(
-		fmt.Sprintf("resty.%s.%s.elapsed_time", service.datadogMetricPrefix, resource),
-		ElapsedSinceFloat(start),
-		tags.ToArray()...)
-}
-
-func (service *restyService) recordErrorMetric(ctx *flat.Context, url string, statusCode int, resource string, err error) {
-	// Metric
-	tags := new(godog.Tags).
-		Add("url", url).
-		Add("status_code", fmt.Sprintf("%d", statusCode)).
-		Add("error", err.Error())
-
-	godog.RecordSimpleMetric(fmt.Sprintf("resty.%s.%s.error", service.datadogMetricPrefix, resource), 1, tags.ToArray()...)
-}
-
-// ElapsedSinceFloat returns elapsed time in ms as float64
-func ElapsedSinceFloat(start time.Time) float64 {
-	return float64(time.Since(start).Nanoseconds()) / 1000000.0
 }

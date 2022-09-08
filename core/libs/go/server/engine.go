@@ -10,7 +10,7 @@ import (
 )
 
 // GroupPreffix is the preffix added to every exposed url
-var GroupPreffix = "/flat"
+var GroupPreffix = "/api"
 
 // settings contains the relevant information that our server may use for initiating.
 type settings struct {

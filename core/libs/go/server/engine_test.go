@@ -40,9 +40,9 @@ func TestNewEngine(t *testing.T) {
 		Scope             string
 		ExpectedEndpoints []string
 	}{
-		{"Read Role", "test-read", []string{"/ping", "/flat/test-read"}},
-		{"Write Role", "test-write", []string{"/ping", "/flat/test-write"}},
-		{"Middleend Role", "test-middleend", []string{"/ping", "/flat/test-middleend"}},
+		{"Read Role", "test-read", []string{"/ping", "/api/test-read"}},
+		{"Write Role", "test-write", []string{"/ping", "/api/test-write"}},
+		{"Middleend Role", "test-middleend", []string{"/ping", "/api/test-middleend"}},
 	}
 
 	for _, tc := range tt {

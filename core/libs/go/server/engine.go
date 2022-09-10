@@ -2,6 +2,7 @@ package server
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/atarantini/ginrequestid"
 	"github.com/gin-gonic/gin"
@@ -48,12 +49,17 @@ type Server struct {
 // RoutingGroup (exposed urls mapped to a valid Role) and accepts a list of options for
 // specifying configuration options outside of the defaults for a given environment.
 func NewEngine(scope string, routes RoutingGroup, opts ...Opt) (*Server, error) {
+	// Read datadog host from environment variables
+	datadogHost, defined := os.LookupEnv("DD_AGENT_HOST")
+	if !defined {
+		datadogHost = "datadog"
+	}
 
 	// Tracer is used to send metrics to Datadog
 	tracer.Start(
-		tracer.WithDogstatsdAddress("datadog:8125"),
+		tracer.WithDogstatsdAddress(datadogHost+":8125"),
 		tracer.WithRuntimeMetrics(),
-		tracer.WithAgentAddr("datadog:8126"),
+		tracer.WithAgentAddr(datadogHost+":8126"),
 	)
 
 	// Infer application context from scope

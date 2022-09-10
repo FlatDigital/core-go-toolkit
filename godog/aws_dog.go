@@ -8,8 +8,7 @@ import (
 )
 
 const (
-	ENDPOINT            string = "datadog:8125"
-	DEFAULT_BUFFER_SIZE int    = 500
+	DEFAULT_BUFFER_SIZE int = 500
 )
 
 type AwsDogClient struct{}
@@ -36,7 +35,13 @@ func getTags(tags ...string) []string {
 }
 
 func init() {
-	c, error := statsd.New(ENDPOINT)
+	// Read datadog host from environment variables
+	datadogHost, defined := os.LookupEnv("DD_AGENT_HOST")
+	if !defined {
+		datadogHost = "datadog"
+	}
+
+	c, error := statsd.New(datadogHost + ":8125")
 	if error != nil {
 		log.Print(error)
 	}

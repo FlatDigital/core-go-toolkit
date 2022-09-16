@@ -10,11 +10,6 @@ import (
 	"github.com/newrelic/go-agent/_integrations/nrgin/v1"
 )
 
-const (
-	apiRulesTestHeader = "X-Flat-Mode"
-	apiRulesTestValue  = "endpoint-test"
-)
-
 // Auth Middleware. It checks that either the caller id or an admin scope is present
 // in the request. If neither is present, it fails with 400 Bad Request.
 // If prerequisites are met, then the found values are added to Gins context.

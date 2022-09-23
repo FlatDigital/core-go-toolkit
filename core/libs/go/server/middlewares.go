@@ -3,16 +3,9 @@ package server
 import (
 	"fmt"
 	"strconv"
-	"strings"
 
 	"github.com/FlatDigital/core-go-toolkit/core/libs/go/errors"
 	"github.com/gin-gonic/gin"
-	"github.com/newrelic/go-agent/_integrations/nrgin/v1"
-)
-
-const (
-	apiRulesTestHeader = "X-Flat-Mode"
-	apiRulesTestValue  = "endpoint-test"
 )
 
 // Auth Middleware. It checks that either the caller id or an admin scope is present
@@ -68,22 +61,6 @@ func HeaderVerification(header string, value string) gin.HandlerFunc {
 			})
 			c.Abort()
 			return
-		}
-
-		c.Next()
-	}
-}
-
-// RenameNewRelicTransaction Middleware
-// Rename Newrelic transaction to controller method name
-func RenameNewRelicTransaction() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		trx := nrgin.Transaction(c)
-		if trx != nil {
-			splitURL := strings.Split(c.HandlerName(), "/")
-			if len(splitURL) > 0 {
-				trx.SetName(splitURL[len(splitURL)-1])
-			}
 		}
 
 		c.Next()

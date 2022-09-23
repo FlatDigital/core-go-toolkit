@@ -7,9 +7,6 @@ import (
 
 	"github.com/FlatDigital/core-go-toolkit/core/libs/go/logger"
 	"github.com/gin-gonic/gin"
-
-	newrelic "github.com/newrelic/go-agent"
-	"github.com/newrelic/go-agent/_integrations/nrgin/v1"
 )
 
 type ErrorCode struct {
@@ -150,18 +147,6 @@ func ReturnError(c *gin.Context, err *Error) {
 			attrs[k] = v
 		}
 		log.Error("alertable_error", attrs)
-
-		transaction := nrgin.Transaction(c)
-		if transaction != nil {
-			transaction.AddAttribute(newrelic.AttributeResponseCode, err.Code.Status)
-			if hasRequestID {
-				transaction.AddAttribute("error.request_id", requestID.(string))
-			}
-			for k, v := range err.Values {
-				transaction.AddAttribute(fmt.Sprintf("error.%s", k), v)
-			}
-			transaction.NoticeError(err)
-		}
 	}
 }
 

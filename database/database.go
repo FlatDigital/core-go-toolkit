@@ -22,6 +22,10 @@ var (
 	errPanicOnBeginTransaction = errors.New("panic_on_begin_trx")
 )
 
+const (
+	ReturningClause string = "RETURNING"
+)
+
 type (
 	// Database service interface
 	Database interface {
@@ -425,6 +429,8 @@ func (service *service) Select(dbc *DBContext, query string, forUpdate bool, par
 		return nil, err
 	}
 
+	queryWithReturningClause := strings.Contains(strings.ToUpper(query), ReturningClause)
+
 	// Build the DbRows
 	dbRowArray := make(DBRowArray, 0)
 	for rows.Next() {
@@ -445,6 +451,15 @@ func (service *service) Select(dbc *DBContext, query string, forUpdate bool, par
 			dbColumns[colName] = DBColumn{
 				name:  colName,
 				field: val,
+			}
+		}
+
+		// 23-09-2022 - Add retrocompatibility for querys with RETURNING clause without tx
+		if queryWithReturningClause && dbc == nil {
+			// Check error
+			err = rows.Close()
+			if err != nil {
+				return nil, err
 			}
 		}
 

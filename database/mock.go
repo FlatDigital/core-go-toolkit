@@ -277,7 +277,7 @@ func getOutputForRollback(err error) outputForRollback {
 
 // PatchWithTransaction patch for WithTransaction function
 func (mock *Mock) PatchWithTransaction(txFn func(dbc *DBContext) error, outputError error) {
-	panic(fmt.Sprintf("To patch Database.WithTransaction patch Database.Begin, Database.Rollback and Database.Commit"))
+	panic("To patch Database.WithTransaction patch Database.Begin, Database.Rollback and Database.Commit")
 }
 
 // PatchSelect patch for Select function

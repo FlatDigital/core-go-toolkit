@@ -201,7 +201,7 @@ func Test_Mock_Database_PatchWithTransaction_ShouldPanic(t *testing.T) {
 	txFn := func(txFn *database.DBContext) error { return nil }
 
 	// Then
-	assertions.PanicsWithValue(fmt.Sprintf("To patch Database.WithTransaction patch Database.Begin, Database.Rollback and Database.Commit"),
+	assertions.PanicsWithValue("To patch Database.WithTransaction patch Database.Begin, Database.Rollback and Database.Commit",
 		func() { mockService.PatchWithTransaction(txFn, nil) })
 }
 

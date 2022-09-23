@@ -28,16 +28,11 @@ type (
 		PoolStats() sql.DBStats
 		TestConnection(dbc *DBContext) error
 		Execute(dbc *DBContext, query string, params ...interface{}) (*DBResult, error)
-		ExecuteWithQuery(dbc *DBContext, query *Query) (*DBResult, error)
 		ExecuteEnsuringOneAffectedRow(dbc *DBContext, query string, params ...interface{}) error
-		ExecuteEnsuringOneAffectedRowWithQuery(dbc *DBContext, query *Query) error
 		QueryRow(query string, params ...interface{}) (*sql.Row, error)
 		Select(dbc *DBContext, query string, forUpdate bool, params ...interface{}) (*DBResult, error)
-		SelectWithQuery(dbc *DBContext, query *Query) (*DBResult, error)
 		SelectUniqueValue(dbc *DBContext, query string, forUpdate bool, params ...interface{}) (*DBRow, error)
-		SelectUniqueValueWithQuery(dbc *DBContext, query *Query) (*DBRow, error)
 		SelectUniqueValueNonEmpty(dbc *DBContext, query string, forUpdate bool, params ...interface{}) (*DBRow, error)
-		SelectUniqueValueNonEmptyWithQuery(dbc *DBContext, query *Query) (*DBRow, error)
 		Connection() (*DBContext, error)
 		Begin(dbc *DBContext) (*DBContext, error)
 		Commit(dbc *DBContext) error
@@ -410,15 +405,6 @@ func (service *service) WithTransaction(txFn func(dbc *DBContext) error) (err er
 	return err
 }
 
-// SelectWithQuery does a select in the database with a Query and process results returning a Map
-func (service *service) SelectWithQuery(dbc *DBContext, query *Query) (*DBResult, error) {
-	stmt, params, err := query.GetStatementAndParams()
-	if err != nil {
-		return nil, err
-	}
-	return service.Select(dbc, stmt, false, params...)
-}
-
 // Select does a select in the database and process results returning a Map
 func (service *service) Select(dbc *DBContext, query string, forUpdate bool, params ...interface{}) (*DBResult, error) {
 	// Add a "FOR UPDATE" at the end of the query if we have a true forUpdate flag.
@@ -473,15 +459,6 @@ func (service *service) Select(dbc *DBContext, query string, forUpdate bool, par
 	}, nil
 }
 
-// SelectUniqueValueWithQuery does a select in the database with a Query and returns the first row
-func (service *service) SelectUniqueValueWithQuery(dbc *DBContext, query *Query) (*DBRow, error) {
-	stmt, params, err := query.GetStatementAndParams()
-	if err != nil {
-		return nil, err
-	}
-	return service.SelectUniqueValue(dbc, stmt, false, params...)
-}
-
 // SelectUniqueValue selects and returns the first row
 func (service *service) SelectUniqueValue(dbc *DBContext, query string,
 	forUpdate bool, params ...interface{}) (*DBRow, error) {
@@ -498,16 +475,6 @@ func (service *service) SelectUniqueValue(dbc *DBContext, query string,
 		return nil, fmt.Errorf("unexpected records size, expected 1 but was: %d", sizeRecords)
 	}
 	return &dbResult.rows.DBRowArray[0], nil
-}
-
-// SelectUniqueValueNonEmptyWithQuery does a select in the database with a
-// Query and returns the first row and error if it don't exists
-func (service *service) SelectUniqueValueNonEmptyWithQuery(dbc *DBContext, query *Query) (*DBRow, error) {
-	stmt, params, err := query.GetStatementAndParams()
-	if err != nil {
-		return nil, err
-	}
-	return service.SelectUniqueValueNonEmpty(dbc, stmt, false, params...)
 }
 
 // SelectUniqueValueNonEmpty selects and returns the first row and error if it don't exists
@@ -587,15 +554,6 @@ func (service *service) doQuery(db converter.DBer, dbc *DBContext, query string,
 	return rows, nil
 }
 
-// ExecuteEnsuringOneAffectedRowWithQuery executes a query inside a given transaction (if you have one)
-func (service *service) ExecuteEnsuringOneAffectedRowWithQuery(dbc *DBContext, query *Query) error {
-	stmt, params, err := query.GetStatementAndParams()
-	if err != nil {
-		return err
-	}
-	return service.ExecuteEnsuringOneAffectedRow(dbc, stmt, params...)
-}
-
 // ExecuteEnsuringOneAffectedRow executes a query inside a given transaction (if you have one)
 func (service *service) ExecuteEnsuringOneAffectedRow(dbc *DBContext, query string, params ...interface{}) error {
 	dbr, err := service.Execute(dbc, query, params...)
@@ -616,15 +574,6 @@ func (service *service) QueryRow(query string, params ...interface{}) (*sql.Row,
 		return nil, err
 	}
 	return row, nil
-}
-
-// ExecuteWithQuery executes a query inside a given transaction (if you have one)
-func (service *service) ExecuteWithQuery(dbc *DBContext, query *Query) (*DBResult, error) {
-	stmt, params, err := query.GetStatementAndParams()
-	if err != nil {
-		return nil, err
-	}
-	return service.Execute(dbc, stmt, params...)
 }
 
 // Execute executes a query inside a given transaction (if you have one)

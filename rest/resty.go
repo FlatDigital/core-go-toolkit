@@ -17,6 +17,7 @@ const (
 	MakePatchRequest         string = "MakePatchRequest"
 	MakeDeleteRequest        string = "MakeDeleteRequest"
 	MakeGetRequestWithConfig string = "MakeGetRequestWithConfig"
+	MakeGetRequestWithBody   string = "MakeGetRequestWithBody"
 )
 
 type restyService struct {
@@ -67,6 +68,15 @@ func NewRestyServiceWithConfig(config ServiceConfig) Rest {
 		restyClient:         restyClient,
 		datadogMetricPrefix: config.DatadogMetricPrefix,
 	}
+}
+
+func (service *restyService) MakeGetRequestWithBody(ctx *flat.Context, url string, body interface{}, headers http.Header) (int, []byte, error) {
+	start := time.Now()
+	req := service.restyClient.SetAllowGetMethodPayload(true).R()
+	req.SetHeaderMultiValues(headers)
+	req.SetBody(body)
+	response, err := req.Get(url)
+	return service.evaluateResponse(ctx, url, response, MakeGetRequest, start, err)
 }
 
 func (service *restyService) MakeGetRequest(ctx *flat.Context, url string, headers http.Header) (int, []byte, error) {

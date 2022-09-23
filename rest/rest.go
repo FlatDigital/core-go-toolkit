@@ -33,6 +33,7 @@ type Rest interface {
 		timeout time.Duration) (int, []byte, error)
 	MakeDeleteRequestWithTimeout(ctx *flat.Context, url string, headers http.Header,
 		timeout time.Duration) (int, []byte, error)
+	MakeGetRequestWithBody(ctx *flat.Context, url string, body interface{}, headers http.Header) (int, []byte, error)
 }
 
 var (

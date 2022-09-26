@@ -15,6 +15,7 @@ import (
 const (
 	selectStmt  string = "SELECT * FROM test FOR UPDATE"
 	selectStmt2 string = "SELECT * FROM test"
+	insertStmt  string = "INSERT INTO test ('created_on', 'email',) VALUES (NOW(), $1) RETURNING id"
 )
 
 func Test_DBRow_Equals_True(t *testing.T) {
@@ -1213,6 +1214,44 @@ func Test_SelectUniqueValueNonEmpty_Success(t *testing.T) {
 	// then
 	ass.NotNil(dbResult)
 	ass.Nil(err)
+}
+
+func Test_SelectUniqueValueNonEmptyWithInsertStmt_Error(t *testing.T) {
+	// given
+	ass := assert.New(t)
+
+	config := ServiceConfig{
+		MaxConnectionRetries: 1,
+	}
+	service, sqlMock := newMockService(config)
+	query := insertStmt
+	stmtMock := newDBStmtMock()
+	rowsMock := newDBRowsMock()
+	params := make([]interface{}, 0)
+	params = append(params, 1)
+	columns := []string{"id"}
+	columnsAux := make([]interface{}, len(columns))
+	columnPointers := make([]interface{}, len(columns))
+	for i := range columnsAux {
+		columnPointers[i] = &columnsAux[i]
+	}
+
+	// when
+	rowsMock.PatchColumns(columns, nil)
+	rowsMock.PatchClose(errors.New("test error"))
+	// One more for defer()
+	rowsMock.PatchClose(errors.New("test error"))
+	rowsMock.PatchNext(true)
+	rowsMock.PatchScan(columnPointers, nil)
+	rowsMock.PatchNext(false)
+	stmtMock.PatchQuery(params, rowsMock, nil)
+	stmtMock.PatchClose(nil)
+	sqlMock.PatchPrepare(query, stmtMock, nil)
+	dbResult, err := service.SelectUniqueValueNonEmpty(nil, query, false, params...)
+
+	// then
+	ass.Nil(dbResult)
+	ass.NotNil(err)
 }
 
 func Test_SelectUniqueValueNonEmpty_Prepare_Error(t *testing.T) {

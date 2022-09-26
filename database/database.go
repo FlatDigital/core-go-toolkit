@@ -24,6 +24,7 @@ var (
 
 const (
 	ReturningClause string = "RETURNING"
+	InsertOperation string = "INSERT"
 )
 
 type (
@@ -429,7 +430,8 @@ func (service *service) Select(dbc *DBContext, query string, forUpdate bool, par
 		return nil, err
 	}
 
-	queryWithReturningClause := strings.Contains(strings.ToUpper(query), ReturningClause)
+	isInsertQueryOperation := strings.Contains(strings.ToUpper(query), InsertOperation)
+	isQueryWithReturningClause := strings.Contains(strings.ToUpper(query), ReturningClause)
 
 	// Build the DbRows
 	dbRowArray := make(DBRowArray, 0)
@@ -454,8 +456,8 @@ func (service *service) Select(dbc *DBContext, query string, forUpdate bool, par
 			}
 		}
 
-		// 23-09-2022 - Add retrocompatibility for querys with RETURNING clause without tx
-		if queryWithReturningClause && dbc == nil {
+		// 23-09-2022 - Add retrocompatibility for INSERT querys with RETURNING clause without tx
+		if isQueryWithReturningClause && isInsertQueryOperation && dbc == nil {
 			// Check error
 			err = rows.Close()
 			if err != nil {

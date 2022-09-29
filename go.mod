@@ -3,10 +3,10 @@ module github.com/FlatDigital/core-go-toolkit
 go 1.18
 
 require (
-	github.com/atarantini/ginrequestid v0.0.0-20180307004245-6d9eee666701
 	github.com/gin-gonic/gin v1.8.1
 	github.com/go-errors/errors v1.4.2
 	github.com/go-resty/resty/v2 v2.7.0
+	github.com/gofrs/uuid v4.0.0+incompatible
 	github.com/lib/pq v1.10.6
 	github.com/newrelic/go-agent v3.16.1+incompatible
 	github.com/satori/go.uuid v1.2.1-0.20181028125025-b2ce2384e17b

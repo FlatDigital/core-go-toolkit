@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/atarantini/ginrequestid"
 	"github.com/gin-gonic/gin"
 	gintrace "gopkg.in/DataDog/dd-trace-go.v1/contrib/gin-gonic/gin"
 	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/tracer"
@@ -117,7 +116,7 @@ func NewEngine(scope string, routes RoutingGroup, opts ...Opt) (*Server, error) 
 	// so that it loads the active urls.
 	group := server.Group(GroupPreffix)
 
-	group.Use(ginrequestid.RequestId())
+	group.Use(RequestId())
 
 	// Add support for test header used by API rules to all endpoints
 	// group.Use(FlatAPIRules())

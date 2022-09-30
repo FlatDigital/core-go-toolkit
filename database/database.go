@@ -22,11 +22,6 @@ var (
 	errPanicOnBeginTransaction = errors.New("panic_on_begin_trx")
 )
 
-const (
-	ReturningClause string = "RETURNING"
-	InsertOperation string = "INSERT"
-)
-
 type (
 	// Database service interface
 	Database interface {
@@ -430,8 +425,15 @@ func (service *service) Select(dbc *DBContext, query string, forUpdate bool, par
 		return nil, err
 	}
 
-	isInsertQueryOperation := strings.Contains(strings.ToUpper(query), InsertOperation)
-	isQueryWithReturningClause := strings.Contains(strings.ToUpper(query), ReturningClause)
+	isInsertQueryOperation, err := regexp.MatchString("\\bINSERT\\b", strings.ToUpper(query))
+	if err != nil {
+		return nil, err
+	}
+
+	isQueryWithReturningClause, err := regexp.MatchString("\\bRETURNING\\b", strings.ToUpper(query))
+	if err != nil {
+		return nil, err
+	}
 
 	// Build the DbRows
 	dbRowArray := make(DBRowArray, 0)

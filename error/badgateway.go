@@ -5,7 +5,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	// gkErrors "github.com/FlatDigital/core-go-toolkit/core/libs/go/errors"
 	gkErrors "github.com/FlatDigital/core-go-toolkit/core/libs/go/errors"
 )
 

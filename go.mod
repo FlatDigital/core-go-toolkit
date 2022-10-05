@@ -8,7 +8,6 @@ require (
 	github.com/go-errors/errors v1.4.2
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/lib/pq v1.10.6
-	github.com/newrelic/go-agent v3.16.1+incompatible
 	github.com/satori/go.uuid v1.2.1-0.20181028125025-b2ce2384e17b
 	github.com/stretchr/testify v1.8.0
 	gopkg.in/DataDog/dd-trace-go.v1 v1.38.1

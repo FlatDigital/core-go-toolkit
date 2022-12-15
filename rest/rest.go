@@ -10,14 +10,14 @@ import (
 
 // Rest interface for rest service
 type Rest interface {
-	MakeGetRequest(ctx *flat.Context, url string, headers http.Header) (int, []byte, error)
-	MakePostRequest(ctx *flat.Context, url string, body interface{}, headers http.Header) (int, []byte, error)
-	MakePutRequest(ctx *flat.Context, url string, body interface{}, headers http.Header) (int, []byte, error)
-	MakePatchRequest(ctx *flat.Context, url string, body interface{}, headers http.Header) (int, []byte, error)
-	MakeDeleteRequest(ctx *flat.Context, url string, headers http.Header) (int, []byte, error)
+	MakeGetRequest(ctx *flat.Context, url string, headers http.Header) (int, []byte, http.Header, error)
+	MakePostRequest(ctx *flat.Context, url string, body interface{}, headers http.Header) (int, []byte, http.Header, error)
+	MakePutRequest(ctx *flat.Context, url string, body interface{}, headers http.Header) (int, []byte, http.Header, error)
+	MakePatchRequest(ctx *flat.Context, url string, body interface{}, headers http.Header) (int, []byte, http.Header, error)
+	MakeDeleteRequest(ctx *flat.Context, url string, headers http.Header) (int, []byte, http.Header, error)
 
 	MakeGetRequestWithConfig(ctx *flat.Context, url string, headers http.Header,
-		config RequestConfig) (int, []byte, error)
+		config RequestConfig) (int, []byte, http.Header, error)
 	MakePostRequestWithConfig(ctx *flat.Context, url string, body interface{}, headers http.Header,
 		config RequestConfig) (int, []byte, error)
 	MakePutRequestWithConfig(ctx *flat.Context, url string, body interface{}, headers http.Header,

@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"testing"
 
-	"github.com/FlatDigital/core-go-toolkit/database/converter"
+	"github.com/FlatDigital/core-go-toolkit/v2/database/converter"
 	"github.com/stretchr/testify/assert"
 )
 

@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/FlatDigital/core-go-toolkit/database/converter"
+	"github.com/FlatDigital/core-go-toolkit/v2/database/converter"
 )
 
 // SQLStmtMock mock struct

@@ -9,7 +9,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	sqlmock "github.com/FlatDigital/core-go-toolkit/database/mock"
+	sqlmock "github.com/FlatDigital/core-go-toolkit/v2/database/mock"
 )
 
 func Test_PatchConn_Success(t *testing.T) {

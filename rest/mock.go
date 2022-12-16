@@ -7,7 +7,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/FlatDigital/core-go-toolkit/core/flat"
+	"github.com/FlatDigital/core-go-toolkit/v2/core/flat"
 )
 
 // Mock struct for Rest mock

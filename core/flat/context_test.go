@@ -5,8 +5,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/FlatDigital/core-go-toolkit/core/flat"
-	"github.com/FlatDigital/core-go-toolkit/core/libs/go/logger"
+	"github.com/FlatDigital/core-go-toolkit/v2/core/flat"
+	"github.com/FlatDigital/core-go-toolkit/v2/core/libs/go/logger"
 	"github.com/gin-gonic/gin"
 	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"

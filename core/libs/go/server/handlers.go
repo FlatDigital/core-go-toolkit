@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/FlatDigital/core-go-toolkit/core/libs/go/errors"
+	"github.com/FlatDigital/core-go-toolkit/v2/core/libs/go/errors"
 	"github.com/gin-gonic/gin"
 )
 

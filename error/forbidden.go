@@ -5,7 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	gkErrors "github.com/FlatDigital/core-go-toolkit/core/libs/go/errors"
+	gkErrors "github.com/FlatDigital/core-go-toolkit/v2/core/libs/go/errors"
 )
 
 // Forbidden (403)

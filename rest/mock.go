@@ -7,7 +7,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/FlatDigital/core-go-toolkit/core/flat"
+	"github.com/FlatDigital/core-go-toolkit/v2/core/flat"
 )
 
 // Mock struct for Rest mock
@@ -242,7 +242,6 @@ func (mock *Mock) MakePutRequest(ctx *flat.Context, url string, body interface{}
 	return output.OutputStatusCode, output.OutputResponse, output.OutputError
 }
 
-//
 type inputForMakePatchRequest struct {
 	InputCTX     *flat.Context
 	InputURL     string

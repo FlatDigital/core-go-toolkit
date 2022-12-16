@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/FlatDigital/core-go-toolkit/core/libs/go/logger"
+	"github.com/FlatDigital/core-go-toolkit/v2/core/libs/go/logger"
 	"github.com/gin-gonic/gin"
 )
 

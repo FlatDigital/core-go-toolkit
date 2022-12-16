@@ -1,4 +1,4 @@
-module github.com/FlatDigital/core-go-toolkit
+module github.com/FlatDigital/core-go-toolkit/v2
 
 go 1.18
 

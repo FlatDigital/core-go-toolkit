@@ -87,7 +87,7 @@ Import and use it.
 import (
  "github.com/gin-gonic/gin"
  "net/http"
- "github.com/FlatDigital/core-go-toolkit/core/libs/go/logger"
+ "github.com/FlatDigital/core-go-toolkit/v2/core/libs/go/logger"
 )
 
 func Ping(c *gin.Context) {
@@ -144,7 +144,7 @@ The scope format used is: `environment`-`role`-`tag` (the `tag` segment is optio
 package main
 
 import (
- "github.com/FlatDigital/core-go-toolkit/core/libs/go/server"
+ "github.com/FlatDigital/core-go-toolkit/v2/core/libs/go/server"
 )
 
 routes := server.RoutingGroup{
@@ -184,7 +184,7 @@ Import lib and use it.
 
 ```go
 import (
-    "github.com/FlatDigital/core-go-toolkit/database"
+    "github.com/FlatDigital/core-go-toolkit/v2/database"
 )
 
 dbConfig := database.ServiceConfig{
@@ -282,7 +282,7 @@ Import lib and use it.
 
 ```go
 import (
-  errorWrapper "github.com/FlatDigital/core-go-toolkit/error"
+  errorWrapper "github.com/FlatDigital/core-go-toolkit/v2/error"
 )
 ```
 
@@ -353,7 +353,7 @@ Import lib and use it.
 
 ```go
 import (
-  "github.com/FlatDigital/core-go-toolkit/src/api/libs/godog"
+  "github.com/FlatDigital/core-go-toolkit/v2/src/api/libs/godog"
 )
 ```
 
@@ -373,7 +373,7 @@ Import lib and use it.
 
 ```go
 import (
-    "github.com/FlatDigital/core-go-toolkit/src/api/libs/rest"
+    "github.com/FlatDigital/core-go-toolkit/v2/src/api/libs/rest"
 )
 ```
 
@@ -424,7 +424,7 @@ Import lib and use it.
 
 ```go
 import (
-  "github.com/FlatDigital/core-go-toolkit/src/api/libs/secrets"
+  "github.com/FlatDigital/core-go-toolkit/v2/src/api/libs/secrets"
 )
 
 // Example

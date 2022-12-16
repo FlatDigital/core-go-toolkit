@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/FlatDigital/core-go-toolkit/core/flat"
+	"github.com/FlatDigital/core-go-toolkit/v2/core/flat"
 	"github.com/go-resty/resty/v2"
 )
 

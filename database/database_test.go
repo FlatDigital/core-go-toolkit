@@ -141,6 +141,25 @@ func Test_NewService_SetWriteAndTimeout_Success(t *testing.T) {
 	ass.NotNil(service)
 }
 
+func Test_NewService_SetDbPort_Success(t *testing.T) {
+	ass := assert.New(t)
+	dbPort := 5555
+	config := ServiceConfig{
+		DBPort: dbPort,
+	}
+	service, err := NewService(config)
+	ass.Nil(err)
+	ass.NotNil(service)
+}
+
+func Test_NewService_DefaultPort_Success(t *testing.T) {
+	ass := assert.New(t)
+	config := ServiceConfig{}
+	service, err := NewService(config)
+	ass.Nil(err)
+	ass.NotNil(service)
+}
+
 func Test_Connection_Success(t *testing.T) {
 	// given
 	ass := assert.New(t)

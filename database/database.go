@@ -55,6 +55,7 @@ type (
 		DBName           string
 		DBPassword       string
 		DBUsername       string
+		DBPort           int
 		MaxIdleConns     int
 		MaxOpenConns     int
 		ConnMaxLifetime  time.Duration
@@ -84,6 +85,7 @@ type (
 const (
 	// default values
 	defaultMaxConnectionRetries = 3
+	defaultDbPort               = 5432
 
 	logError   logType = "error"
 	logSuccess logType = "success"
@@ -96,9 +98,12 @@ func NewService(config ServiceConfig) (Database, error) {
 	// 	config.DBPassword, config.DBHost, config.DBName)
 
 	// connection for Postgress
+	if config.DBPort == 0 {
+		config.DBPort = defaultDbPort
+	}
 	connectionString := fmt.Sprintf("host=%s port=%d user=%s "+
 		"password=%s dbname=%s sslmode=disable",
-		config.DBHost, 5432, config.DBUsername, config.DBPassword, config.DBName)
+		config.DBHost, config.DBPort, config.DBUsername, config.DBPassword, config.DBName)
 
 	// DOC: https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-CONNSTRING
 	// pq dsn not support read_timeout & write_timeout

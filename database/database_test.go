@@ -1686,8 +1686,6 @@ func TestService_SelectOnDbLinkView_Success(t *testing.T) {
 	//dblink query
 	stDbLinkMock := newDBStmtMock()
 	rowsDblinkMock := newDBRowsMock()
-	params := make([]interface{}, 0)
-	params = append(params, 3)
 	columns := []string{"columnA", "columnB", "columnC"}
 	columnsAux := make([]interface{}, len(columns))
 	columnPointers := make([]interface{}, len(columns))
@@ -1735,8 +1733,6 @@ func TestService_SelectOnDbLinkView_SuccessWithParams(t *testing.T) {
 	//dblink query
 	stDbLinkMock := newDBStmtMock()
 	rowsDblinkMock := newDBRowsMock()
-	params := make([]interface{}, 0)
-	params = append(params, 3)
 	columns := []string{"columnA", "columnB", "columnC"}
 	columnsAux := make([]interface{}, len(columns))
 	columnPointers := make([]interface{}, len(columns))

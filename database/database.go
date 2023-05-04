@@ -715,6 +715,7 @@ func (service *service) SelectOnDbLinkView(dbLink *DbLink, dbc *DBContext, query
 	defer func() {
 		_, err := service.Execute(dbc, dbLink.CloseConnection())
 		if err != nil {
+			service.logMetric(logError, "execute", "close dblink connection", err)
 		}
 	}()
 	return result, nil

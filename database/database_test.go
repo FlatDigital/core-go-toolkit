@@ -3,6 +3,7 @@ package database
 import (
 	"context"
 	"errors"
+	"log"
 	"testing"
 	"time"
 
@@ -1667,6 +1668,28 @@ func Test_MySQLError(t *testing.T) {
 	// then
 	ass.Nil(dbCtx)
 	ass.NotNil(err)
+}
+
+func TestService_SelectOnDbLinkView(t *testing.T) {
+	// kaiba
+	service, sqlMock := newMockService(ServiceConfig{
+		MaxConnectionRetries: 1,
+	})
+	dblinkConnMock, _ := NewDbLinkConnection("test", "127.0.0.1", uint(1234), "usrtest", "pass123", "db_test")
+
+	stmtMock := newDBStmtMock()
+	resultDbLinkOpenConnMock := newDBResultMock()
+	resultDbLinkOpenConnMock.PatchRowsAffected(1, nil)
+	stmtMock.PatchExec(nil, resultDbLinkOpenConnMock, nil)
+	stmtMock.PatchClose(nil)
+	dbLinkOpenConn := "SELECT * FROM dblink_connect('test', 'host=127.0.0.1 port=1234 dbname=db_test user=usrtest password=pass123')"
+	sqlMock.PatchPrepare(dbLinkOpenConn, stmtMock, nil)
+
+	queryDbLinkMock := "SELECT * FROM test"
+
+	dbResult, err := service.SelectOnDbLinkView(dblinkConnMock, nil, queryDbLinkMock)
+	log.Print(dbResult)
+	assert.NoError(t, err)
 }
 
 func newMockService(config ServiceConfig) (service, *sqlmock.SQLMock) {

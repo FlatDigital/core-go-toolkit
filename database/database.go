@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"log"
 	"os"
 	"regexp"
 	"strings"
@@ -696,19 +697,29 @@ func (service *service) logMetric(logType logType, operation string, detail stri
 }
 
 func (service *service) SelectOnDbLinkView(dbLink *DbLink, dbc *DBContext, query string, params ...interface{}) (*DBResult, error) {
-	_, err := service.Execute(dbc, dbLink.OpenConnection(), nil)
+	_, err := service.Execute(dbc, dbLink.OpenConnection())
 	if err != nil {
 		return nil, err
 	}
-	result, err := service.Select(dbc, query, false, params...)
-	if err != nil {
-		return nil, err
+	var result *DBResult
+	log.Print("kaiba pase")
+	/*if params != nil {
+		result, err = service.Select(dbc, query, false, params...)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		result, err = service.Select(dbc, query, false)
+		if err != nil {
+			return nil, err
+		}
 	}
-	defer func() {
-		_, err := service.Execute(dbc, dbLink.CloseConnection(), nil)
+	*/
+	/*defer func() {
+		_, err := service.Execute(dbc, dbLink.CloseConnection())
 		if err != nil {
 		}
-	}()
+	}()*/
 	return result, nil
 
 }

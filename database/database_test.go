@@ -1670,7 +1670,7 @@ func Test_MySQLError(t *testing.T) {
 	ass.NotNil(err)
 }
 
-func TestService_SelectOnDbLinkView(t *testing.T) {
+func TestService_SelectOnDbLinkView_Success(t *testing.T) {
 	service, sqlMock := newMockService(ServiceConfig{
 		MaxConnectionRetries: 1,
 	})
@@ -1719,7 +1719,7 @@ func TestService_SelectOnDbLinkView(t *testing.T) {
 	assert.NoError(t, err)
 }
 
-func TestService_SelectOnDbLinkView_WithParams(t *testing.T) {
+func TestService_SelectOnDbLinkView_SuccessWithParams(t *testing.T) {
 	service, sqlMock := newMockService(ServiceConfig{
 		MaxConnectionRetries: 1,
 	})
@@ -1794,6 +1794,73 @@ func TestService_SelectOnDbLinkView_DblinkOpenConnError(t *testing.T) {
 
 	queryDbLinkMock := "SELECT * FROM test"
 	dbResult, err := service.SelectOnDbLinkView(dblinkConnMock, nil, queryDbLinkMock)
+	assert.Nil(t, dbResult)
+	assert.Error(t, err)
+}
+
+func TestService_SelectOnDbLinkView_ResultError(t *testing.T) {
+	service, sqlMock := newMockService(ServiceConfig{
+		MaxConnectionRetries: 1,
+	})
+	dblinkConnMock, _ := NewDbLinkConnection("test", "127.0.0.1", uint(1234), "usrtest", "pass123", "db_test")
+	//dblink open connection
+	stmtMock := newDBStmtMock()
+	resultDbLinkOpenConnMock := newDBResultMock()
+	resultDbLinkOpenConnMock.PatchRowsAffected(1, nil)
+	stmtMock.PatchExec(nil, resultDbLinkOpenConnMock, nil)
+	stmtMock.PatchClose(nil)
+	dbLinkOpenConn := "SELECT * FROM dblink_connect('test', 'host=127.0.0.1 port=1234 dbname=db_test user=usrtest password=pass123')"
+	sqlMock.PatchPrepare(dbLinkOpenConn, stmtMock, nil)
+	//dblink query
+	stDbLinkMock := newDBStmtMock()
+	queryDbLink := "SELECT * FROM test"
+	sqlMock.PatchPrepare(queryDbLink, stDbLinkMock, fmt.Errorf("error on query"))
+
+	//dblink close connection
+	stmtCloseConnMock := newDBStmtMock()
+	resultDbLinkOpenConnMock2 := newDBResultMock()
+	resultDbLinkOpenConnMock2.PatchRowsAffected(1, nil)
+	stmtCloseConnMock.PatchExec(nil, resultDbLinkOpenConnMock2, nil)
+	stmtCloseConnMock.PatchClose(nil)
+	dbLinkCloseConn := "SELECT dblink_disconnect('test')"
+	sqlMock.PatchPrepare(dbLinkCloseConn, stmtCloseConnMock, nil)
+
+	queryDbLinkMock := "SELECT * FROM test"
+	dbResult, err := service.SelectOnDbLinkView(dblinkConnMock, nil, queryDbLinkMock)
+	assert.Nil(t, dbResult)
+	assert.Error(t, err)
+}
+
+func TestService_SelectOnDbLinkView_ErrorWithParams(t *testing.T) {
+	service, sqlMock := newMockService(ServiceConfig{
+		MaxConnectionRetries: 1,
+	})
+	dblinkConnMock, _ := NewDbLinkConnection("test", "127.0.0.1", uint(1234), "usrtest", "pass123", "db_test")
+	//dblink open connection
+	stmtMock := newDBStmtMock()
+	resultDbLinkOpenConnMock := newDBResultMock()
+	resultDbLinkOpenConnMock.PatchRowsAffected(1, nil)
+	stmtMock.PatchExec(nil, resultDbLinkOpenConnMock, nil)
+	stmtMock.PatchClose(nil)
+	dbLinkOpenConn := "SELECT * FROM dblink_connect('test', 'host=127.0.0.1 port=1234 dbname=db_test user=usrtest password=pass123')"
+	sqlMock.PatchPrepare(dbLinkOpenConn, stmtMock, nil)
+	//dblink query
+	stDbLinkMock := newDBStmtMock()
+	queryParams := []interface{}{1}
+	queryDbLink := "SELECT * FROM test where id=?"
+	sqlMock.PatchPrepare(queryDbLink, stDbLinkMock, fmt.Errorf("error on database"))
+
+	//dblink close connection
+	stmtCloseConnMock := newDBStmtMock()
+	resultDbLinkOpenConnMock2 := newDBResultMock()
+	resultDbLinkOpenConnMock2.PatchRowsAffected(1, nil)
+	stmtCloseConnMock.PatchExec(nil, resultDbLinkOpenConnMock2, nil)
+	stmtCloseConnMock.PatchClose(nil)
+	dbLinkCloseConn := "SELECT dblink_disconnect('test')"
+	sqlMock.PatchPrepare(dbLinkCloseConn, stmtCloseConnMock, nil)
+
+	queryDbLinkMock := "SELECT * FROM test where id=?"
+	dbResult, err := service.SelectOnDbLinkView(dblinkConnMock, nil, queryDbLinkMock, queryParams...)
 	assert.Nil(t, dbResult)
 	assert.Error(t, err)
 }

@@ -3,6 +3,7 @@ package database
 import (
 	"context"
 	"errors"
+	"fmt"
 	"testing"
 	"time"
 
@@ -1766,6 +1767,35 @@ func TestService_SelectOnDbLinkView_WithParams(t *testing.T) {
 	dbResult, err := service.SelectOnDbLinkView(dblinkConnMock, nil, queryDbLinkMock, queryParams...)
 	assert.NotNil(t, dbResult)
 	assert.NoError(t, err)
+}
+
+func TestService_SelectOnDbLinkView_DblinkOpenConnError(t *testing.T) {
+	service, sqlMock := newMockService(ServiceConfig{
+		MaxConnectionRetries: 1,
+	})
+	dblinkConnMock, _ := NewDbLinkConnection("test", "127.0.0.1", uint(1234), "usrtest", "pass123", "db_test")
+	//dblink open connection
+	stmtMock := newDBStmtMock()
+	resultDbLinkOpenConnMock := newDBResultMock()
+	resultDbLinkOpenConnMock.PatchRowsAffected(1, nil)
+	stmtMock.PatchExec(nil, resultDbLinkOpenConnMock, nil)
+	stmtMock.PatchClose(nil)
+	dbLinkOpenConn := "SELECT * FROM dblink_connect('test', 'host=127.0.0.1 port=1234 dbname=db_test user=usrtest password=pass123')"
+	sqlMock.PatchPrepare(dbLinkOpenConn, stmtMock, fmt.Errorf("error on dblink connect"))
+
+	//dblink close connection
+	stmtCloseConnMock := newDBStmtMock()
+	resultDbLinkOpenConnMock2 := newDBResultMock()
+	resultDbLinkOpenConnMock2.PatchRowsAffected(1, nil)
+	stmtCloseConnMock.PatchExec(nil, resultDbLinkOpenConnMock2, nil)
+	stmtCloseConnMock.PatchClose(nil)
+	dbLinkCloseConn := "SELECT dblink_disconnect('test')"
+	sqlMock.PatchPrepare(dbLinkCloseConn, stmtCloseConnMock, nil)
+
+	queryDbLinkMock := "SELECT * FROM test"
+	dbResult, err := service.SelectOnDbLinkView(dblinkConnMock, nil, queryDbLinkMock)
+	assert.Nil(t, dbResult)
+	assert.Error(t, err)
 }
 
 func newMockService(config ServiceConfig) (service, *sqlmock.SQLMock) {

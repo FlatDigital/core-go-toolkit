@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"log"
 	"os"
 	"regexp"
 	"strings"
@@ -702,8 +701,7 @@ func (service *service) SelectOnDbLinkView(dbLink *DbLink, dbc *DBContext, query
 		return nil, err
 	}
 	var result *DBResult
-	log.Print("kaiba pase")
-	/*if params != nil {
+	if params != nil {
 		result, err = service.Select(dbc, query, false, params...)
 		if err != nil {
 			return nil, err
@@ -714,12 +712,11 @@ func (service *service) SelectOnDbLinkView(dbLink *DbLink, dbc *DBContext, query
 			return nil, err
 		}
 	}
-	*/
-	/*defer func() {
+	defer func() {
 		_, err := service.Execute(dbc, dbLink.CloseConnection())
 		if err != nil {
 		}
-	}()*/
+	}()
 	return result, nil
 
 }

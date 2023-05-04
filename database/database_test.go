@@ -3,7 +3,6 @@ package database
 import (
 	"context"
 	"errors"
-	"log"
 	"testing"
 	"time"
 
@@ -1671,12 +1670,11 @@ func Test_MySQLError(t *testing.T) {
 }
 
 func TestService_SelectOnDbLinkView(t *testing.T) {
-	// kaiba
 	service, sqlMock := newMockService(ServiceConfig{
 		MaxConnectionRetries: 1,
 	})
 	dblinkConnMock, _ := NewDbLinkConnection("test", "127.0.0.1", uint(1234), "usrtest", "pass123", "db_test")
-
+	//dblink open connection
 	stmtMock := newDBStmtMock()
 	resultDbLinkOpenConnMock := newDBResultMock()
 	resultDbLinkOpenConnMock.PatchRowsAffected(1, nil)
@@ -1684,11 +1682,39 @@ func TestService_SelectOnDbLinkView(t *testing.T) {
 	stmtMock.PatchClose(nil)
 	dbLinkOpenConn := "SELECT * FROM dblink_connect('test', 'host=127.0.0.1 port=1234 dbname=db_test user=usrtest password=pass123')"
 	sqlMock.PatchPrepare(dbLinkOpenConn, stmtMock, nil)
+	//dblink query
+	stDbLinkMock := newDBStmtMock()
+	rowsDblinkMock := newDBRowsMock()
+	params := make([]interface{}, 0)
+	params = append(params, 3)
+	columns := []string{"columnA", "columnB", "columnC"}
+	columnsAux := make([]interface{}, len(columns))
+	columnPointers := make([]interface{}, len(columns))
+	for i := range columnsAux {
+		columnPointers[i] = &columnsAux[i]
+	}
+	rowsDblinkMock.PatchColumns(columns, nil)
+	rowsDblinkMock.PatchClose(nil)
+	rowsDblinkMock.PatchNext(true)
+	rowsDblinkMock.PatchScan(columnPointers, nil)
+	rowsDblinkMock.PatchNext(false)
+	stDbLinkMock.PatchQuery(nil, rowsDblinkMock, nil)
+	stDbLinkMock.PatchClose(nil)
+	queryDbLink := "SELECT * FROM test"
+	sqlMock.PatchPrepare(queryDbLink, stDbLinkMock, nil)
+
+	//dblink close connection
+	stmtCloseConnMock := newDBStmtMock()
+	resultDbLinkOpenConnMock2 := newDBResultMock()
+	resultDbLinkOpenConnMock2.PatchRowsAffected(1, nil)
+	stmtCloseConnMock.PatchExec(nil, resultDbLinkOpenConnMock2, nil)
+	stmtCloseConnMock.PatchClose(nil)
+	dbLinkCloseConn := "SELECT dblink_disconnect('test')"
+	sqlMock.PatchPrepare(dbLinkCloseConn, stmtCloseConnMock, nil)
 
 	queryDbLinkMock := "SELECT * FROM test"
-
 	dbResult, err := service.SelectOnDbLinkView(dblinkConnMock, nil, queryDbLinkMock)
-	log.Print(dbResult)
+	assert.NotNil(t, dbResult)
 	assert.NoError(t, err)
 }
 

@@ -44,6 +44,7 @@ type (
 		Rollback(dbc *DBContext) error
 		Close(dbc *DBContext) error
 		WithTransaction(txFn func(dbc *DBContext) error) error
+		SelectOnDbLinkView(dbLink *DbLink, dbc *DBContext, query string, params ...interface{}) (*DBResult, error)
 	}
 
 	// ServiceConfig database service config
@@ -692,4 +693,31 @@ func (service *service) logMetric(logType logType, operation string, detail stri
 
 	godog.RecordSimpleMetric(fmt.Sprintf("application.%s.db.service.%s", service.datadogMetricPrefix,
 		string(logType)), 1, tags.ToArray()...)
+}
+
+func (service *service) SelectOnDbLinkView(dbLink *DbLink, dbc *DBContext, query string, params ...interface{}) (*DBResult, error) {
+	_, err := service.Execute(dbc, dbLink.OpenConnection())
+	if err != nil {
+		return nil, err
+	}
+	var result *DBResult
+	if params != nil {
+		result, err = service.Select(dbc, query, false, params...)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		result, err = service.Select(dbc, query, false)
+		if err != nil {
+			return nil, err
+		}
+	}
+	defer func() {
+		_, err := service.Execute(dbc, dbLink.CloseConnection())
+		if err != nil {
+			service.logMetric(logError, "execute", "close dblink connection", err)
+		}
+	}()
+	return result, nil
+
 }

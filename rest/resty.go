@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/FlatDigital/core-go-toolkit/core/flat"
+	"github.com/FlatDigital/core-go-toolkit/v2/core/flat"
 	"github.com/go-resty/resty/v2"
 )
 
@@ -69,7 +69,7 @@ func NewRestyServiceWithConfig(config ServiceConfig) Rest {
 	}
 }
 
-func (service *restyService) MakeGetRequest(ctx *flat.Context, url string, headers http.Header) (int, []byte, error) {
+func (service *restyService) MakeGetRequest(ctx *flat.Context, url string, headers http.Header) (int, []byte, http.Header, error) {
 	start := time.Now()
 	req := service.restyClient.R()
 	req.SetHeaderMultiValues(headers)
@@ -78,7 +78,7 @@ func (service *restyService) MakeGetRequest(ctx *flat.Context, url string, heade
 	return service.evaluateResponse(ctx, url, response, MakeGetRequest, start, err)
 }
 
-func (service *restyService) MakePostRequest(ctx *flat.Context, url string, body interface{}, headers http.Header) (int, []byte, error) {
+func (service *restyService) MakePostRequest(ctx *flat.Context, url string, body interface{}, headers http.Header) (int, []byte, http.Header, error) {
 	start := time.Now()
 	req := service.restyClient.R()
 	req.SetHeaderMultiValues(headers)
@@ -88,7 +88,7 @@ func (service *restyService) MakePostRequest(ctx *flat.Context, url string, body
 	return service.evaluateResponse(ctx, url, response, MakePostRequest, start, err)
 }
 
-func (service *restyService) MakePutRequest(ctx *flat.Context, url string, body interface{}, headers http.Header) (int, []byte, error) {
+func (service *restyService) MakePutRequest(ctx *flat.Context, url string, body interface{}, headers http.Header) (int, []byte, http.Header, error) {
 	start := time.Now()
 	req := service.restyClient.R()
 	req.SetHeaderMultiValues(headers)
@@ -98,7 +98,7 @@ func (service *restyService) MakePutRequest(ctx *flat.Context, url string, body 
 	return service.evaluateResponse(ctx, url, response, MakePutRequest, start, err)
 }
 
-func (service *restyService) MakePatchRequest(ctx *flat.Context, url string, body interface{}, headers http.Header) (int, []byte, error) {
+func (service *restyService) MakePatchRequest(ctx *flat.Context, url string, body interface{}, headers http.Header) (int, []byte, http.Header, error) {
 	start := time.Now()
 	req := service.restyClient.R()
 	req.SetHeaderMultiValues(headers)
@@ -108,7 +108,7 @@ func (service *restyService) MakePatchRequest(ctx *flat.Context, url string, bod
 	return service.evaluateResponse(ctx, url, response, MakePutRequest, start, err)
 }
 
-func (service *restyService) MakeDeleteRequest(ctx *flat.Context, url string, headers http.Header) (int, []byte, error) {
+func (service *restyService) MakeDeleteRequest(ctx *flat.Context, url string, headers http.Header) (int, []byte, http.Header, error) {
 	start := time.Now()
 	req := service.restyClient.R()
 	req.SetHeaderMultiValues(headers)
@@ -117,7 +117,7 @@ func (service *restyService) MakeDeleteRequest(ctx *flat.Context, url string, he
 	return service.evaluateResponse(ctx, url, response, MakeDeleteRequest, start, err)
 }
 
-func (service *restyService) MakeGetRequestWithConfig(ctx *flat.Context, url string, headers http.Header, config RequestConfig) (int, []byte, error) {
+func (service *restyService) MakeGetRequestWithConfig(ctx *flat.Context, url string, headers http.Header, config RequestConfig) (int, []byte, http.Header, error) {
 	start := time.Now()
 	client := service.restyClient
 	client.SetTimeout(config.Timeout)
@@ -158,17 +158,17 @@ func (service *restyService) MakeDeleteRequestWithTimeout(ctx *flat.Context, url
 }
 
 func (service *restyService) evaluateResponse(ctx *flat.Context, url string, response *resty.Response, resource string,
-	start time.Time, err error) (int, []byte, error) {
+	start time.Time, err error) (int, []byte, http.Header, error) {
 
 	if response == nil {
-		return 0, nil, errResponseNotReceived
+		return 0, nil, http.Header{}, errResponseNotReceived
 	}
 	if err != nil {
-		return response.StatusCode(), response.Body(), err
+		return response.StatusCode(), response.Body(), response.Header(), err
 	}
 	if !(response.StatusCode() >= http.StatusOK && response.StatusCode() <= http.StatusIMUsed) {
-		return response.StatusCode(), response.Body(), errors.New(response.Status())
+		return response.StatusCode(), response.Body(), response.Header(), errors.New(response.Status())
 	}
 
-	return response.StatusCode(), response.Body(), nil
+	return response.StatusCode(), response.Body(), response.Header(), nil
 }

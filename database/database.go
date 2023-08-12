@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/FlatDigital/core-go-toolkit/database/converter"
-	"github.com/FlatDigital/core-go-toolkit/godog"
+	"github.com/FlatDigital/core-go-toolkit/v2/database/converter"
+	"github.com/FlatDigital/core-go-toolkit/v2/godog"
 	"github.com/lib/pq"
 )
 

@@ -3,7 +3,7 @@ package sqlmock_test
 import (
 	"testing"
 
-	sqlmock "github.com/FlatDigital/core-go-toolkit/database/mock"
+	sqlmock "github.com/FlatDigital/core-go-toolkit/v2/database/mock"
 	"github.com/stretchr/testify/assert"
 )
 

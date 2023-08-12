@@ -9,7 +9,7 @@ import (
 	"github.com/lib/pq"
 	"github.com/stretchr/testify/assert"
 
-	sqlmock "github.com/FlatDigital/core-go-toolkit/database/mock"
+	sqlmock "github.com/FlatDigital/core-go-toolkit/v2/database/mock"
 )
 
 const (

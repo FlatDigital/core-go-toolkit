@@ -3,6 +3,8 @@ package utils
 import (
 	"database/sql/driver"
 	"encoding/json"
+	"fmt"
+	"strings"
 )
 
 type Set[T comparable] struct {
@@ -12,6 +14,13 @@ type Set[T comparable] struct {
 func NewSet[T comparable]() *Set[T] {
 	s := &Set[T]{}
 	s.list = make(map[T]struct{})
+	return s
+}
+
+func NewSetFromSlice[T comparable](list []T) *Set[T] {
+	s := &Set[T]{}
+	s.list = make(map[T]struct{})
+	s.AddMulti(list...)
 	return s
 }
 
@@ -71,4 +80,40 @@ func (s *Set[T]) UnmarshalJSON(bytes []byte) error {
 	s.AddMulti(array...)
 
 	return nil
+}
+
+func (s *Set[T]) Union(other *Set[T]) *Set[T] {
+	unionSet := NewSet[T]()
+	unionSet.AddMulti(s.ToSlice()...)
+	unionSet.AddMulti(other.ToSlice()...)
+	return unionSet
+}
+
+func (s *Set[T]) Intersect(other *Set[T]) *Set[T] {
+	intersectionSet := NewSet[T]()
+	for k := range s.list {
+		if other.Has(k) {
+			intersectionSet.Add(k)
+		}
+	}
+	return intersectionSet
+}
+
+func (s *Set[T]) Difference(other *Set[T]) *Set[T] {
+	differenceSet := NewSet[T]()
+	for k := range s.list {
+		if !other.Has(k) {
+			differenceSet.Add(k)
+		}
+	}
+	return differenceSet
+}
+
+func (s *Set[T]) String() string {
+	list := s.ToSlice()
+	stringSlice := make([]string, len(list))
+	for i, v := range list {
+		stringSlice[i] = fmt.Sprintf("%v", v)
+	}
+	return strings.Join(stringSlice, ", ")
 }

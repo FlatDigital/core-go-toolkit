@@ -3,7 +3,7 @@ package utils_test
 import (
 	"testing"
 
-	utils "github.com/FlatDigital/core-go-toolkit/utils"
+	utils "github.com/FlatDigital/core-go-toolkit/v2/utils"
 	"github.com/stretchr/testify/assert"
 )
 

@@ -4,9 +4,8 @@ import (
 	"regexp"
 	"testing"
 
+	utils "github.com/FlatDigital/core-go-toolkit/v2/utils"
 	"github.com/stretchr/testify/assert"
-
-	utils "github.com/FlatDigital/core-go-toolkit/utils"
 )
 
 func TestAnStringWith10LengthAnd3AsMaxValueLengthShouldTruncateStringTo3Length(t *testing.T) {

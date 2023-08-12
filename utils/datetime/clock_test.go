@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/FlatDigital/core-go-toolkit/utils/datetime"
+	"github.com/FlatDigital/core-go-toolkit/v2/utils/datetime"
 	"github.com/stretchr/testify/assert"
 )
 

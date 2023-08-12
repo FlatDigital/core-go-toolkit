@@ -4,9 +4,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/FlatDigital/core-go-toolkit/v2/utils/datetime"
 	"github.com/stretchr/testify/assert"
-
-	"github.com/FlatDigital/core-go-toolkit/utils/datetime"
 )
 
 func Test_TimeUtils(t *testing.T) {

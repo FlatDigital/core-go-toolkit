@@ -3,9 +3,8 @@ package utils_test
 import (
 	"testing"
 
+	utils "github.com/FlatDigital/core-go-toolkit/v2/utils"
 	"github.com/stretchr/testify/assert"
-
-	utils "github.com/FlatDigital/core-go-toolkit/utils"
 )
 
 func Test_Contains_True(t *testing.T) {

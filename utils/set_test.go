@@ -1,120 +1,129 @@
 package utils_test
 
 import (
+	"encoding/json"
 	"testing"
 
-	utils "github.com/FlatDigital/core-go-toolkit/v2/utils"
+	"github.com/FlatDigital/core-go-toolkit/v2/utils"
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_Contains(t *testing.T) {
-	ass := assert.New(t)
+func TestSet(t *testing.T) {
 
-	s := utils.NewSet()
+	assert := assert.New(t)
 
-	s.Add("Axel")
-	s.Add("Marco")
+	set := utils.NewSet[string]()
+	assert.False(set.Has("test"))
 
-	ass.True(s.Contains("Axel"))
-	ass.False(s.Contains("Pablo"))
+	set.Add("test")
+	assert.True(set.Has("test"))
 
-	s.Delete("Marco")
-	ass.False(s.Contains("Marco"))
 }
 
-func Test_NewSetFromSlice(t *testing.T) {
-	ass := assert.New(t)
+func TestSize(t *testing.T) {
 
-	arrayString := []string{
-		"Axel",
-		"Pablo",
+	assert := assert.New(t)
+
+	set := utils.NewSet[string]()
+	assert.Equal(0, set.Size())
+
+	set.Add("test")
+	assert.Equal(1, set.Size())
+
+	set.Add("test")
+	assert.Equal(1, set.Size())
+
+}
+
+func TestAddMulti(t *testing.T) {
+
+	assert := assert.New(t)
+
+	set := utils.NewSet[string]()
+	assert.Equal(0, set.Size())
+
+	set.AddMulti("test1", "test2", "test3")
+	assert.Equal(3, set.Size())
+
+}
+
+func TestRemove(t *testing.T) {
+
+	assert := assert.New(t)
+
+	set := utils.NewSet[string]()
+
+	set.AddMulti("test1", "test2", "test3")
+	assert.Equal(3, set.Size())
+
+	set.Remove("test")
+	assert.Equal(3, set.Size())
+
+	set.Remove("test1")
+	assert.Equal(2, set.Size())
+
+}
+
+func TestToSlice(t *testing.T) {
+
+	assert := assert.New(t)
+
+	set := utils.NewSet[string]()
+
+	expected := []string{"test1", "test2", "test3"}
+	set.AddMulti(expected...)
+
+	list := set.ToSlice()
+	assert.Equal(3, len(list))
+
+	for _, v := range list {
+		assert.Contains(expected, v)
 	}
 
-	s := utils.NewSetFromSlice(arrayString)
-
-	ass.True(s.Contains("Axel"))
-	ass.False(s.Contains("Marco"))
 }
 
-func Test_Size(t *testing.T) {
-	ass := assert.New(t)
+func TestMarshalJSON(t *testing.T) {
 
-	s := utils.NewSet()
+	assert := assert.New(t)
 
-	s.Add("Axel")
-	s.Add("Marco")
+	set := utils.NewSet[string]()
 
-	ass.Equal(2, s.Size())
+	expected := []string{"test1", "test2", "test3"}
+	set.AddMulti(expected...)
+
+	bytes, err := set.MarshalJSON()
+	assert.NoError(err)
+
+	var list []string
+	err = json.Unmarshal(bytes, &list)
+	assert.NoError(err)
+
+	assert.Equal(3, len(list))
+
+	for _, v := range list {
+		assert.Contains(expected, v)
+	}
+
 }
 
-func Test_Union(t *testing.T) {
-	ass := assert.New(t)
+func TestUnmarshalJSON(t *testing.T) {
 
-	s1 := utils.NewSet()
+	assert := assert.New(t)
 
-	s1.Add("Axel")
-	s1.Add("Marco")
+	set := utils.NewSet[string]()
 
-	s2 := utils.NewSetFromSlice([]string{
-		"Pablo",
-	})
+	expected := []string{"test1", "test2", "test3"}
 
-	union := s1.Union(s2)
+	bytes, err := json.Marshal(expected)
+	assert.NoError(err)
 
-	ass.Equal(3, union.Size())
-}
+	err = set.UnmarshalJSON(bytes)
+	assert.NoError(err)
 
-func Test_Intersection(t *testing.T) {
-	ass := assert.New(t)
+	assert.Equal(3, set.Size())
 
-	s1 := utils.NewSet()
+	for _, v := range expected {
+		assert.True(set.Has(v))
+	}
 
-	s1.Add("Axel")
-	s1.Add("Marco")
-
-	s2 := utils.NewSetFromSlice([]string{
-		"Pablo",
-		"Axel",
-	})
-
-	intersection := s1.Intersect(s2)
-
-	ass.Equal(1, intersection.Size())
-}
-
-func Test_Intersection2(t *testing.T) {
-	ass := assert.New(t)
-
-	s1 := utils.NewSet()
-
-	s1.Add("Axel")
-	s1.Add("Marco")
-
-	s2 := utils.NewSetFromSlice([]string{
-		"Pablo",
-		"Axel",
-		"Amilcar",
-	})
-
-	intersection := s1.Intersect(s2)
-
-	ass.Equal(1, intersection.Size())
-}
-
-func Test_Difference(t *testing.T) {
-	ass := assert.New(t)
-
-	s1 := utils.NewSet()
-
-	s1.Add("Axel")
-	s1.Add("Marco")
-
-	s2 := utils.NewSetFromSlice([]string{
-		"Pablo",
-		"Axel",
-	})
-
-	difference := s1.Difference(s2)
-
-	ass.Equal(1, difference.Size())
 }

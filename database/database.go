@@ -44,6 +44,7 @@ type (
 		Rollback(dbc *DBContext) error
 		Close(dbc *DBContext) error
 		WithTransaction(txFn func(dbc *DBContext) error) error
+		SelectOnDbLinkView(dbLink *DbLink, dbc *DBContext, query string, params ...interface{}) (*DBResult, error)
 	}
 
 	// ServiceConfig database service config
@@ -55,6 +56,7 @@ type (
 		DBName           string
 		DBPassword       string
 		DBUsername       string
+		DBPort           int
 		MaxIdleConns     int
 		MaxOpenConns     int
 		ConnMaxLifetime  time.Duration
@@ -84,6 +86,7 @@ type (
 const (
 	// default values
 	defaultMaxConnectionRetries = 3
+	defaultDbPort               = 5432
 
 	logError   logType = "error"
 	logSuccess logType = "success"
@@ -96,9 +99,12 @@ func NewService(config ServiceConfig) (Database, error) {
 	// 	config.DBPassword, config.DBHost, config.DBName)
 
 	// connection for Postgress
+	if config.DBPort == 0 {
+		config.DBPort = defaultDbPort
+	}
 	connectionString := fmt.Sprintf("host=%s port=%d user=%s "+
 		"password=%s dbname=%s sslmode=disable",
-		config.DBHost, 5432, config.DBUsername, config.DBPassword, config.DBName)
+		config.DBHost, config.DBPort, config.DBUsername, config.DBPassword, config.DBName)
 
 	// DOC: https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-CONNSTRING
 	// pq dsn not support read_timeout & write_timeout
@@ -687,4 +693,31 @@ func (service *service) logMetric(logType logType, operation string, detail stri
 
 	godog.RecordSimpleMetric(fmt.Sprintf("application.%s.db.service.%s", service.datadogMetricPrefix,
 		string(logType)), 1, tags.ToArray()...)
+}
+
+func (service *service) SelectOnDbLinkView(dbLink *DbLink, dbc *DBContext, query string, params ...interface{}) (*DBResult, error) {
+	_, err := service.Execute(dbc, dbLink.OpenConnection())
+	if err != nil {
+		return nil, err
+	}
+	var result *DBResult
+	if params != nil {
+		result, err = service.Select(dbc, query, false, params...)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		result, err = service.Select(dbc, query, false)
+		if err != nil {
+			return nil, err
+		}
+	}
+	defer func() {
+		_, err := service.Execute(dbc, dbLink.CloseConnection())
+		if err != nil {
+			service.logMetric(logError, "execute", "close dblink connection", err)
+		}
+	}()
+	return result, nil
+
 }

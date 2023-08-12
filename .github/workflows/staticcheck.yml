@@ -10,31 +10,6 @@ jobs:
   run-checks:
     runs-on: ubuntu-latest
     steps:
-      - name: Configure git for private repos
-        run: |
-          git config --global url."https://${{ secrets.GIT_TOKEN }}:x-oauth-basic@github.com/".insteadOf "https://github.com/"
-
-      - name: Check out code
-        uses: actions/checkout@v2
+      - uses: FlatDigital/platform-github-actions/.github/actions/golang-static-check@main
         with:
-          fetch-depth: 1
-
-      - name: Sets up go version
-        uses: WillAbides/setup-go-faster@v1.7.0
-        with:
-          go-version: "1.18"
-
-      - name: Run tests with coverage
-        run: "go test -coverprofile=coverage.out -covermode=count ./..."
-      
-      - name: Run patch cover
-        uses: seriousben/go-patch-cover-action@v1
-        with:
-          version: "latest"
-
-      - name: Run staticcheck
-        uses: dominikh/staticcheck-action@v1.2.0
-        with:
-          version: "2022.1.1"
-          install-go: false
-          cache-key: "1.18"
+          doppler_token: ${{ secrets.DOPPLER_TOKEN_STG }}

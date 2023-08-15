@@ -111,7 +111,7 @@ func Test_SanitizeString_Success(t *testing.T) {
 	// Given
 	ass := assert.New(t)
 	// string with special character "\u00"
-	testString := "Alan Mat­as Moreno"
+	testString := "Alan Mat\u00adas Moreno"
 
 	// When
 	sanitizedString, hasInvalidChar := utils.SanitizeString(testString)
@@ -142,7 +142,7 @@ func Test_SanitizeString_Success_JSON(t *testing.T) {
         {
             "information_bucket": {
                 "users_api": {
-                    "first_name": "Alan Mat­as Moreno",
+                    "first_name": "Alan Matas Moreno",
                 }
             },
         }

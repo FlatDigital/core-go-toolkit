@@ -148,22 +148,22 @@ func Test_ParseTimeUS(t *testing.T) {
 	ass.Equal(`parsing time "Not a Date pattern" as "01-02-2006": cannot parse "Not a Date pattern" as "01"`, err.Error())
 
 	// invalid US format -> error
-	datetimeExpected, err = ParseTimeUS("24-12-2020")
+	_, err = ParseTimeUS("24-12-2020")
 	ass.NotNil(err)
 	ass.Equal(`parsing time "24-12-2020": month out of range`, err.Error())
 
 	// month not valid -> error
-	datetimeExpected, err = ParseTimeUS("32-12-2020")
+	_, err = ParseTimeUS("32-12-2020")
 	ass.NotNil(err)
 	ass.Equal(`parsing time "32-12-2020": month out of range`, err.Error())
 
 	// day not valid -> error
-	datetimeExpected, err = ParseTimeUS("10-33-2020")
+	_, err = ParseTimeUS("10-33-2020")
 	ass.NotNil(err)
 	ass.Equal(`parsing time "10-33-2020": day out of range`, err.Error())
 
 	// year not valid -> error
-	datetimeExpected, err = ParseTimeUS("10-33-3")
+	_, err = ParseTimeUS("10-33-3")
 	ass.NotNil(err)
 	ass.Equal(`parsing time "10-33-3" as "01-02-2006": cannot parse "3" as "2006"`, err.Error())
 }

@@ -1,7 +1,7 @@
 package server
 
 import (
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"reflect"
@@ -15,7 +15,7 @@ import (
 func init() {
 	// We need to disable logging on this package because gin outputs debug
 	// information using log that makes it hard to understand tests output.
-	log.SetOutput(ioutil.Discard)
+	log.SetOutput(io.Discard)
 }
 
 func okHandler(c *gin.Context) {

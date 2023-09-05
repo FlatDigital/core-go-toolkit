@@ -36,3 +36,27 @@ func Test_ReturnNotFoundError(t *testing.T) {
 	ass.Equal(http.StatusNotFound, rr.Code)
 	ass.Equal("{\"error\":\"NotFoundApiError\",\"cause\":\"forced for test\"}", rr.Body.String())
 }
+
+func Test_GetNotFoundStatusCode(t *testing.T) {
+	err := error.NewErrWrappedNotFound("forced for test")
+
+	statusCode := error.GetStatusCode(err)
+
+	assert.Equal(t, http.StatusNotFound, statusCode)
+}
+
+func Test_NotFoundIsServerError(t *testing.T) {
+	err := error.NewErrWrappedNotFound("forced for test")
+
+	isClientError := error.IsServerError(err)
+
+	assert.False(t, isClientError)
+}
+
+func Test_NotFoundIsClientError(t *testing.T) {
+	err := error.NewErrWrappedNotFound("forced for test")
+
+	isClientError := error.IsClientError(err)
+
+	assert.True(t, isClientError)
+}

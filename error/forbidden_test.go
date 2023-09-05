@@ -53,3 +53,27 @@ func Test_ReturnForbiddenErrorFromStatus(t *testing.T) {
 	ass.IsType(error.ErrForbidden{}, wrappedError.WrappedErr())
 	ass.EqualError(wrappedError.WrappedErr(), err.Error())
 }
+
+func Test_GetForbiddenStatusCode(t *testing.T) {
+	err := error.NewErrWrappedForbidden("forced for test")
+
+	statusCode := error.GetStatusCode(err)
+
+	assert.Equal(t, http.StatusForbidden, statusCode)
+}
+
+func Test_ForbiddenIsServerError(t *testing.T) {
+	err := error.NewErrWrappedForbidden("forced for test")
+
+	isClientError := error.IsServerError(err)
+
+	assert.False(t, isClientError)
+}
+
+func Test_ForbiddenIsClientError(t *testing.T) {
+	err := error.NewErrWrappedForbidden("forced for test")
+
+	isClientError := error.IsClientError(err)
+
+	assert.True(t, isClientError)
+}

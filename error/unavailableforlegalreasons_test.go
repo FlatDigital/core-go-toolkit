@@ -36,3 +36,27 @@ func Test_ReturnUnavailableForLegalReasonsError(t *testing.T) {
 	ass.Equal(http.StatusUnavailableForLegalReasons, rr.Code)
 	ass.Equal("{\"error\":\"UnavailableForLegalReasonsError\",\"cause\":\"forced for test\"}", rr.Body.String())
 }
+
+func Test_GetUnavailableForLegalReasonsStatusCode(t *testing.T) {
+	err := error.NewErrWrappedUnavailableForLegalReasons("forced for test")
+
+	statusCode := error.GetStatusCode(err)
+
+	assert.Equal(t, http.StatusUnavailableForLegalReasons, statusCode)
+}
+
+func Test_UnavailableForLegalReasonsIsServerError(t *testing.T) {
+	err := error.NewErrWrappedUnavailableForLegalReasons("forced for test")
+
+	isClientError := error.IsServerError(err)
+
+	assert.False(t, isClientError)
+}
+
+func Test_UnavailableForLegalReasonsIsClientError(t *testing.T) {
+	err := error.NewErrWrappedUnavailableForLegalReasons("forced for test")
+
+	isClientError := error.IsClientError(err)
+
+	assert.True(t, isClientError)
+}

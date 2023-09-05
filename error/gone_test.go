@@ -36,3 +36,27 @@ func Test_ReturnGoneError(t *testing.T) {
 	ass.Equal(http.StatusGone, rr.Code)
 	ass.Equal("{\"error\":\"GoneApiError\",\"cause\":\"forced for test\"}", rr.Body.String())
 }
+
+func Test_GetGoneStatusCode(t *testing.T) {
+	err := error.NewErrWrappedGone("forced for test")
+
+	statusCode := error.GetStatusCode(err)
+
+	assert.Equal(t, http.StatusGone, statusCode)
+}
+
+func Test_GoneIsServerError(t *testing.T) {
+	err := error.NewErrWrappedGone("forced for test")
+
+	isClientError := error.IsServerError(err)
+
+	assert.False(t, isClientError)
+}
+
+func Test_GoneIsClientError(t *testing.T) {
+	err := error.NewErrWrappedGone("forced for test")
+
+	isClientError := error.IsClientError(err)
+
+	assert.True(t, isClientError)
+}

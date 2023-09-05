@@ -36,3 +36,27 @@ func Test_ReturnInternalServerErrorError(t *testing.T) {
 	ass.Equal(http.StatusInternalServerError, rr.Code)
 	ass.Equal("{\"error\":\"InternalServerApiError\",\"cause\":\"forced for test\"}", rr.Body.String())
 }
+
+func Test_GetInternalServerErrorStatusCode(t *testing.T) {
+	err := error.NewErrWrappedInternalServerError("forced for test")
+
+	statusCode := error.GetStatusCode(err)
+
+	assert.Equal(t, http.StatusInternalServerError, statusCode)
+}
+
+func Test_InternalServerErrorIsServerError(t *testing.T) {
+	err := error.NewErrWrappedInternalServerError("forced for test")
+
+	isClientError := error.IsServerError(err)
+
+	assert.True(t, isClientError)
+}
+
+func Test_InternalServerErrorIsClientError(t *testing.T) {
+	err := error.NewErrWrappedInternalServerError("forced for test")
+
+	isClientError := error.IsClientError(err)
+
+	assert.False(t, isClientError)
+}

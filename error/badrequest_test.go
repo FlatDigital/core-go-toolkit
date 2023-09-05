@@ -36,3 +36,27 @@ func Test_ReturnBadRequestError(t *testing.T) {
 	ass.Equal(http.StatusBadRequest, rr.Code)
 	ass.Equal("{\"error\":\"BadRequestApiError\",\"cause\":\"forced for test\"}", rr.Body.String())
 }
+
+func Test_GetBadRequestStatusCode(t *testing.T) {
+	err := error.NewErrWrappedBadRequest("forced for test")
+
+	statusCode := error.GetStatusCode(err)
+
+	assert.Equal(t, http.StatusBadRequest, statusCode)
+}
+
+func Test_BadRequestIsServerError(t *testing.T) {
+	err := error.NewErrWrappedBadRequest("forced for test")
+
+	isClientError := error.IsServerError(err)
+
+	assert.False(t, isClientError)
+}
+
+func Test_BadRequestIsClientError(t *testing.T) {
+	err := error.NewErrWrappedBadRequest("forced for test")
+
+	isClientError := error.IsClientError(err)
+
+	assert.True(t, isClientError)
+}

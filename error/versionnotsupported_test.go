@@ -36,3 +36,27 @@ func Test_ReturnVersionNotSupportedError(t *testing.T) {
 	ass.Equal(http.StatusHTTPVersionNotSupported, rr.Code)
 	ass.Equal("{\"error\":\"HTTPVersionNotSupportedApiError\",\"cause\":\"forced for test\"}", rr.Body.String())
 }
+
+func Test_GetVersionNotSupportedStatusCode(t *testing.T) {
+	err := error.NewErrWrappedVersionNotSupported("forced for test")
+
+	statusCode := error.GetStatusCode(err)
+
+	assert.Equal(t, http.StatusHTTPVersionNotSupported, statusCode)
+}
+
+func Test_VersionNotSupportedIsServerError(t *testing.T) {
+	err := error.NewErrWrappedVersionNotSupported("forced for test")
+
+	isClientError := error.IsServerError(err)
+
+	assert.True(t, isClientError)
+}
+
+func Test_VersionNotSupportedIsClientError(t *testing.T) {
+	err := error.NewErrWrappedVersionNotSupported("forced for test")
+
+	isClientError := error.IsClientError(err)
+
+	assert.False(t, isClientError)
+}

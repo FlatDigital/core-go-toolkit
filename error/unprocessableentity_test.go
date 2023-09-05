@@ -36,3 +36,27 @@ func Test_ReturnUnprocessableEntityError(t *testing.T) {
 	ass.Equal(http.StatusUnprocessableEntity, rr.Code)
 	ass.Equal("{\"error\":\"UnprocessableEntityApiError\",\"cause\":\"forced for test\"}", rr.Body.String())
 }
+
+func Test_GetUnprocessableEntityStatusCode(t *testing.T) {
+	err := error.NewErrWrappedUnprocessableEntity("forced for test")
+
+	statusCode := error.GetStatusCode(err)
+
+	assert.Equal(t, http.StatusUnprocessableEntity, statusCode)
+}
+
+func Test_UnprocessableEntityIsServerError(t *testing.T) {
+	err := error.NewErrWrappedUnprocessableEntity("forced for test")
+
+	isClientError := error.IsServerError(err)
+
+	assert.False(t, isClientError)
+}
+
+func Test_UnprocessableEntityIsClientError(t *testing.T) {
+	err := error.NewErrWrappedUnprocessableEntity("forced for test")
+
+	isClientError := error.IsClientError(err)
+
+	assert.True(t, isClientError)
+}

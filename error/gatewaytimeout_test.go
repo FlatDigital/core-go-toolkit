@@ -36,3 +36,27 @@ func Test_ReturnGatewayTimeoutError(t *testing.T) {
 	ass.Equal(http.StatusGatewayTimeout, rr.Code)
 	ass.Equal("{\"error\":\"GatewayTimeoutApiError\",\"cause\":\"forced for test\"}", rr.Body.String())
 }
+
+func Test_GetGatewayTimeoutStatusCode(t *testing.T) {
+	err := error.NewErrWrappedGatewayTimeout("forced for test")
+
+	statusCode := error.GetStatusCode(err)
+
+	assert.Equal(t, http.StatusGatewayTimeout, statusCode)
+}
+
+func Test_GatewayTimeoutIsServerError(t *testing.T) {
+	err := error.NewErrWrappedGatewayTimeout("forced for test")
+
+	isClientError := error.IsServerError(err)
+
+	assert.True(t, isClientError)
+}
+
+func Test_GatewayTimeoutIsClientError(t *testing.T) {
+	err := error.NewErrWrappedGatewayTimeout("forced for test")
+
+	isClientError := error.IsClientError(err)
+
+	assert.False(t, isClientError)
+}

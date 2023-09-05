@@ -186,3 +186,57 @@ func ReturnWrappedErrorFromStatus(statusCode int, err error) Wrapper {
 		return NewErrWrappedInternalServerError(err.Error())
 	}
 }
+
+func GetStatusCode(errWrapped Wrapper) int {
+	err := errWrapped.WrappedErr()
+	switch err.(type) {
+
+	case ErrBadGateway:
+		return http.StatusBadGateway
+	case ErrBadRequest:
+		return http.StatusBadRequest
+	case ErrConflict:
+		return http.StatusConflict
+	case ErrForbidden:
+		return http.StatusForbidden
+	case ErrGatewayTimeout:
+		return http.StatusGatewayTimeout
+	case ErrGone:
+		return http.StatusGone
+	case ErrInternalServerError:
+		return http.StatusInternalServerError
+	case ErrLocked:
+		return http.StatusLocked
+	case ErrNotFound:
+		return http.StatusNotFound
+	case ErrNotImplemented:
+		return http.StatusNotImplemented
+	case ErrTooManyRequests:
+		return http.StatusTooManyRequests
+	case ErrUnauthorized:
+		return http.StatusUnauthorized
+	case ErrUnprocessableEntity:
+		return http.StatusUnprocessableEntity
+	case ErrUpgradeRequired:
+		return http.StatusUpgradeRequired
+	case ErrVersionNotSupported:
+		return http.StatusHTTPVersionNotSupported
+	case ErrFailDependency:
+		return http.StatusFailedDependency
+	case ErrUnavailableForLegalReasons:
+		return http.StatusUnavailableForLegalReasons
+
+	default:
+		return http.StatusInternalServerError
+	}
+}
+
+func IsServerError(errWrapped Wrapper) bool {
+	return GetStatusCode(errWrapped) >= http.StatusInternalServerError
+}
+
+func IsClientError(errWrapped Wrapper) bool {
+	statusCode := GetStatusCode(errWrapped)
+
+	return statusCode >= http.StatusBadRequest && statusCode < http.StatusInternalServerError
+}

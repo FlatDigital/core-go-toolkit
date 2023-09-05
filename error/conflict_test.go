@@ -36,3 +36,27 @@ func Test_ReturnConflictError(t *testing.T) {
 	ass.Equal(http.StatusConflict, rr.Code)
 	ass.Equal("{\"error\":\"ResourceConflictApiError\",\"cause\":\"forced for test\"}", rr.Body.String())
 }
+
+func Test_GetConflictStatusCode(t *testing.T) {
+	err := error.NewErrWrappedConflict("forced for test")
+
+	statusCode := error.GetStatusCode(err)
+
+	assert.Equal(t, http.StatusConflict, statusCode)
+}
+
+func Test_ConflictIsServerError(t *testing.T) {
+	err := error.NewErrWrappedConflict("forced for test")
+
+	isClientError := error.IsServerError(err)
+
+	assert.False(t, isClientError)
+}
+
+func Test_ConflictIsClientError(t *testing.T) {
+	err := error.NewErrWrappedConflict("forced for test")
+
+	isClientError := error.IsClientError(err)
+
+	assert.True(t, isClientError)
+}

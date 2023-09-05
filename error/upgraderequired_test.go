@@ -36,3 +36,27 @@ func Test_ReturnUpgradeRequiredError(t *testing.T) {
 	ass.Equal(http.StatusUpgradeRequired, rr.Code)
 	ass.Equal("{\"error\":\"UpgradeRequiredApiError\",\"cause\":\"forced for test\"}", rr.Body.String())
 }
+
+func Test_GetUpgradeRequiredStatusCode(t *testing.T) {
+	err := error.NewErrWrappedUpgradeRequired("forced for test")
+
+	statusCode := error.GetStatusCode(err)
+
+	assert.Equal(t, http.StatusUpgradeRequired, statusCode)
+}
+
+func Test_UpgradeRequiredIsServerError(t *testing.T) {
+	err := error.NewErrWrappedUpgradeRequired("forced for test")
+
+	isClientError := error.IsServerError(err)
+
+	assert.False(t, isClientError)
+}
+
+func Test_UpgradeRequiredIsClientError(t *testing.T) {
+	err := error.NewErrWrappedUpgradeRequired("forced for test")
+
+	isClientError := error.IsClientError(err)
+
+	assert.True(t, isClientError)
+}

@@ -36,3 +36,27 @@ func Test_ReturnBadGatewayError(t *testing.T) {
 	ass.Equal(http.StatusBadGateway, rr.Code)
 	ass.Equal("{\"error\":\"BadGatewayApiError\",\"cause\":\"forced for test\"}", rr.Body.String())
 }
+
+func Test_GetBadGatewayStatusCode(t *testing.T) {
+	err := error.NewErrWrappedBadGateway("forced for test")
+
+	statusCode := error.GetStatusCode(err)
+
+	assert.Equal(t, http.StatusBadGateway, statusCode)
+}
+
+func Test_BadGatewayIsServerError(t *testing.T) {
+	err := error.NewErrWrappedBadGateway("forced for test")
+
+	isClientError := error.IsServerError(err)
+
+	assert.True(t, isClientError)
+}
+
+func Test_BadGatewayIsClientError(t *testing.T) {
+	err := error.NewErrWrappedBadGateway("forced for test")
+
+	isClientError := error.IsClientError(err)
+
+	assert.False(t, isClientError)
+}

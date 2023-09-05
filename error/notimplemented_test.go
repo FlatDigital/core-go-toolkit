@@ -36,3 +36,27 @@ func Test_ReturnNotImplementedError(t *testing.T) {
 	ass.Equal(http.StatusNotImplemented, rr.Code)
 	ass.Equal("{\"error\":\"NotImplementedApiError\",\"cause\":\"forced for test\"}", rr.Body.String())
 }
+
+func Test_GetNotImplementedStatusCode(t *testing.T) {
+	err := error.NewErrWrappedNotImplemented("forced for test")
+
+	statusCode := error.GetStatusCode(err)
+
+	assert.Equal(t, http.StatusNotImplemented, statusCode)
+}
+
+func Test_NotImplementedIsServerError(t *testing.T) {
+	err := error.NewErrWrappedNotImplemented("forced for test")
+
+	isClientError := error.IsServerError(err)
+
+	assert.True(t, isClientError)
+}
+
+func Test_NotImplementedIsClientError(t *testing.T) {
+	err := error.NewErrWrappedNotImplemented("forced for test")
+
+	isClientError := error.IsClientError(err)
+
+	assert.False(t, isClientError)
+}

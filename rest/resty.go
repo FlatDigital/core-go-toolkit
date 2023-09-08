@@ -188,22 +188,28 @@ func (service *restyService) evaluateResponse(url string, response *resty.Respon
 	return response.StatusCode(), response.Body(), response.Header(), nil
 }
 
-func getPathFromUrl(rawUrl string) string {
+func getSanitizedPathFromUrl(rawUrl string) string {
 	var path string
 	parsedUrl, _ := url.Parse(rawUrl)
 	if parsedUrl != nil {
 		path = parsedUrl.Path
 	}
 
-	pattern := `/[0-9]+`
-	re := regexp.MustCompile(pattern)
-	return re.ReplaceAllString(path, "/_")
+	// ids removal
+	re := regexp.MustCompile(`/[0-9]+`)
+	path = re.ReplaceAllString(path, "/_")
+
+	// emails removal
+	re = regexp.MustCompile(`[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}`)
+	path = re.ReplaceAllString(path, "_")
+
+	return path
 }
 
 func (service *restyService) logMetric(logType logType, rawUrl string, statusCode int, action string, start time.Time) {
 	// Metric
 	tags := new(godog.Tags).
-		Add("resource", getPathFromUrl(rawUrl)).
+		Add("resource", getSanitizedPathFromUrl(rawUrl)).
 		Add("status_code", fmt.Sprintf("%d", statusCode)).
 		Add("action", action)
 	godog.RecordSimpleMetric(

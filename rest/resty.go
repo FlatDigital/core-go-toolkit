@@ -226,5 +226,5 @@ func (service *restyService) logMetric(logType logType, rawUrl string, statusCod
 
 // elapsedSinceFloat returns elapsed time in ms as float64
 func elapsedSinceFloat(start time.Time) float64 {
-	return float64(time.Since(start).Nanoseconds()) / 1000000.0
+	return float64(time.Since(start).Milliseconds())
 }

@@ -5,6 +5,7 @@ import (
 	"crypto/cipher"
 	"crypto/rand"
 	"encoding/base64"
+	"fmt"
 	"io"
 )
 
@@ -42,6 +43,10 @@ func Decrypt(secretKey string, encryptedText string) (plainText string, err erro
 	data, err := base64.StdEncoding.DecodeString(encryptedText)
 	if err != nil {
 		return
+	}
+
+	if data == nil || len(data) < aesgcm.NonceSize() {
+		return "", fmt.Errorf("invalid encrypted text format")
 	}
 
 	nonce, cipherText := data[:aesgcm.NonceSize()], data[aesgcm.NonceSize():]

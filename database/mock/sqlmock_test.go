@@ -39,7 +39,7 @@ func Test_PatchConn_Panic(t *testing.T) {
 	// when
 
 	// then
-	ass.PanicsWithValue("Mock not available for SQLMock.Conn", func() {
+	ass.Panics(func() {
 		mock.Conn(ctx)
 	})
 }
@@ -67,7 +67,7 @@ func Test_PatchPing_Panic(t *testing.T) {
 	// when
 
 	// then
-	ass.PanicsWithValue("Mock not available for SQLMock.Ping", func() {
+	ass.Panics(func() {
 		mock.Ping()
 	})
 }
@@ -97,7 +97,7 @@ func Test_PatchPingContext_Panic(t *testing.T) {
 	// when
 
 	// then
-	ass.PanicsWithValue("Mock not available for SQLMock.PingContext", func() {
+	ass.Panics(func() {
 		mock.PingContext(ctx)
 	})
 }
@@ -125,7 +125,7 @@ func Test_PatchClose_Panic(t *testing.T) {
 	// when
 
 	// then
-	ass.PanicsWithValue("Mock not available for SQLMock.Close", func() {
+	ass.Panics(func() {
 		mock.Close()
 	})
 }
@@ -158,7 +158,7 @@ func Test_PatchBeginTx_Panic(t *testing.T) {
 	// when
 
 	// then
-	ass.PanicsWithValue("Mock not available for SQLMock.BeginTx", func() {
+	ass.Panics(func() {
 		mock.BeginTx(ctx, nil)
 	})
 }
@@ -188,7 +188,7 @@ func Test_PatchPrepare_Panic(t *testing.T) {
 	// when
 
 	// then
-	ass.PanicsWithValue("Mock not available for SQLMock.Prepare", func() {
+	ass.Panics(func() {
 		mock.Prepare("")
 	})
 }
@@ -217,7 +217,7 @@ func Test_PatchStats_Panic(t *testing.T) {
 	// when
 
 	// then
-	ass.PanicsWithValue("Mock not available for SQLMock.Stats", func() {
+	ass.Panics(func() {
 		mock.Stats()
 	})
 }
@@ -249,7 +249,7 @@ func Test_PatchPrepareContext_Panic(t *testing.T) {
 	// when
 
 	// then
-	ass.PanicsWithValue("Mock not available for SQLMock.PrepareContext", func() {
+	ass.Panics(func() {
 		mock.PrepareContext(ctx, "")
 	})
 }

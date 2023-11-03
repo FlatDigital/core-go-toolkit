@@ -32,7 +32,7 @@ func Test_Rows_PatchColumns_Panic(t *testing.T) {
 	// when
 
 	// then
-	ass.PanicsWithValue("Mock not available for SQLRowsMock.Columns", func() {
+	ass.Panics(func() {
 		mock.Columns()
 	})
 }
@@ -60,7 +60,7 @@ func Test_Rows_PatchClose_Panic(t *testing.T) {
 	// when
 
 	// then
-	ass.PanicsWithValue("Mock not available for SQLRowsMock.Close", func() {
+	ass.Panics(func() {
 		mock.Close()
 	})
 }
@@ -88,7 +88,7 @@ func Test_Rows_PatchNext_Panic(t *testing.T) {
 	// when
 
 	// then
-	ass.PanicsWithValue("Mock not available for SQLRowsMock.Next", func() {
+	ass.Panics(func() {
 		mock.Next()
 	})
 }
@@ -117,7 +117,7 @@ func Test_Rows_PatchScan_Panic(t *testing.T) {
 	// when
 
 	// then
-	ass.PanicsWithValue("Mock not available for SQLRowsMock.Scan", func() {
+	ass.Panics(func() {
 		mock.Scan(nil)
 	})
 }

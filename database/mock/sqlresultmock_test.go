@@ -31,7 +31,7 @@ func Test_Result_PatchRowsAffected_Panic(t *testing.T) {
 	// when
 
 	// then
-	ass.PanicsWithValue("Mock not available for SQLResultMock.RowsAffected", func() {
+	ass.Panics(func() {
 		mock.RowsAffected()
 	})
 }

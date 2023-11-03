@@ -1,47 +1,30 @@
 package sqlmock
 
+import "github.com/stretchr/testify/mock"
+
 // SQLResultMock mock struct
 type SQLResultMock struct {
-	patchResultRowsAffected []outputForResultRowsAffected
+	mock.Mock
 }
 
 // NewResultMockService return mock for database/sql
 func NewResultMockService() *SQLResultMock {
-	sqlResultMock := SQLResultMock{
-		patchResultRowsAffected: make([]outputForResultRowsAffected, 0),
+	return &SQLResultMock{
+		Mock: mock.Mock{},
 	}
-
-	return &sqlResultMock
 }
-
-type (
-	outputForResultRowsAffected struct {
-		rowsNum     int64
-		outputError error
-	}
-)
 
 // PatchRowsAffected patches the funcion RowsAffected
 func (mock *SQLResultMock) PatchRowsAffected(rowsNum int64, outputErr error) {
-	output := outputForResultRowsAffected{
-		rowsNum:     rowsNum,
-		outputError: outputErr,
-	}
-
-	mock.patchResultRowsAffected = append(mock.patchResultRowsAffected, output)
+	mock.On("RowsAffected").Return(rowsNum, outputErr).Once()
 }
 
 // RowsAffected mocks the real implementation of RowsAffected for the database/sql/rows
 func (mock *SQLResultMock) RowsAffected() (int64, error) {
-	if len(mock.patchResultRowsAffected) == 0 {
-		panic("Mock not available for SQLResultMock.RowsAffected")
-	}
-
-	output := mock.patchResultRowsAffected[0]
-	// dequeue
-	mock.patchResultRowsAffected = mock.patchResultRowsAffected[1:]
-
-	return output.rowsNum, output.outputError
+	args := mock.Called()
+	rowsNum, _ := args.Get(0).(int64)
+	err, _ := args.Get(1).(error)
+	return rowsNum, err
 }
 
 // LastInsertId mocks the real implementation of LastInsertId for the database/sql/result

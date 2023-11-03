@@ -5,126 +5,58 @@ import (
 	"database/sql"
 
 	"github.com/FlatDigital/core-go-toolkit/v2/database/converter"
+	"github.com/stretchr/testify/mock"
 )
 
 // SQLTxMock mock struct
 type SQLTxMock struct {
-	patchTxCommit         []outputForTxCommit
-	patchTxRollback       []outputForTxRollback
-	patchTxPrepareContext map[hash][]outputForTxPrepareContext
+	mock.Mock
 	converter.DBTxer
 }
 
 // NewTxMockService return mock for database/sql
 func NewTxMockService() *SQLTxMock {
-	sqlTxMock := SQLTxMock{
-		patchTxCommit:         make([]outputForTxCommit, 0),
-		patchTxRollback:       make([]outputForTxRollback, 0),
-		patchTxPrepareContext: map[hash][]outputForTxPrepareContext{},
+	return &SQLTxMock{
+		Mock: mock.Mock{},
 	}
-
-	return &sqlTxMock
 }
-
-type (
-	outputForTxCommit struct {
-		outputError error
-	}
-
-	outputForTxRollback struct {
-		outputError error
-	}
-
-	inputForTxPrepareContext struct {
-		Context context.Context
-		Query   string
-	}
-
-	outputForTxPrepareContext struct {
-		stmt        converter.DBStmter
-		outputError error
-	}
-)
 
 // PatchCommit patches the funcion Commit
 func (mock *SQLTxMock) PatchCommit(outputErr error) {
-	output := outputForTxCommit{
-		outputError: outputErr,
-	}
-
-	mock.patchTxCommit = append(mock.patchTxCommit, output)
+	mock.On("Commit").Return(outputErr).Once()
 }
 
 // Commit mocks the real implementation of Commit for the database/sql/tx
 func (mock *SQLTxMock) Commit() error {
-	if len(mock.patchTxCommit) == 0 {
-		panic("Mock not available for SQLTxMock.Commit")
-	}
-
-	output := mock.patchTxCommit[0]
-	// dequeue
-	mock.patchTxCommit = mock.patchTxCommit[1:]
-
-	return output.outputError
+	args := mock.Called()
+	err, _ := args.Get(0).(error)
+	return err
 }
 
 // PatchRollback patches the funcion Rollback
 func (mock *SQLTxMock) PatchRollback(outputErr error) {
-	output := outputForTxRollback{
-		outputError: outputErr,
-	}
-
-	mock.patchTxRollback = append(mock.patchTxRollback, output)
+	mock.On("Rollback").Return(outputErr).Once()
 }
 
 // Rollback mocks the real implementation of Rollback for the database/sql/tx
 func (mock *SQLTxMock) Rollback() error {
-	if len(mock.patchTxRollback) == 0 {
-		panic("Mock not available for SQLTxMock.Rollback")
-	}
-
-	output := mock.patchTxRollback[0]
-	// dequeue
-	mock.patchTxRollback = mock.patchTxRollback[1:]
-
-	return output.outputError
+	args := mock.Called()
+	err, _ := args.Get(0).(error)
+	return err
 }
 
 // PatchPrepareContext patches the funcion PrepareContext
 func (mock *SQLTxMock) PatchPrepareContext(ctx context.Context, query string,
 	stmt converter.DBStmter, outputErr error) {
-	input := inputForTxPrepareContext{
-		Context: ctx,
-		Query:   query,
-	}
-	hash := toHash(input)
-
-	output := outputForTxPrepareContext{
-		stmt:        stmt,
-		outputError: outputErr,
-	}
-
-	mock.patchTxPrepareContext[hash] = append(mock.patchTxPrepareContext[hash], output)
+	mock.On("PrepareContext", ctx, query).Return(stmt, outputErr).Once()
 }
 
 // PrepareContext mocks the real implementation of PrepareContext for the database/sql/tx
 func (mock *SQLTxMock) PrepareContext(ctx context.Context, query string) (converter.DBStmter, error) {
-	inputStruct := inputForTxPrepareContext{
-		Context: ctx,
-		Query:   query,
-	}
-	hash := toHash(inputStruct)
-
-	mocksArr, isPresent := mock.patchTxPrepareContext[hash]
-	if !isPresent || len(mocksArr) == 0 {
-		panic("Mock not available for SQLTxMock.PrepareContext")
-	}
-
-	output := mocksArr[0]
-	// dequeue
-	mock.patchTxPrepareContext[hash] = mocksArr[1:]
-
-	return output.stmt, output.outputError
+	args := mock.Called(ctx, query)
+	stmt, _ := args.Get(0).(converter.DBStmter)
+	err, _ := args.Get(1).(error)
+	return stmt, err
 }
 
 // Exec mocks the real implementation of Exec for the database/sql/tx

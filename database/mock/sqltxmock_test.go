@@ -33,7 +33,7 @@ func Test_Tx_PatchCommit_Panic(t *testing.T) {
 	// when
 
 	// then
-	ass.PanicsWithValue("Mock not available for SQLTxMock.Commit", func() {
+	ass.Panics(func() {
 		mock.Commit()
 	})
 }
@@ -61,7 +61,7 @@ func Test_Tx_PatchRollback_Panic(t *testing.T) {
 	// when
 
 	// then
-	ass.PanicsWithValue("Mock not available for SQLTxMock.Rollback", func() {
+	ass.Panics(func() {
 		mock.Rollback()
 	})
 }
@@ -93,7 +93,7 @@ func Test_Tx_PatchPrepareContext_Panic(t *testing.T) {
 	// when
 
 	// then
-	ass.PanicsWithValue("Mock not available for SQLTxMock.PrepareContext", func() {
+	ass.Panics(func() {
 		mock.PrepareContext(ctx, "")
 	})
 }

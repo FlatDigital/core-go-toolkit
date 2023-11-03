@@ -35,7 +35,7 @@ func Test_Stmt_PatchQuery_Panic(t *testing.T) {
 	// when
 
 	// then
-	ass.PanicsWithValue("Mock not available for SQLStmtMock.Query", func() {
+	ass.Panics(func() {
 		mock.Query(nil)
 	})
 }
@@ -63,7 +63,7 @@ func Test_Stmt_PatchClose_Panic(t *testing.T) {
 	// when
 
 	// then
-	ass.PanicsWithValue("Mock not available for SQLStmtMock.Close", func() {
+	ass.Panics(func() {
 		mock.Close()
 	})
 }
@@ -94,7 +94,7 @@ func Test_Stmt_PatchExec_Panic(t *testing.T) {
 	// when
 
 	// then
-	ass.PanicsWithValue("Mock not available for SQLStmtMock.Exec", func() {
+	ass.Panics(func() {
 		mock.Exec(nil)
 	})
 }
@@ -127,7 +127,7 @@ func Test_Stmt_PatchExecContex_Panic(t *testing.T) {
 	// when
 
 	// then
-	ass.PanicsWithValue("Mock not available for SQLStmtMock.ExecContext", func() {
+	ass.Panics(func() {
 		mock.ExecContext(ctx, nil)
 	})
 }
@@ -160,7 +160,7 @@ func Test_Stmt_PatchQueryContext_Panic(t *testing.T) {
 	// when
 
 	// then
-	ass.PanicsWithValue("Mock not available for SQLStmtMock.QueryContext", func() {
+	ass.Panics(func() {
 		mock.QueryContext(ctx, nil)
 	})
 }

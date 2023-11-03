@@ -10,7 +10,7 @@ import (
 
 func Test_Rows_PatchColumns_Success(t *testing.T) {
 	// given
-	ass := assert.New(t)
+	assert := assert.New(t)
 
 	mock := sqlmock.NewRowsMockService()
 
@@ -19,27 +19,27 @@ func Test_Rows_PatchColumns_Success(t *testing.T) {
 	outResult, err := mock.Columns()
 
 	// then
-	ass.NotNil(outResult)
-	ass.Nil(err)
+	assert.NotNil(outResult)
+	assert.Nil(err)
 }
 
 func Test_Rows_PatchColumns_Panic(t *testing.T) {
 	// given
-	ass := assert.New(t)
+	assert := assert.New(t)
 
 	mock := sqlmock.NewRowsMockService()
 
 	// when
 
 	// then
-	ass.Panics(func() {
+	assert.Panics(func() {
 		mock.Columns()
 	})
 }
 
 func Test_Rows_PatchClose_Success(t *testing.T) {
 	// given
-	ass := assert.New(t)
+	assert := assert.New(t)
 
 	mock := sqlmock.NewRowsMockService()
 
@@ -48,26 +48,26 @@ func Test_Rows_PatchClose_Success(t *testing.T) {
 	err := mock.Close()
 
 	// then
-	ass.Nil(err)
+	assert.Nil(err)
 }
 
 func Test_Rows_PatchClose_Panic(t *testing.T) {
 	// given
-	ass := assert.New(t)
+	assert := assert.New(t)
 
 	mock := sqlmock.NewRowsMockService()
 
 	// when
 
 	// then
-	ass.Panics(func() {
+	assert.Panics(func() {
 		mock.Close()
 	})
 }
 
 func Test_Rows_PatchNext_Success(t *testing.T) {
 	// given
-	ass := assert.New(t)
+	assert := assert.New(t)
 
 	mock := sqlmock.NewRowsMockService()
 
@@ -76,26 +76,26 @@ func Test_Rows_PatchNext_Success(t *testing.T) {
 	outResult := mock.Next()
 
 	// then
-	ass.NotNil(outResult)
+	assert.NotNil(outResult)
 }
 
 func Test_Rows_PatchNext_Panic(t *testing.T) {
 	// given
-	ass := assert.New(t)
+	assert := assert.New(t)
 
 	mock := sqlmock.NewRowsMockService()
 
 	// when
 
 	// then
-	ass.Panics(func() {
+	assert.Panics(func() {
 		mock.Next()
 	})
 }
 
 func Test_Rows_PatchScan_Success(t *testing.T) {
 	// given
-	ass := assert.New(t)
+	assert := assert.New(t)
 
 	mock := sqlmock.NewRowsMockService()
 	dest := make([]interface{}, 0)
@@ -105,61 +105,61 @@ func Test_Rows_PatchScan_Success(t *testing.T) {
 	err := mock.Scan(dest...)
 
 	// then
-	ass.Nil(err)
+	assert.Nil(err)
 }
 
 func Test_Rows_PatchScan_Panic(t *testing.T) {
 	// given
-	ass := assert.New(t)
+	assert := assert.New(t)
 
 	mock := sqlmock.NewRowsMockService()
 
 	// when
 
 	// then
-	ass.Panics(func() {
+	assert.Panics(func() {
 		mock.Scan(nil)
 	})
 }
 
 func Test_Rows_PatchColumnTypes_Panic(t *testing.T) {
 	// given
-	ass := assert.New(t)
+	assert := assert.New(t)
 
 	mock := sqlmock.NewRowsMockService()
 
 	// when
 
 	// then
-	ass.Panics(func() {
+	assert.Panics(func() {
 		mock.ColumnTypes()
 	})
 }
 
 func Test_Rows_PatchErr_Panic(t *testing.T) {
 	// given
-	ass := assert.New(t)
+	assert := assert.New(t)
 
 	mock := sqlmock.NewRowsMockService()
 
 	// when
 
 	// then
-	ass.Panics(func() {
+	assert.Panics(func() {
 		mock.Err()
 	})
 }
 
 func Test_Rows_PatchNextResultSet_Panic(t *testing.T) {
 	// given
-	ass := assert.New(t)
+	assert := assert.New(t)
 
 	mock := sqlmock.NewRowsMockService()
 
 	// when
 
 	// then
-	ass.Panics(func() {
+	assert.Panics(func() {
 		mock.NextResultSet()
 	})
 }

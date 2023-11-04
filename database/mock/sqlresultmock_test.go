@@ -9,7 +9,7 @@ import (
 
 func Test_Result_PatchRowsAffected_Success(t *testing.T) {
 	// given
-	ass := assert.New(t)
+	assert := assert.New(t)
 
 	mock := sqlmock.NewResultMockService()
 
@@ -18,34 +18,34 @@ func Test_Result_PatchRowsAffected_Success(t *testing.T) {
 	outResult, err := mock.RowsAffected()
 
 	// then
-	ass.NotNil(outResult)
-	ass.Nil(err)
+	assert.NotNil(outResult)
+	assert.Nil(err)
 }
 
 func Test_Result_PatchRowsAffected_Panic(t *testing.T) {
 	// given
-	ass := assert.New(t)
+	assert := assert.New(t)
 
 	mock := sqlmock.NewResultMockService()
 
 	// when
 
 	// then
-	ass.PanicsWithValue("Mock not available for SQLResultMock.RowsAffected", func() {
+	assert.Panics(func() {
 		mock.RowsAffected()
 	})
 }
 
 func Test_Result_PatchLastInsertId_Panic(t *testing.T) {
 	// given
-	ass := assert.New(t)
+	assert := assert.New(t)
 
 	mock := sqlmock.NewResultMockService()
 
 	// when
 
 	// then
-	ass.Panics(func() {
+	assert.Panics(func() {
 		mock.LastInsertId()
 	})
 }

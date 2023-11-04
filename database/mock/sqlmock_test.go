@@ -14,7 +14,7 @@ import (
 
 func Test_PatchConn_Success(t *testing.T) {
 	// given
-	ass := assert.New(t)
+	assert := assert.New(t)
 
 	mock := sqlmock.NewMockService()
 	ctx := context.Background()
@@ -25,13 +25,13 @@ func Test_PatchConn_Success(t *testing.T) {
 	outConn, err := mock.Conn(ctx)
 
 	// then
-	ass.NotNil(outConn)
-	ass.Nil(err)
+	assert.NotNil(outConn)
+	assert.Nil(err)
 }
 
 func Test_PatchConn_Panic(t *testing.T) {
 	// given
-	ass := assert.New(t)
+	assert := assert.New(t)
 
 	mock := sqlmock.NewMockService()
 	ctx := context.Background()
@@ -39,14 +39,14 @@ func Test_PatchConn_Panic(t *testing.T) {
 	// when
 
 	// then
-	ass.PanicsWithValue("Mock not available for SQLMock.Conn", func() {
+	assert.Panics(func() {
 		mock.Conn(ctx)
 	})
 }
 
 func Test_PatchPing_Success(t *testing.T) {
 	// given
-	ass := assert.New(t)
+	assert := assert.New(t)
 
 	mock := sqlmock.NewMockService()
 
@@ -55,26 +55,26 @@ func Test_PatchPing_Success(t *testing.T) {
 	err := mock.Ping()
 
 	// then
-	ass.Nil(err)
+	assert.Nil(err)
 }
 
 func Test_PatchPing_Panic(t *testing.T) {
 	// given
-	ass := assert.New(t)
+	assert := assert.New(t)
 
 	mock := sqlmock.NewMockService()
 
 	// when
 
 	// then
-	ass.PanicsWithValue("Mock not available for SQLMock.Ping", func() {
+	assert.Panics(func() {
 		mock.Ping()
 	})
 }
 
 func Test_PatchPingContext_Success(t *testing.T) {
 	// given
-	ass := assert.New(t)
+	assert := assert.New(t)
 
 	mock := sqlmock.NewMockService()
 	ctx := context.Background()
@@ -84,12 +84,12 @@ func Test_PatchPingContext_Success(t *testing.T) {
 	err := mock.PingContext(ctx)
 
 	// then
-	ass.Nil(err)
+	assert.Nil(err)
 }
 
 func Test_PatchPingContext_Panic(t *testing.T) {
 	// given
-	ass := assert.New(t)
+	assert := assert.New(t)
 
 	mock := sqlmock.NewMockService()
 	ctx := context.Background()
@@ -97,14 +97,14 @@ func Test_PatchPingContext_Panic(t *testing.T) {
 	// when
 
 	// then
-	ass.PanicsWithValue("Mock not available for SQLMock.PingContext", func() {
+	assert.Panics(func() {
 		mock.PingContext(ctx)
 	})
 }
 
 func Test_PatchClose_Success(t *testing.T) {
 	// given
-	ass := assert.New(t)
+	assert := assert.New(t)
 
 	mock := sqlmock.NewMockService()
 
@@ -113,26 +113,26 @@ func Test_PatchClose_Success(t *testing.T) {
 	err := mock.Close()
 
 	// then
-	ass.Nil(err)
+	assert.Nil(err)
 }
 
 func Test_PatchClose_Panic(t *testing.T) {
 	// given
-	ass := assert.New(t)
+	assert := assert.New(t)
 
 	mock := sqlmock.NewMockService()
 
 	// when
 
 	// then
-	ass.PanicsWithValue("Mock not available for SQLMock.Close", func() {
+	assert.Panics(func() {
 		mock.Close()
 	})
 }
 
 func Test_PatchBeginTx_Success(t *testing.T) {
 	// given
-	ass := assert.New(t)
+	assert := assert.New(t)
 
 	mock := sqlmock.NewMockService()
 	ctx := context.Background()
@@ -144,13 +144,13 @@ func Test_PatchBeginTx_Success(t *testing.T) {
 	outTx, err := mock.BeginTx(ctx, opts)
 
 	// then
-	ass.NotNil(outTx)
-	ass.Nil(err)
+	assert.NotNil(outTx)
+	assert.Nil(err)
 }
 
 func Test_PatchBeginTx_Panic(t *testing.T) {
 	// given
-	ass := assert.New(t)
+	assert := assert.New(t)
 
 	mock := sqlmock.NewMockService()
 	ctx := context.Background()
@@ -158,14 +158,14 @@ func Test_PatchBeginTx_Panic(t *testing.T) {
 	// when
 
 	// then
-	ass.PanicsWithValue("Mock not available for SQLMock.BeginTx", func() {
+	assert.Panics(func() {
 		mock.BeginTx(ctx, nil)
 	})
 }
 
 func Test_PatchPrepare_Success(t *testing.T) {
 	// given
-	ass := assert.New(t)
+	assert := assert.New(t)
 
 	mock := sqlmock.NewMockService()
 	stmt := sqlmock.NewStmtMockService()
@@ -175,27 +175,27 @@ func Test_PatchPrepare_Success(t *testing.T) {
 	outStmt, err := mock.Prepare("")
 
 	// then
-	ass.NotNil(outStmt)
-	ass.Nil(err)
+	assert.NotNil(outStmt)
+	assert.Nil(err)
 }
 
 func Test_PatchPrepare_Panic(t *testing.T) {
 	// given
-	ass := assert.New(t)
+	assert := assert.New(t)
 
 	mock := sqlmock.NewMockService()
 
 	// when
 
 	// then
-	ass.PanicsWithValue("Mock not available for SQLMock.Prepare", func() {
+	assert.Panics(func() {
 		mock.Prepare("")
 	})
 }
 
 func Test_PatchStats_Success(t *testing.T) {
 	// given
-	ass := assert.New(t)
+	assert := assert.New(t)
 
 	mock := sqlmock.NewMockService()
 	stats := sql.DBStats{}
@@ -205,26 +205,26 @@ func Test_PatchStats_Success(t *testing.T) {
 	outStats := mock.Stats()
 
 	// then
-	ass.NotNil(outStats)
+	assert.NotNil(outStats)
 }
 
 func Test_PatchStats_Panic(t *testing.T) {
 	// given
-	ass := assert.New(t)
+	assert := assert.New(t)
 
 	mock := sqlmock.NewMockService()
 
 	// when
 
 	// then
-	ass.PanicsWithValue("Mock not available for SQLMock.Stats", func() {
+	assert.Panics(func() {
 		mock.Stats()
 	})
 }
 
 func Test_PatchPrepareContext_Success(t *testing.T) {
 	// given
-	ass := assert.New(t)
+	assert := assert.New(t)
 
 	mock := sqlmock.NewMockService()
 	ctx := context.Background()
@@ -235,13 +235,13 @@ func Test_PatchPrepareContext_Success(t *testing.T) {
 	outStmt, err := mock.PrepareContext(ctx, "")
 
 	// then
-	ass.NotNil(outStmt)
-	ass.Nil(err)
+	assert.NotNil(outStmt)
+	assert.Nil(err)
 }
 
 func Test_PatchPrepareContext_Panic(t *testing.T) {
 	// given
-	ass := assert.New(t)
+	assert := assert.New(t)
 
 	mock := sqlmock.NewMockService()
 	ctx := context.Background()
@@ -249,56 +249,56 @@ func Test_PatchPrepareContext_Panic(t *testing.T) {
 	// when
 
 	// then
-	ass.PanicsWithValue("Mock not available for SQLMock.PrepareContext", func() {
+	assert.Panics(func() {
 		mock.PrepareContext(ctx, "")
 	})
 }
 
 func Test_PatchBegin_Panic(t *testing.T) {
 	// given
-	ass := assert.New(t)
+	assert := assert.New(t)
 
 	mock := sqlmock.NewMockService()
 
 	// when
 
 	// then
-	ass.Panics(func() {
+	assert.Panics(func() {
 		mock.Begin()
 	})
 }
 
 func Test_PatchDriver_Panic(t *testing.T) {
 	// given
-	ass := assert.New(t)
+	assert := assert.New(t)
 
 	mock := sqlmock.NewMockService()
 
 	// when
 
 	// then
-	ass.Panics(func() {
+	assert.Panics(func() {
 		mock.Driver()
 	})
 }
 
 func Test_PatchExec_Panic(t *testing.T) {
 	// given
-	ass := assert.New(t)
+	assert := assert.New(t)
 
 	mock := sqlmock.NewMockService()
 
 	// when
 
 	// then
-	ass.Panics(func() {
+	assert.Panics(func() {
 		mock.Exec("", nil)
 	})
 }
 
 func Test_PatchExecContext_Panic(t *testing.T) {
 	// given
-	ass := assert.New(t)
+	assert := assert.New(t)
 
 	mock := sqlmock.NewMockService()
 	ctx := context.Background()
@@ -306,21 +306,21 @@ func Test_PatchExecContext_Panic(t *testing.T) {
 	// when
 
 	// then
-	ass.Panics(func() {
+	assert.Panics(func() {
 		mock.ExecContext(ctx, "", nil)
 	})
 }
 
 func Test_PatchQuery_Panic(t *testing.T) {
 	// given
-	ass := assert.New(t)
+	assert := assert.New(t)
 
 	mock := sqlmock.NewMockService()
 
 	// when
 
 	// then
-	ass.Panics(func() {
+	assert.Panics(func() {
 		if rows, err := mock.Query("", nil); err != nil {
 			_ = rows.Err()
 			return
@@ -330,7 +330,7 @@ func Test_PatchQuery_Panic(t *testing.T) {
 
 func Test_PatchQueryContext_Panic(t *testing.T) {
 	// given
-	ass := assert.New(t)
+	assert := assert.New(t)
 
 	mock := sqlmock.NewMockService()
 	ctx := context.Background()
@@ -338,7 +338,7 @@ func Test_PatchQueryContext_Panic(t *testing.T) {
 	// when
 
 	// then
-	ass.Panics(func() {
+	assert.Panics(func() {
 		if rows, err := mock.QueryContext(ctx, "", nil); err != nil {
 			_ = rows.Err()
 			return
@@ -348,21 +348,21 @@ func Test_PatchQueryContext_Panic(t *testing.T) {
 
 func Test_PatchQueryRow_Panic(t *testing.T) {
 	// given
-	ass := assert.New(t)
+	assert := assert.New(t)
 
 	mock := sqlmock.NewMockService()
 
 	// when
 
 	// then
-	ass.Panics(func() {
+	assert.Panics(func() {
 		mock.QueryRow("", nil)
 	})
 }
 
 func Test_PatchQueryRowContext_Panic(t *testing.T) {
 	// given
-	ass := assert.New(t)
+	assert := assert.New(t)
 
 	mock := sqlmock.NewMockService()
 	ctx := context.Background()
@@ -370,49 +370,49 @@ func Test_PatchQueryRowContext_Panic(t *testing.T) {
 	// when
 
 	// then
-	ass.Panics(func() {
+	assert.Panics(func() {
 		mock.QueryRowContext(ctx, "", nil)
 	})
 }
 
 func Test_PatchSetConnLifeMaxTime_Panic(t *testing.T) {
 	// given
-	ass := assert.New(t)
+	assert := assert.New(t)
 
 	mock := sqlmock.NewMockService()
 
 	// when
 
 	// then
-	ass.Panics(func() {
+	assert.Panics(func() {
 		mock.SetConnMaxLifetime(time.Duration(12000))
 	})
 }
 
 func Test_PatchSetMaxIdleConns_Panic(t *testing.T) {
 	// given
-	ass := assert.New(t)
+	assert := assert.New(t)
 
 	mock := sqlmock.NewMockService()
 
 	// when
 
 	// then
-	ass.Panics(func() {
+	assert.Panics(func() {
 		mock.SetMaxIdleConns(1)
 	})
 }
 
 func Test_PatchSetMaxOpenConns_Panic(t *testing.T) {
 	// given
-	ass := assert.New(t)
+	assert := assert.New(t)
 
 	mock := sqlmock.NewMockService()
 
 	// when
 
 	// then
-	ass.Panics(func() {
+	assert.Panics(func() {
 		mock.SetMaxOpenConns(1)
 	})
 }

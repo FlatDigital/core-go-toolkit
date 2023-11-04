@@ -11,7 +11,7 @@ import (
 
 func Test_Stmt_PatchQuery_Success(t *testing.T) {
 	// given
-	ass := assert.New(t)
+	assert := assert.New(t)
 
 	mock := sqlmock.NewStmtMockService()
 	params := make([]interface{}, 0)
@@ -22,27 +22,27 @@ func Test_Stmt_PatchQuery_Success(t *testing.T) {
 	outResult, err := mock.Query(params...)
 
 	// then
-	ass.NotNil(outResult)
-	ass.Nil(err)
+	assert.NotNil(outResult)
+	assert.Nil(err)
 }
 
 func Test_Stmt_PatchQuery_Panic(t *testing.T) {
 	// given
-	ass := assert.New(t)
+	assert := assert.New(t)
 
 	mock := sqlmock.NewStmtMockService()
 
 	// when
 
 	// then
-	ass.PanicsWithValue("Mock not available for SQLStmtMock.Query", func() {
+	assert.Panics(func() {
 		mock.Query(nil)
 	})
 }
 
 func Test_Stmt_PatchClose_Success(t *testing.T) {
 	// given
-	ass := assert.New(t)
+	assert := assert.New(t)
 
 	mock := sqlmock.NewStmtMockService()
 
@@ -51,26 +51,26 @@ func Test_Stmt_PatchClose_Success(t *testing.T) {
 	err := mock.Close()
 
 	// then
-	ass.Nil(err)
+	assert.Nil(err)
 }
 
 func Test_Stmt_PatchClose_Panic(t *testing.T) {
 	// given
-	ass := assert.New(t)
+	assert := assert.New(t)
 
 	mock := sqlmock.NewStmtMockService()
 
 	// when
 
 	// then
-	ass.PanicsWithValue("Mock not available for SQLStmtMock.Close", func() {
+	assert.Panics(func() {
 		mock.Close()
 	})
 }
 
 func Test_Stmt_PatchExec_Success(t *testing.T) {
 	// given
-	ass := assert.New(t)
+	assert := assert.New(t)
 
 	mock := sqlmock.NewStmtMockService()
 	params := make([]interface{}, 0)
@@ -81,27 +81,27 @@ func Test_Stmt_PatchExec_Success(t *testing.T) {
 	outResult, err := mock.Exec(params...)
 
 	// then
-	ass.NotNil(outResult)
-	ass.Nil(err)
+	assert.NotNil(outResult)
+	assert.Nil(err)
 }
 
 func Test_Stmt_PatchExec_Panic(t *testing.T) {
 	// given
-	ass := assert.New(t)
+	assert := assert.New(t)
 
 	mock := sqlmock.NewStmtMockService()
 
 	// when
 
 	// then
-	ass.PanicsWithValue("Mock not available for SQLStmtMock.Exec", func() {
+	assert.Panics(func() {
 		mock.Exec(nil)
 	})
 }
 
 func Test_Stmt_PatchExecContext_Success(t *testing.T) {
 	// given
-	ass := assert.New(t)
+	assert := assert.New(t)
 
 	mock := sqlmock.NewStmtMockService()
 	params := make([]interface{}, 0)
@@ -113,13 +113,13 @@ func Test_Stmt_PatchExecContext_Success(t *testing.T) {
 	outResult, err := mock.ExecContext(ctx, params...)
 
 	// then
-	ass.NotNil(outResult)
-	ass.Nil(err)
+	assert.NotNil(outResult)
+	assert.Nil(err)
 }
 
 func Test_Stmt_PatchExecContex_Panic(t *testing.T) {
 	// given
-	ass := assert.New(t)
+	assert := assert.New(t)
 
 	mock := sqlmock.NewStmtMockService()
 	ctx := context.Background()
@@ -127,14 +127,14 @@ func Test_Stmt_PatchExecContex_Panic(t *testing.T) {
 	// when
 
 	// then
-	ass.PanicsWithValue("Mock not available for SQLStmtMock.ExecContext", func() {
+	assert.Panics(func() {
 		mock.ExecContext(ctx, nil)
 	})
 }
 
 func Test_Stmt_PatchQueryContext_Success(t *testing.T) {
 	// given
-	ass := assert.New(t)
+	assert := assert.New(t)
 
 	mock := sqlmock.NewStmtMockService()
 	params := make([]interface{}, 0)
@@ -146,13 +146,13 @@ func Test_Stmt_PatchQueryContext_Success(t *testing.T) {
 	outResult, err := mock.QueryContext(ctx, params...)
 
 	// then
-	ass.NotNil(outResult)
-	ass.Nil(err)
+	assert.NotNil(outResult)
+	assert.Nil(err)
 }
 
 func Test_Stmt_PatchQueryContext_Panic(t *testing.T) {
 	// given
-	ass := assert.New(t)
+	assert := assert.New(t)
 
 	mock := sqlmock.NewStmtMockService()
 	ctx := context.Background()
@@ -160,28 +160,28 @@ func Test_Stmt_PatchQueryContext_Panic(t *testing.T) {
 	// when
 
 	// then
-	ass.PanicsWithValue("Mock not available for SQLStmtMock.QueryContext", func() {
+	assert.Panics(func() {
 		mock.QueryContext(ctx, nil)
 	})
 }
 
 func Test_Stmt_PatchQueryRow_Panic(t *testing.T) {
 	// given
-	ass := assert.New(t)
+	assert := assert.New(t)
 
 	mock := sqlmock.NewStmtMockService()
 
 	// when
 
 	// then
-	ass.Panics(func() {
+	assert.Panics(func() {
 		mock.QueryRow(nil)
 	})
 }
 
 func Test_Stmt_PatchQueryRowContext_Panic(t *testing.T) {
 	// given
-	ass := assert.New(t)
+	assert := assert.New(t)
 
 	mock := sqlmock.NewStmtMockService()
 	ctx := context.Background()
@@ -189,7 +189,7 @@ func Test_Stmt_PatchQueryRowContext_Panic(t *testing.T) {
 	// when
 
 	// then
-	ass.Panics(func() {
+	assert.Panics(func() {
 		mock.QueryRowContext(ctx, "")
 	})
 }

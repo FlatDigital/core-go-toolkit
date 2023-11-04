@@ -3,48 +3,32 @@ package sqlmock
 import (
 	"context"
 	"database/sql"
+
+	"github.com/stretchr/testify/mock"
 )
 
 // SQLConnMock mock struct
 type SQLConnMock struct {
-	patchClose []outputForConnClose
+	mock.Mock
 }
 
 // NewConnMockService return mock for database/sql
 func NewConnMockService() *SQLConnMock {
-	sqlConnMock := SQLConnMock{
-		patchClose: make([]outputForConnClose, 0),
+	return &SQLConnMock{
+		Mock: mock.Mock{},
 	}
-
-	return &sqlConnMock
 }
-
-type (
-	outputForConnClose struct {
-		outputError error
-	}
-)
 
 // PatchClose patches the funcion Close
 func (mock *SQLConnMock) PatchClose(outputErr error) {
-	output := outputForConnClose{
-		outputError: outputErr,
-	}
-
-	mock.patchClose = append(mock.patchClose, output)
+	mock.On("Close").Return(outputErr).Once()
 }
 
 // Close mocks the real implementation of Close for the database/sql/conn
 func (mock *SQLConnMock) Close() error {
-	if len(mock.patchClose) == 0 {
-		panic("Mock not available for SQLConnMock.Close")
-	}
-
-	output := mock.patchClose[0]
-	// dequeue
-	mock.patchClose = mock.patchClose[1:]
-
-	return output.outputError
+	args := mock.Called()
+	err, _ := args.Get(0).(error)
+	return err
 }
 
 // BeginTx mocks the real implementation of BeginTx for the database/sql/conn

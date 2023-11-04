@@ -1,148 +1,70 @@
 package sqlmock
 
-import "database/sql"
+import (
+	"database/sql"
+
+	"github.com/stretchr/testify/mock"
+)
 
 // SQLRowsMock mock struct
 type SQLRowsMock struct {
-	patchRowsColumns []outputForRowsColumns
-	patchRowsClose   []outputForRowsClose
-	patchRowsNext    []outputForRowsNext
-	patchRowsScan    map[hash][]outputForRowsScan
+	mock.Mock
 }
 
 // NewRowsMockService return mock for database/sql
 func NewRowsMockService() *SQLRowsMock {
-	sqlRowsMock := SQLRowsMock{
-		patchRowsColumns: make([]outputForRowsColumns, 0),
-		patchRowsClose:   make([]outputForRowsClose, 0),
-		patchRowsNext:    make([]outputForRowsNext, 0),
-		patchRowsScan:    map[hash][]outputForRowsScan{},
+	return &SQLRowsMock{
+		Mock: mock.Mock{},
 	}
-
-	return &sqlRowsMock
 }
-
-type (
-	outputForRowsColumns struct {
-		cols        []string
-		outputError error
-	}
-
-	outputForRowsClose struct {
-		outputError error
-	}
-
-	outputForRowsNext struct {
-		outputRet bool
-	}
-
-	inputForRowsScan struct {
-		Dest []interface{}
-	}
-
-	outputForRowsScan struct {
-		outputError error
-	}
-)
 
 // PatchColumns patches the funcion Columns
 func (mock *SQLRowsMock) PatchColumns(cols []string, outputErr error) {
-	output := outputForRowsColumns{
-		cols:        cols,
-		outputError: outputErr,
-	}
-
-	mock.patchRowsColumns = append(mock.patchRowsColumns, output)
+	mock.On("Columns").Return(cols, outputErr).Once()
 }
 
 // Columns mocks the real implementation of Columns for the database/sql/rows
 func (mock *SQLRowsMock) Columns() ([]string, error) {
-	if len(mock.patchRowsColumns) == 0 {
-		panic("Mock not available for SQLRowsMock.Columns")
-	}
-
-	output := mock.patchRowsColumns[0]
-	// dequeue
-	mock.patchRowsColumns = mock.patchRowsColumns[1:]
-
-	return output.cols, output.outputError
+	args := mock.Called()
+	cols, _ := args.Get(0).([]string)
+	err, _ := args.Get(1).(error)
+	return cols, err
 }
 
 // PatchClose patches the funcion Close
 func (mock *SQLRowsMock) PatchClose(outputErr error) {
-	output := outputForRowsClose{
-		outputError: outputErr,
-	}
-
-	mock.patchRowsClose = append(mock.patchRowsClose, output)
+	mock.On("Close").Return(outputErr).Once()
 }
 
 // Close mocks the real implementation of Close for the database/sql/rows
 func (mock *SQLRowsMock) Close() error {
-	if len(mock.patchRowsClose) == 0 {
-		panic("Mock not available for SQLRowsMock.Close")
-	}
-
-	output := mock.patchRowsClose[0]
-	// dequeue
-	mock.patchRowsClose = mock.patchRowsClose[1:]
-
-	return output.outputError
+	args := mock.Called()
+	err, _ := args.Get(0).(error)
+	return err
 }
 
 // PatchNext patches the funcion Next
 func (mock *SQLRowsMock) PatchNext(outputRet bool) {
-	output := outputForRowsNext{
-		outputRet: outputRet,
-	}
-
-	mock.patchRowsNext = append(mock.patchRowsNext, output)
+	mock.On("Next").Return(outputRet).Once()
 }
 
 // Next mocks the real implementation of Next for the database/sql/rows
 func (mock *SQLRowsMock) Next() bool {
-	if len(mock.patchRowsNext) == 0 {
-		panic("Mock not available for SQLRowsMock.Next")
-	}
-
-	output := mock.patchRowsNext[0]
-	// dequeue
-	mock.patchRowsNext = mock.patchRowsNext[1:]
-
-	return output.outputRet
+	args := mock.Called()
+	ret, _ := args.Get(0).(bool)
+	return ret
 }
 
 // PatchScan patches the funcion Scan
 func (mock *SQLRowsMock) PatchScan(outputDest []interface{}, outputErr error) {
-	input := inputForRowsScan{
-		Dest: outputDest,
-	}
-	hash := toHash(input)
-
-	output := outputForRowsScan{
-		outputError: outputErr,
-	}
-
-	mock.patchRowsScan[hash] = append(mock.patchRowsScan[hash], output)
+	mock.On("Scan", outputDest).Return(outputErr).Once()
 }
 
 // Scan mocks the real implementation of Scan for the database/sql/rows
 func (mock *SQLRowsMock) Scan(dest ...interface{}) error {
-	inputStruct := inputForRowsScan{
-		Dest: dest,
-	}
-	hash := toHash(inputStruct)
-
-	mocksArr, isPresent := mock.patchRowsScan[hash]
-	if !isPresent || len(mocksArr) == 0 {
-		panic("Mock not available for SQLRowsMock.Scan")
-	}
-
-	output := mocksArr[0]
-	// dequeue
-	mock.patchRowsScan[hash] = mocksArr[1:]
-
-	return output.outputError
+	args := mock.Called(dest)
+	err, _ := args.Get(0).(error)
+	return err
 }
 
 // ColumnTypes mocks the real implementation of ColumnTypes for the database/sql/rows

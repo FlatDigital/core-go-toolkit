@@ -1,0 +1,22 @@
+name: Pull Requests - Linting Check
+
+on:
+  push:
+    tags:
+      - v*
+    branches:
+      - master
+      - main
+  pull_request:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  linter-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: FlatDigital/platform-github-actions/.github/actions/golang-linter-check@main
+        with:
+          doppler_token: ${{ secrets.DOPPLER_TOKEN_STG }}

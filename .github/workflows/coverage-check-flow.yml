@@ -1,4 +1,4 @@
-name: Coverage & Staticcheck
+name: Pull Requests - Coverage Check
 
 on: ["pull_request"]
 
@@ -7,9 +7,9 @@ permissions:
   pull-requests: write
 
 jobs:
-  run-checks:
+  coverage-check:
     runs-on: ubuntu-latest
     steps:
-      - uses: FlatDigital/platform-github-actions/.github/actions/golang-static-check@main
+      - uses: FlatDigital/platform-github-actions/.github/actions/golang-coverage-check@main
         with:
           doppler_token: ${{ secrets.DOPPLER_TOKEN_STG }}

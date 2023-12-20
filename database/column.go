@@ -135,18 +135,21 @@ func (dbc *DBColumn) GetString() (*string, error) {
 	return &stringValue, nil
 }
 
-// GetBool returns the value of the field in string type
+// GetBool returns the value of the field in bool type
 func (dbc *DBColumn) GetBool() (*bool, error) {
 	if dbc.field == nil {
 		return nil, nil
 	}
-	intValue, err := dbc.GetInt64()
-	if err != nil {
-		return nil, err
-	}
-	boolValue := false
-	if *intValue != int64(0) {
-		boolValue = true
+	var boolValue bool
+	boolValue, ok := dbc.field.(bool)
+	if !ok {
+		intValue, err := dbc.GetInt64()
+		if err != nil {
+			return nil, err
+		}
+		if *intValue != int64(0) {
+			boolValue = true
+		}
 	}
 	return &boolValue, nil
 }

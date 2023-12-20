@@ -331,6 +331,23 @@ func Test_GetBool_Success(t *testing.T) {
 	// given
 	ass := assert.New(t)
 	name := col1
+	value := true
+
+	column := database.NewColumn(name, value)
+
+	// when
+	result, err := column.GetBool()
+
+	// then
+	ass.NotNil(result)
+	ass.Nil(err)
+	ass.Equal(value, *result)
+}
+
+func Test_GetBool_Int64_Success(t *testing.T) {
+	// given
+	ass := assert.New(t)
+	name := col1
 	value := int64(1)
 
 	column := database.NewColumn(name, value)
@@ -338,15 +355,10 @@ func Test_GetBool_Success(t *testing.T) {
 	// when
 	result, err := column.GetBool()
 
-	var resultInt int64
-	if *result {
-		resultInt = 1
-	}
-
 	// then
 	ass.NotNil(result)
 	ass.Nil(err)
-	ass.Equal(value, resultInt)
+	ass.Equal(true, *result)
 }
 
 func Test_GetBool_Nil(t *testing.T) {

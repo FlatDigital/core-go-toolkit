@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"net/url"
 	"time"
 
 	"github.com/FlatDigital/core-go-toolkit/v2/godog"
@@ -31,6 +32,14 @@ const (
 type restyService struct {
 	restyClient         *resty.Client
 	datadogMetricPrefix string
+}
+
+// URLComponents holds the different components of a parsed URL.
+type URLComponents struct {
+	Scheme      string
+	Host        string
+	Path        string
+	QueryString string
 }
 
 var log = logger.LoggerWithName(nil, "core-go-toolkit")
@@ -206,15 +215,46 @@ func (service *restyService) logMetric(logType logType, rawUrl string, statusCod
 		elapsedSinceFloat(start),
 		tags.ToArray()...)
 
+	// Parse the URL and get its components.
+	canSplitURL := true
+	components, err := getURLComponents(rawUrl)
+	if err != nil {
+		canSplitURL = false
+	}
+
 	log.Info(action, logger.Attrs{
-		"resource":    rawUrl,
-		"status_code": fmt.Sprintf("%d", statusCode),
-		"action":      action,
-		"type":        logType,
+		"resource":     rawUrl,
+		"status_code":  fmt.Sprintf("%d", statusCode),
+		"action":       action,
+		"type":         logType,
+		"scheme":       components.Scheme,
+		"host":         components.Host,
+		"path":         components.Path,
+		"query_params": components.QueryString,
+		"url_splited":  canSplitURL,
 	})
 }
 
 // elapsedSinceFloat returns elapsed time in ms as float64
 func elapsedSinceFloat(start time.Time) float64 {
 	return float64(time.Since(start).Milliseconds())
+}
+
+// getURLComponents takes a string URL, parses it, and returns its components in a URLComponents struct.
+func getURLComponents(rawURL string) (*URLComponents, error) {
+	// Parse the URL.
+	parsedURL, err := url.Parse(rawURL)
+	if err != nil {
+		return nil, fmt.Errorf("error parsing URL: %w", err)
+	}
+
+	// Create a URLComponents struct with the parsed URL components.
+	components := &URLComponents{
+		Scheme:      parsedURL.Scheme,
+		Host:        parsedURL.Host,
+		Path:        parsedURL.Path,
+		QueryString: parsedURL.RawQuery,
+	}
+
+	return components, nil
 }

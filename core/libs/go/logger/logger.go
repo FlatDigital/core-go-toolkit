@@ -84,8 +84,7 @@ func LoggerWithName(c *gin.Context, name string) *Logger {
 	}
 
 	if c != nil {
-		reqID, ok := c.Get("RequestId")
-		if ok {
+		if reqID, ok := c.Get("RequestId"); ok {
 			logger.Attributes["request_id"] = reqID.(string)
 		}
 	}

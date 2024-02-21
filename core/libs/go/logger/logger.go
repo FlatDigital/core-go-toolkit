@@ -76,16 +76,20 @@ func channelWriter() chan Logger {
 }
 
 func LoggerWithName(c *gin.Context, name string) *Logger {
-	reqID, ok := c.Get("RequestId")
 	logger := &Logger{
 		Attributes: map[string]interface{}{
 			"source": name,
 		},
 		Writer: defaultLogWriter,
 	}
-	if ok {
-		logger.Attributes["request_id"] = reqID.(string)
+
+	if c != nil {
+		reqID, ok := c.Get("RequestId")
+		if ok {
+			logger.Attributes["request_id"] = reqID.(string)
+		}
 	}
+
 	return logger
 }
 

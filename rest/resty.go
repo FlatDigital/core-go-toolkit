@@ -3,14 +3,14 @@ package rest
 import (
 	"errors"
 	"fmt"
-	"github.com/FlatDigital/core-go-toolkit/v2/godog"
 	"net"
 	"net/http"
-	"net/url"
-	"regexp"
 	"time"
 
+	"github.com/FlatDigital/core-go-toolkit/v2/godog"
+
 	"github.com/FlatDigital/core-go-toolkit/v2/core/flat"
+	"github.com/FlatDigital/core-go-toolkit/v2/core/libs/go/logger"
 	"github.com/go-resty/resty/v2"
 )
 
@@ -32,6 +32,8 @@ type restyService struct {
 	restyClient         *resty.Client
 	datadogMetricPrefix string
 }
+
+var log = logger.LoggerWithName(nil, "core-go-toolkit")
 
 func NewRestyService(metricPrefix string) Rest {
 	return &restyService{
@@ -188,28 +190,9 @@ func (service *restyService) evaluateResponse(url string, response *resty.Respon
 	return response.StatusCode(), response.Body(), response.Header(), nil
 }
 
-func getSanitizedPathFromUrl(rawUrl string) string {
-	var path string
-	parsedUrl, _ := url.Parse(rawUrl)
-	if parsedUrl != nil {
-		path = parsedUrl.Path
-	}
-
-	// ids removal
-	re := regexp.MustCompile(`/[0-9]+`)
-	path = re.ReplaceAllString(path, "/_")
-
-	// emails removal
-	re = regexp.MustCompile(`[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}`)
-	path = re.ReplaceAllString(path, "_")
-
-	return path
-}
-
 func (service *restyService) logMetric(logType logType, rawUrl string, statusCode int, action string, start time.Time) {
 	// Metric
 	tags := new(godog.Tags).
-		Add("resource", getSanitizedPathFromUrl(rawUrl)).
 		Add("status_code", fmt.Sprintf("%d", statusCode)).
 		Add("action", action)
 	godog.RecordSimpleMetric(
@@ -222,6 +205,13 @@ func (service *restyService) logMetric(logType logType, rawUrl string, statusCod
 		fmt.Sprintf("application.%s.rest.service.elapsed_time", service.datadogMetricPrefix),
 		elapsedSinceFloat(start),
 		tags.ToArray()...)
+
+	log.Info(action, logger.Attrs{
+		"resource":    rawUrl,
+		"status_code": fmt.Sprintf("%d", statusCode),
+		"action":      action,
+		"type":        logType,
+	})
 }
 
 // elapsedSinceFloat returns elapsed time in ms as float64

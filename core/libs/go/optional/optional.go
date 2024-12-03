@@ -14,62 +14,68 @@ const (
 )
 
 type (
-	OptionalInt64 struct {
+	Int64 struct {
 		Value int64
 		Valid bool
 		Set   bool
 	}
 
-	OptionalUint64 struct {
+	Uint64 struct {
 		Value uint64
 		Valid bool
 		Set   bool
 	}
 
-	OptionalFloat64 struct {
+	Float64 struct {
 		Value float64
 		Valid bool
 		Set   bool
 	}
 
-	OptionalString struct {
+	String struct {
 		Value string
 		Valid bool
 		Set   bool
 	}
 
-	OptionalBool struct {
+	Bool struct {
 		Value bool
 		Valid bool
 		Set   bool
 	}
 
-	OptionalDate struct {
+	Date struct {
 		Value string
 		Valid bool
 		Set   bool
 	}
 
-	OptionalStringArray struct {
+	DateTime struct {
+		Value time.Time
+		Valid bool
+		Set   bool
+	}
+
+	StringArray struct {
 		Value []string
 		Valid bool
 		Set   bool
 	}
 
-	OptionalUint64Array struct {
+	Uint64Array struct {
 		Value []uint64
 		Valid bool
 		Set   bool
 	}
 
-	OptionalMapStringInterface struct {
+	MapStringInterface struct {
 		Value map[string]interface{}
 		Valid bool
 		Set   bool
 	}
 )
 
-func (i *OptionalInt64) UnmarshalJSON(data []byte) error {
+func (i *Int64) UnmarshalJSON(data []byte) error {
 	// If this method was called, the value was set.
 	i.Set = true
 
@@ -89,7 +95,7 @@ func (i *OptionalInt64) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (i *OptionalInt64) GetForInt64Pointer(to *int64) *int64 {
+func (i *Int64) GetForInt64Pointer(to *int64) *int64 {
 	if i.Set {
 		if i.Valid {
 			value := i.Value
@@ -100,7 +106,7 @@ func (i *OptionalInt64) GetForInt64Pointer(to *int64) *int64 {
 	return to
 }
 
-func (i *OptionalInt64) GetForInt64(to int64) int64 {
+func (i *Int64) GetForInt64(to int64) int64 {
 	if i.Set {
 		if i.Valid {
 			return i.Value
@@ -110,7 +116,7 @@ func (i *OptionalInt64) GetForInt64(to int64) int64 {
 	return to
 }
 
-func (i *OptionalUint64) UnmarshalJSON(data []byte) error {
+func (i *Uint64) UnmarshalJSON(data []byte) error {
 	// If this method was called, the value was set.
 	i.Set = true
 
@@ -130,7 +136,7 @@ func (i *OptionalUint64) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (i *OptionalUint64) GetForUint64Pointer(to *uint64) *uint64 {
+func (i *Uint64) GetForUint64Pointer(to *uint64) *uint64 {
 	if i.Set {
 		if i.Valid {
 			value := i.Value
@@ -141,7 +147,7 @@ func (i *OptionalUint64) GetForUint64Pointer(to *uint64) *uint64 {
 	return to
 }
 
-func (i *OptionalUint64) GetForUint64(to uint64) uint64 {
+func (i *Uint64) GetForUint64(to uint64) uint64 {
 	if i.Set {
 		if i.Valid {
 			return i.Value
@@ -151,7 +157,7 @@ func (i *OptionalUint64) GetForUint64(to uint64) uint64 {
 	return to
 }
 
-func (i *OptionalFloat64) UnmarshalJSON(data []byte) error {
+func (i *Float64) UnmarshalJSON(data []byte) error {
 	// If this method was called, the value was set.
 	i.Set = true
 
@@ -171,7 +177,7 @@ func (i *OptionalFloat64) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (i *OptionalFloat64) GetForFloat64Pointer(to *float64) *float64 {
+func (i *Float64) GetForFloat64Pointer(to *float64) *float64 {
 	if i.Set {
 		if i.Valid {
 			value := i.Value
@@ -182,7 +188,7 @@ func (i *OptionalFloat64) GetForFloat64Pointer(to *float64) *float64 {
 	return to
 }
 
-func (i *OptionalFloat64) GetForFloat64(to float64) float64 {
+func (i *Float64) GetForFloat64(to float64) float64 {
 	if i.Set {
 		if i.Valid {
 			return i.Value
@@ -192,7 +198,7 @@ func (i *OptionalFloat64) GetForFloat64(to float64) float64 {
 	return to
 }
 
-func (i *OptionalString) UnmarshalJSON(data []byte) error {
+func (i *String) UnmarshalJSON(data []byte) error {
 	// If this method was called, the value was set.
 	i.Set = true
 
@@ -212,7 +218,7 @@ func (i *OptionalString) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (i *OptionalString) GetForStringPointer(to *string) *string {
+func (i *String) GetForStringPointer(to *string) *string {
 	if i.Set {
 		if i.Valid {
 			value := i.Value
@@ -223,7 +229,7 @@ func (i *OptionalString) GetForStringPointer(to *string) *string {
 	return to
 }
 
-func (i *OptionalString) GetForString(to string) string {
+func (i *String) GetForString(to string) string {
 	if i.Set {
 		if i.Valid {
 			return i.Value
@@ -233,7 +239,7 @@ func (i *OptionalString) GetForString(to string) string {
 	return to
 }
 
-func (i *OptionalBool) UnmarshalJSON(data []byte) error {
+func (i *Bool) UnmarshalJSON(data []byte) error {
 	// If this method was called, the value was set.
 	i.Set = true
 
@@ -253,7 +259,7 @@ func (i *OptionalBool) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (i *OptionalBool) GetForBoolPointer(to *bool) *bool {
+func (i *Bool) GetForBoolPointer(to *bool) *bool {
 	if i.Set {
 		if i.Valid {
 			value := i.Value
@@ -264,7 +270,7 @@ func (i *OptionalBool) GetForBoolPointer(to *bool) *bool {
 	return to
 }
 
-func (i *OptionalBool) GetForBool(to bool) bool {
+func (i *Bool) GetForBool(to bool) bool {
 	if i.Set {
 		if i.Valid {
 			return i.Value
@@ -274,7 +280,7 @@ func (i *OptionalBool) GetForBool(to bool) bool {
 	return to
 }
 
-func (i *OptionalDate) UnmarshalJSON(data []byte) error {
+func (i *Date) UnmarshalJSON(data []byte) error {
 	// If this method was called, the value was set.
 	i.Set = true
 
@@ -304,7 +310,7 @@ func (i *OptionalDate) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (i *OptionalDate) GetForDatePointer(to *string) *string {
+func (i *Date) GetForDatePointer(to *string) *string {
 	if i.Set {
 		if i.Valid {
 			value := i.Value
@@ -315,7 +321,7 @@ func (i *OptionalDate) GetForDatePointer(to *string) *string {
 	return to
 }
 
-func (i *OptionalDate) GetForDate(to string) string {
+func (i *Date) GetForDate(to string) string {
 	if i.Set {
 		if i.Valid {
 			return i.Value
@@ -325,7 +331,58 @@ func (i *OptionalDate) GetForDate(to string) string {
 	return to
 }
 
-func (i *OptionalStringArray) UnmarshalJSON(data []byte) error {
+func (i *DateTime) UnmarshalJSON(data []byte) error {
+	// If this method was called, the value was set.
+	i.Set = true
+
+	if string(data) == "null" {
+		// The key was set to null
+		i.Valid = false
+		return nil
+	}
+
+	// The key isn't set to null
+	var temp string
+	if err := json.Unmarshal(data, &temp); err != nil {
+		return err
+	}
+
+	// Verify date format is valid
+	theTime, err := time.Parse(YYYYMMDDHHMMSS, temp)
+	if err != nil {
+		return err
+	}
+
+	// Apply expected time format
+	temp = theTime.Format(YYYYMMDDHHMMSS)
+	i.Value = theTime
+	i.Valid = true
+
+	return nil
+}
+
+func (i *DateTime) GetForDateTimePointer(to *time.Time) *time.Time {
+	if i.Set {
+		if i.Valid {
+			value := i.Value
+			return &value
+		}
+		return nil
+	}
+	return to
+}
+
+func (i *DateTime) GetForDateTime(to time.Time) time.Time {
+	if i.Set {
+		if i.Valid {
+			return i.Value
+		}
+		return time.Time{}
+	}
+	return to
+}
+
+func (i *StringArray) UnmarshalJSON(data []byte) error {
 	// If this method was called, the value was set.
 	i.Set = true
 
@@ -345,7 +402,7 @@ func (i *OptionalStringArray) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (i *OptionalStringArray) GetForStringArrayPointer(to *[]string) *[]string {
+func (i *StringArray) GetForStringArrayPointer(to *[]string) *[]string {
 	if i.Set {
 		if i.Valid {
 			value := i.Value
@@ -356,7 +413,7 @@ func (i *OptionalStringArray) GetForStringArrayPointer(to *[]string) *[]string {
 	return to
 }
 
-func (i *OptionalStringArray) GetForStringArray(to []string) []string {
+func (i *StringArray) GetForStringArray(to []string) []string {
 	if i.Set {
 		if i.Valid {
 			return i.Value
@@ -366,7 +423,7 @@ func (i *OptionalStringArray) GetForStringArray(to []string) []string {
 	return to
 }
 
-func (i *OptionalUint64Array) UnmarshalJSON(data []byte) error {
+func (i *Uint64Array) UnmarshalJSON(data []byte) error {
 	// If this method was called, the value was set.
 	i.Set = true
 
@@ -386,7 +443,7 @@ func (i *OptionalUint64Array) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (i *OptionalUint64Array) GetForStringArrayPointer(to *[]uint64) *[]uint64 {
+func (i *Uint64Array) GetForStringArrayPointer(to *[]uint64) *[]uint64 {
 	if i.Set {
 		if i.Valid {
 			value := i.Value
@@ -397,7 +454,7 @@ func (i *OptionalUint64Array) GetForStringArrayPointer(to *[]uint64) *[]uint64 {
 	return to
 }
 
-func (i *OptionalUint64Array) GetForStringArray(to []uint64) []uint64 {
+func (i *Uint64Array) GetForStringArray(to []uint64) []uint64 {
 	if i.Set {
 		if i.Valid {
 			return i.Value
@@ -407,7 +464,7 @@ func (i *OptionalUint64Array) GetForStringArray(to []uint64) []uint64 {
 	return to
 }
 
-func (i *OptionalMapStringInterface) UnmarshalJSON(data []byte) error {
+func (i *MapStringInterface) UnmarshalJSON(data []byte) error {
 	// If this method was called, the value was set.
 	i.Set = true
 
@@ -427,7 +484,7 @@ func (i *OptionalMapStringInterface) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (i *OptionalMapStringInterface) GetForStringArrayPointer(to *map[string]interface{}) *map[string]interface{} {
+func (i *MapStringInterface) GetForStringArrayPointer(to *map[string]interface{}) *map[string]interface{} {
 	if i.Set {
 		if i.Valid {
 			value := i.Value
@@ -438,7 +495,7 @@ func (i *OptionalMapStringInterface) GetForStringArrayPointer(to *map[string]int
 	return to
 }
 
-func (i *OptionalMapStringInterface) GetForStringArray(to map[string]interface{}) map[string]interface{} {
+func (i *MapStringInterface) GetForStringArray(to map[string]interface{}) map[string]interface{} {
 	if i.Set {
 		if i.Valid {
 			return i.Value
